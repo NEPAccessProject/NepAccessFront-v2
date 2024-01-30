@@ -1,0 +1,7 @@
+@host = "http://localhost:8080/data/"
+
+###
+GET {{host}}?title="copper" HTTP/1.1
+
+###
+GET http://localhost:8080/search?_page=1&_limit=1&_sort=desc&doc.id=2707 HTTP/1.1

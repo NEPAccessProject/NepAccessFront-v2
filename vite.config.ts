@@ -16,8 +16,8 @@ export default defineConfig({
       port: 4000,
       clientPort: 4000,
     },
-    host: process.env.NEPA_HOST || 'localhost',
-    port: parseInt(process.env.NEPA_PORT) || 4000,
+    host: 'localhost',
+    port:  4000,
   },
   resolve: {
     alias: {
@@ -26,7 +26,7 @@ export default defineConfig({
   },
   envPrefix: 'NEPA',
   define: {
-    __VALUE__: `${process.env.VALUE}`,
+   // __VALUE__: `${process.env.VALUE}`,
   }
 
 });
