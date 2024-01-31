@@ -86,7 +86,7 @@ const SearchHeader = () => {
         container
         display={"flex"}
         justifyContent={"flex-start"}
-        style={{ border: "1px solid #ccc" }}
+        style={{}}
       >
         <Grid xs={3}>
           <ul>
@@ -97,7 +97,7 @@ const SearchHeader = () => {
         </Grid>
         <Grid
           display={"flex"}
-          style={{ border: "1px solid #ccc", padding: 1, margin: 0 }}
+          style={{padding: 1, margin: 0 }}
           justifyContent={"center"}
           xs={9}
           alignItems={"center"}
@@ -151,7 +151,7 @@ const SearchHeader = () => {
         container
         display={"flex"}
         justifyContent={"flex-start"}
-        style={{ border: "1px solid #ccc" }}
+        // style={{ border: "1px solid #ccc" }}
       >
         <Grid xs={3}></Grid>
         <Grid xs={3}>

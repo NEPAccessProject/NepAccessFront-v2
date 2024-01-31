@@ -140,6 +140,16 @@ import { update } from 'lodash';
                   </FormLabel>
                 </Box>
                 <Box>
+                  <FormLabel htmlFor='is_fast41'>
+                    Fast 41 Documents Only
+                  </FormLabel>
+                   <Checkbox 
+                      id="is_fast41"
+                      name='is_fast41'
+                      onChange={(e) => updateFilterStateValues("isFast41", !filters.isFast41)}
+                    />
+                </Box>
+                <Box>
                 <Button
                     style={{margin:0}}
                     variant='outlined'

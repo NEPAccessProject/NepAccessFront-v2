@@ -84,6 +84,7 @@ export type FilterType = {
 	cooperatingAgency: string[];
 	county: string[];
 	countyRaw: "";
+	isFast41: boolean;
 	state: string[];
 	startComment: "";
 	needsComments: boolean;
@@ -109,6 +110,7 @@ export type FilterType = {
 	agency: [],
 	action: [""],
 	agencyRaw: "",
+	isFast41: false,
 	state: [],
 	needsComments: false,
 	needsDocument: true,
@@ -132,9 +134,7 @@ export type FilterType = {
     countyRaw: "",
     startComment: "",
 	filtersHidden: false,
-  };
-  
-  
+  };  
   export type SearchContextType = {
 	filters: FilterType;
 	results: SearchResultType[];

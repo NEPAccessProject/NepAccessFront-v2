@@ -72,7 +72,7 @@ const SearchResults = (props:SearchResultsType) => {
 
   
   return (
-    <Paper id="search-results-root" 
+    <Paper elevation={0} id="search-results-root" 
       sx={{
     }}>
       <Pagination
@@ -84,7 +84,8 @@ const SearchResults = (props:SearchResultsType) => {
         onChange={onPaginationChange}
         showFirstButton={true}
         showLastButton={true}
-
+        size='large'
+        style={{border:'1px solid #ddd', marginBottom: 8, marginTop: 1,}}
       />
       {
         results.map((result) => {

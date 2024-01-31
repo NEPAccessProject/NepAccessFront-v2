@@ -15,6 +15,7 @@ const filters: FilterType = {
   cooperatingAgency: [],  
   county: [],
   countyRaw:"",
+  isFast41: false,
   state: [],
   needsComments: false,
   needsDocument: true,
