@@ -131,17 +131,17 @@ declare module "@mui/material/Typography" {
 					},
 				},
 			},
-      MuiFormControlLabel: {
-        styleOverrides: {
-          label: "This is a label?",
-          root: {
-            fontSize: 12,
-            color: grey[700],
+    //   MuiFormControlLabel: {
+    //     styleOverrides: {
+    //       label: "This is a label?",
+    //       root: {
+    //         fontSize: 12,
+    //         color: grey[700],
 
 
-          }
-        }
-      }
+    //       }
+    //     }
+    //   }
 			// MuiFormControlLabel: {
 			// 	styleOverrides: {
 			// 		// Name of the slot

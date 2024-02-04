@@ -127,14 +127,14 @@ const SearchHeader = () => {
             sx={{
               padding: 0,
               margin: 1,
-              "& .MuiOutlinedInput-root": {
-                border: "1px solid lightblue",
-                borderRadius: "0",
-                padding: "0",
-              },
-              "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-                border: "1px solid lightblue",
-              },
+              // "& .MuiOutlinedInput-root": {
+              //   border: "1px solid lightblue",
+              //   borderRadius: "0",
+              //   padding: "0",
+              // },
+              // "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+              //   border: "1px solid lightblue",
+              // },
             }}
             InputProps={{
               endAdornment: (

@@ -90,7 +90,7 @@ export type FilterType = {
 	decisionRaw: "";
 	isFast41: boolean;
 	states: [];
-	stateRaw: [];
+	stateRaw: "";
 	startComment: "";
 	needsComments: boolean;
 	needsDocument: boolean;
@@ -117,7 +117,7 @@ export type FilterType = {
 	decisionRaw: "",
 	isFast41: false,
 	states: [],
-	stateRaw: [],
+	stateRaw: "",
 	needsComments: false,
 	needsDocument: true,
 	typeAll: false,

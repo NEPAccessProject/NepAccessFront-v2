@@ -1,6 +1,6 @@
 import { Pagination } from '@mui/material';
 
-import {SearchResultPropsType,SearchResultType,SearchResultsType,FilterType,PaginiationType} from '@/components/interfaces/interfaces';
+import {SearchResultPropsType,SearchResultType,SearchResultsType,FilterType,PaginiationType} from '../interfaces/interfaces';
 import React from "react";
 
 
@@ -9,8 +9,8 @@ import React from "react";
 
 
 const filters: FilterType = {
-  action:[""],
-  agency: [],
+  action:[],
+  agency: "",
   agencyRaw: "",
   cooperatingAgency: [],  
   county: [],
@@ -29,7 +29,7 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  titleRaw: "",
+  titleRaw: [],
   actionRaw: "",
   decisionRaw: "",
   endComment: "",

@@ -17,14 +17,16 @@ import {
   FormHelperText,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import SearchResults from "@/components/Search/SearchResults";
+import SearchResults from "./SearchResults";
+import SearchHeader from "./SearchHeader";
 import SearchFilters from "./SearchFilters";
+import DecisionFilter from "./filters/DecisionFilter";
+
 import SearchContext from "./SearchContext";
-//import SearchHeader from "./SearchHeader";
 import {
   SearchResultType,
   PaginiationType,
-} from "@/components/interfaces/interfaces";
+} from "../interfaces/interfaces";
 import { useParams } from "react-router-dom";
 import SearchTips from "./SearchTips";
 import { title } from "process";
@@ -75,6 +77,35 @@ const SearchApp = (props: SearchAppPropType) => {
       [key]: value,
     });
   };
+
+  useEffect(() => {
+    if(!_mounted.current) {
+      return;
+    }
+    (async function fetchData() {
+      const filtered = [];
+      Object.keys(filters).forEach((key) => {
+          const filterValue = filters[key]
+          console.log(`key: ${key}`, 'has value: ', filters[key]);
+          if(filterValue){
+            filtered.push(filterValue)
+          }
+
+      })
+      console.log('FILTERED VALUES',filtered)
+
+      const response = await post(`http://localhost:8080/text/search_no_context/`, {
+        ...filtered
+      })
+
+      console.log(response)
+      //const results = await post(`${process.env.REACT_APP_API_URL}/search/results`, {
+      setResults(results);
+    })
+    return () => {
+      _mounted.current = false;
+    };
+  })
 
   useEffect(() => {
     if (!_mounted.current) {
@@ -202,6 +233,7 @@ const SearchApp = (props: SearchAppPropType) => {
   };
   const { page, limit, sortby, sortdir } = pagination;
   const { isFast41 } = filters;
+  console.log('FILTERS', filters);
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
@@ -209,8 +241,7 @@ const SearchApp = (props: SearchAppPropType) => {
           <Paper elevation={1}>
             <Grid container>
               <Grid xs={12} flex={1}>
-                {/* <SearchHeader /> */}
-                <h2>Search Header</h2>
+                <SearchHeader />
               </Grid>
             </Grid>
             <Grid container borderTop={1} borderColor={'#ccc'} marginTop={0} spacing={2}>
@@ -244,6 +275,7 @@ const SearchApp = (props: SearchAppPropType) => {
                   {/* Fast 41 ? {isFast41 ? "Yes" : "No"} */}
                   <Typography variant="h5">Pagination</Typography>
                     {JSON.stringify(pagination, null, 2)}
+                  <Typography variant="h5">Filters</Typography>
                   {/* {Object.keys(pagination).map((key) => {
                     return (
                       <li key={key}>
@@ -252,17 +284,7 @@ const SearchApp = (props: SearchAppPropType) => {
                       </li>
                     );
                   })} */}
-                  <Divider />
-                  <Typography variant="h5">Filters</Typography>
-                  {JSON.stringify(Object.keys(filters), null, 2)} 
-                  {Object.keys(filters).map((key, index) => {
-                    return (
-                      <li key={index}>
-                        <b>{key}: </b>
-                        {/* <b>{JSON.stringify(filters[key])}</b> */}
-                      </li>
-                    );
-                  })}
+                  <Divider /> 
                 </Paper>
               </Grid>
             </Grid>
