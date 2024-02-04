@@ -14,32 +14,31 @@ import {
   Typography,
   Stack,
   Chip,
+  IconButton,
   FormControlLabel,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import styled from "styled-components";
 import SearchContext from "./SearchContext";
 import { AutoComplete } from "material-ui";
+import { BorderRight } from "@mui/icons-material";
 
-const GridItem = styled(Grid)(({ theme }) => ({
-  // padding: 0.5,
+
+
+const GridItemProps ={
+  borderRight: 1,
+  borderColor: '#ddd',
+  padding: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingRight: 2,
   // elevation: 1,
   // borderRadius: 1,
   // justifyContent: 'flex-start',
   // alignItems: 'center',
   // border: '1px solid black',
   // flexWrap: 'wrap',
-}));
-const GridContainer = styled(Grid)(({ theme }) => ({
-  // padding: 0.5,
-  // elevation: 1,
-  // display: 'flex',
-  // border: 0,
-  // borderRadius: 1,
-  // justifyContent: 'flex-start',
-  // alignItems: 'center',
-  // flexWrap: 'wrap',
-}));
+};
 
 const SearchHeader = () => {
   //const {titleRaw, onInput, onKeyUp, onKeyDown, onEnter, onSearch} = ctx;
@@ -83,26 +82,36 @@ const SearchHeader = () => {
           <AppBar />
         </Grid> */}
       <Grid
-        container
+        container 
         display={"flex"}
         justifyContent={"flex-start"}
-        style={{}}
+        borderBottom={1}
+        borderColor={"#EEE"}
+        padding={1}
+
       >
-        <Grid xs={3}>
-          <ul>
+        <Grid 
+          xs={2}
+          borderRight={1}
+          borderColor={"#EEE"}   
+
+        >
+          <b>Search Distance control</b>
+          {/* <ul>
             <li>Link 1</li>
             <li>Link 2</li>
             <li>Link 3</li>
-          </ul>
+          </ul> */}
         </Grid>
         <Grid
           display={"flex"}
-          style={{padding: 1, margin: 0 }}
+          style={{}}
           justifyContent={"center"}
           xs={9}
           alignItems={"center"}
           alignContent={"center"}
           justifyItems={"center"}
+
         >
           <TextField
             fullWidth
@@ -117,7 +126,7 @@ const SearchHeader = () => {
             value={titleRaw ? titleRaw : ""}
             sx={{
               padding: 0,
-              margin: 0,
+              margin: 1,
               "& .MuiOutlinedInput-root": {
                 border: "1px solid lightblue",
                 borderRadius: "0",
@@ -127,40 +136,41 @@ const SearchHeader = () => {
                 border: "1px solid lightblue",
               },
             }}
-            // InputProps={{
-            //   endAdornment: (
-            //       <Grid md={1} xs={0}>
-            //         <IconButton
-            //           name="titleRaw"
-            //             value={
-            //               titleRaw
-            //                 ? titleRaw
-            //                 : ''
-            //             }
-            //             onClick={(evt)=>onIconClick(evt)}
-            //         >
-            //           {/* <SearchOutlined /> */}
-            //         </IconButton>
-            //       </Grid>
-            //   ),
-            // }}
+            InputProps={{
+              endAdornment: (
+                  <Grid md={1} xs={0}>
+                    <IconButton
+                      name="titleRaw"
+                        value={
+                          titleRaw
+                            ? titleRaw
+                            : ''
+                        }
+                        onClick={(evt)=>onIconClick(evt)}
+                    >
+                      {/* <SearchOutlined /> */}
+                    </IconButton>
+                  </Grid>
+              ),
+            }}
           />
         </Grid>
       </Grid>
-      <Grid
-        container
+      <Grid container
         display={"flex"}
         justifyContent={"flex-start"}
-        // style={{ border: "1px solid #ccc" }}
+        style={{  }}
       >
-        <Grid xs={3}></Grid>
-        <Grid xs={3}>
-          <SortByControl />
+        <Grid {...GridItemProps} xs={3}>
+          Term Distance
         </Grid>
-        <Grid xs={3}>
-          <SortDirControl />
+        <Grid {...GridItemProps} xs={3}>
+          {/* <SortByControl /> */}
         </Grid>
-        <Grid xs={2}>
+        <Grid {...GridItemProps} xs={3}>
+          {/* <SortDirControl /> */}
+        </Grid>
+        <Grid {...GridItemProps} xs={3}>
           <LimitControl />
         </Grid>
       </Grid>
@@ -172,6 +182,7 @@ export default SearchHeader;
 const gridStyle = {
   display:'flex',
             justifyContent:'flex-end',
+            alignContent: 'center',
             alignItems:'center',
             padding:2,
 }
@@ -181,7 +192,7 @@ const SortByControl = () => {
   const { page, limit, sortby, sortdir } = pagination;
   return (
       <Grid container style={{display:'flex'}}>
-          <Grid xs={3} style={gridStyle}>
+          <Grid xs={3} style={gridStyle} paddingLeft={1}>
             <FormLabel  htmlFor="searchAgency">
               Sort By:
             </FormLabel>
@@ -273,9 +284,9 @@ const LimitControl = () => {
   const { page, limit, sortby, sortdir } = pagination;
   return (
     <Grid container>
-      <Grid xs={3} style={gridStyle}>
+      <Grid xs={3} style={gridStyle} marginRight={0} paddingRight={0}>
         <FormLabel htmlFor="searchAgency">
-          # of Results
+          # of Results:
         </FormLabel>
       </Grid>
       <Grid xs={9}>

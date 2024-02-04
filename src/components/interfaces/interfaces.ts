@@ -10,6 +10,7 @@ export type DocumentType = {
 	cooperatingAgency: string;
 	county: string ;
 	decision: string ;
+	decisionRaw: string ;
 	department: string;
 	documentType: string;
 	draftNoa: Date ;
@@ -23,7 +24,7 @@ export type DocumentType = {
 	processId: number ;
 	registerDate: Date ;
 	size: number;
-	state: string;
+	states: string;
 	status: string;
 	subtype: string;
 	summaryText: string;
@@ -78,14 +79,18 @@ export type SearchTipsPropType = {
 export type FilterType = {
 	startPublish: string | Date;
 	endPublish: string | Date;
-	action: string[];
-	agency: string[];
-	agencyRaw: ""
-	cooperatingAgency: string[];
-	county: string[];
+	action: [];
+	actionRaw: string;
+	agency: string;
+	agencyRaw: "";
+	cooperatingAgency: [];
+	county: [];
 	countyRaw: "";
+	decision: [];
+	decisionRaw: "";
 	isFast41: boolean;
-	state: string[];
+	states: [];
+	stateRaw: [];
 	startComment: "";
 	needsComments: boolean;
 	needsDocument: boolean;
@@ -97,9 +102,7 @@ export type FilterType = {
 	typeOther: boolean;
 	typeROD: boolean;
 	typeScoping: boolean;
-	actionRaw: string;
-	titleRaw: string;
-	decisionRaw: string;
+	titleRaw: [];
 	endComment: Date | string;
 	cooperatingAgencyRaw: string;
 	filtersHidden: boolean;
@@ -107,11 +110,14 @@ export type FilterType = {
   };
   
   const filters: FilterType = {
-	agency: [],
-	action: [""],
+	agency: "",
+	action: [],
 	agencyRaw: "",
+	decision: [],
+	decisionRaw: "",
 	isFast41: false,
-	state: [],
+	states: [],
+	stateRaw: [],
 	needsComments: false,
 	needsDocument: true,
 	typeAll: false,
@@ -124,9 +130,8 @@ export type FilterType = {
 	typeScoping: false,
 	startPublish: "",
 	endPublish: "",
-	titleRaw: "",
+	titleRaw: [],
 	actionRaw: "",
-	decisionRaw: "",
 	endComment: "",
 	cooperatingAgencyRaw: "",
 	cooperatingAgency: [],
@@ -136,18 +141,17 @@ export type FilterType = {
 	filtersHidden: false,
   };  
   export type SearchContextType = {
-	filters: FilterType;
-	results: SearchResultType[];
-	loading: boolean;
 	action: string[];
 	agency: string[];
 	agencyRaw: string[];
 	cooperatingAgency: string[];
 	cooperatingAgencyRaw: string[];
 	county: string[];
-	countyRaw: string[];
 	countyOptions: string[]; //Globals.counties,
+	countyRaw: string;
 	decision: string[];
+	decisionRaw: string[];
+	filters: FilterType;
 	filtersHidden: boolean;
 	fragmentSizeValue: number;
 	hideOrganization: boolean;
@@ -156,15 +160,19 @@ export type FilterType = {
 	isDirty: false;
 	isQuickStartDialogOpen: false;
 	isSearchTipsDialogOpen: false;
+	loading: boolean;
 	markup: boolean;
 	message: string;
 	needsComments: boolean;
 	needsDocument: boolean;
 	optionsChecked: boolean;
+	pagination: PaginiationType;
 	proximityDisabled: boolean;
 	proximityOption: string;
-	pagination: PaginiationType;
+	results: SearchResultType[];
 	searchOption: string;
+	states: [],
+	stateRaw: [],
 	showContext: boolean;
 	showPDFDialog: boolean;
 	showQuickTipsDialog: boolean;
@@ -175,3 +183,8 @@ export type FilterType = {
 	tooltipOpen: boolean;
   
   };
+
+  export type FilterOptionType = {
+	key: string;
+	value: any;
+  }

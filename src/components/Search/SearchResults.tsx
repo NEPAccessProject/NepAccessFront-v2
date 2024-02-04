@@ -59,7 +59,7 @@ const sortByRelevance = (a, b) => {
 
 //not having a dependency should... only run once per result set
 const SearchResults = (props:SearchResultsType) => {
-  console.log("🚀 ~ file: SearchResults.jsx:71 ~ SearchResults ~ props:", props)
+//  console.log("🚀 ~ file: SearchResults.jsx:71 ~ SearchResults ~ props:", props)
   const classes = useStyles(theme);
   const _mounted = useRef(false);
   const context = React.useContext(SearchContext);
@@ -70,7 +70,7 @@ const SearchResults = (props:SearchResultsType) => {
     console.log('onPaginationChange', evt)
   }
 
-  
+  const {filters} = context;
   return (
     <Paper elevation={0} id="search-results-root" 
       sx={{
@@ -91,9 +91,10 @@ const SearchResults = (props:SearchResultsType) => {
         results.map((result) => {
           const {doc} = result;
           return (
-            <Box border={1} key={doc.id}>
+            <Box border={1} key={doc.id} borderBottom={1} borderColor={'#ddd'}>
               <Link variant='filterLabel' href={`./record-details?id=${doc.processId}`}>{doc.title}</Link>
               <Box sx={{ margin: 5 }}>
+                {JSON.stringify(filters)}
               {!context.results.length && <SearchTips />}
                 {/* <SearchResultCards result={result} /> */}
                 <SearchResult result={result} />

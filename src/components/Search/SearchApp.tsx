@@ -20,13 +20,15 @@ import Grid from "@mui/material/Unstable_Grid2";
 import SearchResults from "@/components/Search/SearchResults";
 import SearchFilters from "./SearchFilters";
 import SearchContext from "./SearchContext";
-import SearchHeader from "./SearchHeader";
+//import SearchHeader from "./SearchHeader";
 import {
   SearchResultType,
-  SearchFiltersPropType,
   PaginiationType,
 } from "@/components/interfaces/interfaces";
 import { useParams } from "react-router-dom";
+import SearchTips from "./SearchTips";
+import { title } from "process";
+import { agencies } from "./data/dropdownValues";
 
 type SearchAppPropType = {
   results: SearchResultType[];
@@ -34,14 +36,12 @@ type SearchAppPropType = {
 };
 
 const SearchApp = (props: SearchAppPropType) => {
+//  console.log('APP ENV:',import.meta.env)
   //const {results} = props;
   //[TODO] ONLY FOR MOCKING INITIALY
   const [context, setContext] = useState(useContext(SearchContext));
-  console.log(`SearchApp ~ context:`, context);
   const [results, setResults] = useState(context.results);
-  console.log(`SearchApp ~ results:`, results);
   const [filters, setFilterValues] = useState(context.filters);
-  console.log(`SearchApp ~ filters:`, filters);
   const [titleRaw, setTitleRaw] = useState(context.filters.titleRaw);
   const [pagination, setPaginationValues] = useState(context.pagination);
 
@@ -50,10 +50,8 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const _mounted = React.useRef(false);
   let params = useParams();
-  console.log(`Query Param params`, params);
-  console.log(`Q???`, params.q);
   const updateFilterStateValues = (key: string, value: any) => {
-    console.log(`updateFilterStateValues ~ key:string,value:any:`, key, value);
+    console.log(`Update Filter Values - key ${key} -- value:`,value)
     setFilterValues({
       ...filters,
       [key]: value,
@@ -76,11 +74,9 @@ const SearchApp = (props: SearchAppPropType) => {
       ...pagination,
       [key]: value,
     });
-    console.log(`updatePaginationStateValues ~ pagination:`, pagination);
   };
 
   useEffect(() => {
-    console.log("SEARCH APP GET DATA EFFECT", context);
     if (!_mounted.current) {
       return;
     }
@@ -125,11 +121,62 @@ const SearchApp = (props: SearchAppPropType) => {
     return data;
   };
 
+  const post = async(url: string, data: any) => {
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+  }
+
+  
+
+  const doFilteredSearch = async() => {
+    const url = urlFromContextPagination(pagination);
+    const data = {}
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data
+
+    })});
+    const results = await response.json();
+    setResults(results);
+  }
+
+  type activeFilterType = {
+    key?: string,
+    value?: any,
+  }
+  const activeFilters:activeFilterType[] = [];
+
   const updateResults = async () => {
     const url = urlFromContextPagination(pagination);
-    const results = await getData(url);
-    console.log("UPDATED RESULTS", results);
-    setResults(results);
+    const {agency,county,action,states,isFast41,titleRaw,agencyRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
+    const filterKeys = Object.keys(filters);
+    console.log("FILTER KEYS", filterKeys);
+
+    filterKeys.map((key:string) => {
+      if(filters[key]!== ""){
+        activeFilters.push({
+          key:key, 
+          value:filters[key],
+        })
+      }
+    })
+    // const results = await post(url,{
+    //     (titleRaw) ? titleRaw : '',
+    //      (isFast41) && isFast41 : '',
+    //      (agencies) && filters.agency: '',
+    //     (county) && filters.county: '',
+    //     (action) && filters.action: '',
+    //     (state) && filters.state: '', 
+    // });
   };
 
   const urlFromContextPagination = (pagination: PaginiationType): string => {
@@ -140,7 +187,6 @@ const SearchApp = (props: SearchAppPropType) => {
     //[TODO] Add loginc for each filtervalue such as agency={agency1,agency2} as well as sort order and direction
 
     const url = `http://localhost:8080/search_top/?${searchTerms}&_page=${page}&_limit=${limit}`;
-    console.log("RETURNING URL FROM CONTEXT", url);
     return url;
   };
 
@@ -158,53 +204,62 @@ const SearchApp = (props: SearchAppPropType) => {
   const { isFast41 } = filters;
   return (
     <SearchContext.Provider value={value}>
-      <Container>
-        <>
+      <Container id="search-app-container" maxWidth="xl" disableGutters>
+        {/* <SearchContext.Consumer children={ */}
           <Paper elevation={1}>
             <Grid container>
               <Grid xs={12} flex={1}>
-                <SearchHeader />
+                {/* <SearchHeader /> */}
+                <h2>Search Header</h2>
               </Grid>
             </Grid>
-            <Grid container spacing={2}>
+            <Grid container borderTop={1} borderColor={'#ccc'} marginTop={0} spacing={2}>
               <Grid xs={3}>
                 <Paper style={{padding: 5, flexGrow: 1}}><SearchFilters /></Paper>
               </Grid>
               <Grid xs={9}>
+                {results.length > 0 
+                  ? (
+                    <>
+                    <SearchResults results={results} />
+                    
+                    </>
+                  )
+                  : (
+                    <>
+                    <SearchTips/>
+                    <Button variant="contained" onClick={() => updateResults()}>
+                    Get Data
+                  </Button>
+                  </>
+
+                  )
+                }
+                
                 <Paper style={{padding: 10, flexGrow: 1}}>
                   <SearchResults results={results} />
                   <Button variant="contained" onClick={() => updateResults()}>
                     Get Data
                   </Button>
-                  Fast 41 ? {isFast41 ? "Yes" : "No"}
-                  <h4>Context.Filters</h4>
-                  {JSON.stringify(context.filters, null, 2)}
-                  <Typography variant="h4">Filter Props</Typography>
-                  {JSON.stringify(Object.keys(filters))}
-                  {/* {filters && Object.keys(filters).map((key) => {
-                          return (
-                            <li key={key}>
-                              <>{key}: </>
-                              <b>{filters[key]}</b>
-                            </li>
-                          );
-                        })} */}
+                  {/* Fast 41 ? {isFast41 ? "Yes" : "No"} */}
                   <Typography variant="h5">Pagination</Typography>
-                  {Object.keys(pagination).map((key) => {
+                    {JSON.stringify(pagination, null, 2)}
+                  {/* {Object.keys(pagination).map((key) => {
                     return (
                       <li key={key}>
                         <>{key}: </>
                         <b>{pagination[key]}</b>
                       </li>
                     );
-                  })}
+                  })} */}
                   <Divider />
                   <Typography variant="h5">Filters</Typography>
+                  {JSON.stringify(Object.keys(filters), null, 2)} 
                   {Object.keys(filters).map((key, index) => {
                     return (
                       <li key={index}>
                         <b>{key}: </b>
-                        <b>{filters[key]}</b>
+                        {/* <b>{JSON.stringify(filters[key])}</b> */}
                       </li>
                     );
                   })}
@@ -212,7 +267,7 @@ const SearchApp = (props: SearchAppPropType) => {
               </Grid>
             </Grid>
           </Paper>
-        </>
+        {/* </SearchContext.Consumer> */}
       </Container>
     </SearchContext.Provider>
   );
