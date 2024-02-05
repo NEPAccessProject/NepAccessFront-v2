@@ -26,11 +26,11 @@ import SearchContext from "./SearchContext";
 import { ThemeProvider } from "@material-ui/core";
 import SearchDatePickers from "./SearchDatePickers";
 import { FilterType } from "../interfaces/interfaces";
-import ActionsFilter from "./filters/ActionFilter";
-import AgencyFilter from "./filters/AgencyFilter";
+import ActionsFilter from "./filters/ActionsFilter";
+import AgencyFilter from "./filters/AgenciesFilter";
 import DecisionFilter from "./filters/DecisionFilter";
 import StatesFilter from "./filters/StateFilter";
-import CooperatingAgencFilter from "./filters/CooperatingAgencFilter";
+import CooperatingAgenciesFilter from "./filters/CooperatingAgenciesFilter";
 
 import {
   actionOptions as actions,
@@ -40,6 +40,7 @@ import {
   counties,
 } from "./data/dropdownValues";
 import CountyFilter from "./filters/CountyFilter";
+import ActionFilter from "./filters/ActionsFilter";
 //console.log(actions.length, agencies.length, decisions.length, locations.length, counties.length);
 // const actions = Array.from(new Set(actionOptions));
 // const agencies = Array.from(new Set(agencyOptions));
@@ -70,20 +71,15 @@ const SearchFilters = (props) => {
   } = context;
   const { page, sortby, sortdir, limit } = pagination;
   const {
-    action,
-    agency,
-    agencyRaw,
+    actions,
+    agencies,
+    agenciesRaw,
     cooperatingAgency,
     cooperatingAgencyRaw,
     county,
     countyRaw,
     isFast41,
   } = filters;
-
-  // Add missing prop validation
-  interface ISearchFiltersProps {
-    filtersHidden: boolean;
-  }
 
   //Common Settings used by all autocomplete filters
   const filterProps = {
@@ -174,7 +170,7 @@ const SearchFilters = (props) => {
         </Box>
 
         <Box>
-          <CooperatingAgencFilter />
+          <CooperatingAgenciesFilter />
         </Box>
         <Box>
           <StatesFilter />
@@ -183,11 +179,11 @@ const SearchFilters = (props) => {
           <CountyFilter />
         </Box>
         <Box>
-          {/* <ActionsFilter /> */}
+          <ActionsFilter />
         </Box>
         <Box>
-          {/* <DecisionFilter /> */}
-        </Box>
+          <DecisionFilter />
+        </Box> 
       </Box>
       <FormLabel htmlFor="searchDecision"></FormLabel>
       <Divider />

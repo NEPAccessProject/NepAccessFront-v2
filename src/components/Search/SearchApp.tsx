@@ -19,18 +19,22 @@ import {
 import Grid from "@mui/material/Unstable_Grid2";
 import SearchResults from "./SearchResults";
 import SearchHeader from "./SearchHeader";
-import SearchFilters from "./SearchFilters";
+import SearchFilters from "../Search/SearchFilters";
 import DecisionFilter from "./filters/DecisionFilter";
 
 import SearchContext from "./SearchContext";
 import {
   SearchResultType,
   PaginiationType,
+  FilterType,
+  FilterOptionType,
+  InputEvent,
 } from "../interfaces/interfaces";
 import { useParams } from "react-router-dom";
 import SearchTips from "./SearchTips";
 import { title } from "process";
 import { agencies } from "./data/dropdownValues";
+import { json } from "stream/consumers";
 
 type SearchAppPropType = {
   results: SearchResultType[];
@@ -41,7 +45,7 @@ const SearchApp = (props: SearchAppPropType) => {
 //  console.log('APP ENV:',import.meta.env)
   //const {results} = props;
   //[TODO] ONLY FOR MOCKING INITIALY
-  const [context, setContext] = useState(useContext(SearchContext));
+  const context = useContext(SearchContext);
   const [results, setResults] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
   const [titleRaw, setTitleRaw] = useState(context.filters.titleRaw);
@@ -54,10 +58,12 @@ const SearchApp = (props: SearchAppPropType) => {
   let params = useParams();
   const updateFilterStateValues = (key: string, value: any) => {
     console.log(`Update Filter Values - key ${key} -- value:`,value)
-    setFilterValues({
-      ...filters,
-      [key]: value,
-    });
+    if(!value){
+      console.error('Attempted to update state variable with no value, this might be a bug or legitimate in some value','KEY',key,'VALUE',value);
+      return
+  }
+    setFilterValues({...filters, [key]: value});
+    console.log(`\r\n !!!!! AFTER FILTER UPDATE Filter Values - key ${key}`,`value:`,value)
   };
   useEffect(() => {
     _mounted.current = true;
@@ -67,6 +73,12 @@ const SearchApp = (props: SearchAppPropType) => {
   });
 
   const updatePaginationStateValues = (key: string, value: any) => {
+    console.log('FILTERING KEY',key);
+    console.log('FILTERING VALUE',value)
+    if(!value){
+      console.error('Attempted to update state variable with no value, this might be a bug or legitimate in some value','KEY',key,'VALUE',value);  
+    return;
+  }
     console.log(
       `updatePaginationStateValues ~ key:string,value:any:`,
       key,
@@ -76,6 +88,7 @@ const SearchApp = (props: SearchAppPropType) => {
       ...pagination,
       [key]: value,
     });
+    console.log('FINSHED FILTERS UPDATE - Filters are now',filters)
   };
 
   useEffect(() => {
@@ -83,7 +96,7 @@ const SearchApp = (props: SearchAppPropType) => {
       return;
     }
     (async function fetchData() {
-      const filtered = [];
+      const filtered:any = [];
       Object.keys(filters).forEach((key) => {
           const filterValue = filters[key]
           console.log(`key: ${key}`, 'has value: ', filters[key]);
@@ -105,7 +118,7 @@ const SearchApp = (props: SearchAppPropType) => {
     return () => {
       _mounted.current = false;
     };
-  })
+  }, [filters]);
 
   useEffect(() => {
     if (!_mounted.current) {
@@ -153,12 +166,13 @@ const SearchApp = (props: SearchAppPropType) => {
   };
 
   const post = async(url: string, data: any) => {
+    console.log(`post ~ url: string, data: any:`, url, data);
     fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: data,
     })
   }
 
@@ -180,26 +194,55 @@ const SearchApp = (props: SearchAppPropType) => {
     setResults(results);
   }
 
-  type activeFilterType = {
-    key?: string,
-    value?: any,
-  }
-  const activeFilters:activeFilterType[] = [];
+  const activeFilters:FilterOptionType[] = [];
+
+  useEffect(()=>{
+    async function fetchData(){
+      console.log('FETCHING DATA');
+      (async () => {
+        const url = urlFromContextPagination(pagination);
+        console.log(`updateResults ~ url:`, url);
+        const {agencies,county,actions,states,isFast41,titleRaw,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
+        const filterKeys = Object.keys(filters);
+    
+        filterKeys.map((key:string) => {
+          console.log('CHECKING FOR ACTIVE FILTERS',key, filters[key]);
+          if(filters[key]!== "" && filters[key] !== 0){
+            console.log(`UPDATE RESULTS WITH FILTERS key: ${key}`, 'has value: ', filters[key]);
+            activeFilters.push({
+              label:key, 
+              value:filters[key],
+            })
+          }
+        })
+      })();
+    }
+  },[])
 
   const updateResults = async () => {
     const url = urlFromContextPagination(pagination);
-    const {agency,county,action,states,isFast41,titleRaw,agencyRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
+    console.log(`updateResults ~ url:`, url);
+    const {agencies,county,actions,states,isFast41,titleRaw,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
     const filterKeys = Object.keys(filters);
-    console.log("FILTER KEYS", filterKeys);
 
     filterKeys.map((key:string) => {
-      if(filters[key]!== ""){
+      console.log('CHECKING FOR ACTIVE FILTERS',key, filters[key]);
+      if(filters[key]!== "" && filters[key].length !== 0 ||  filters[key] !== 0 || filters[key] !== false){
+        console.log(`UPDATE RESULTS WITH FILTERS key: ${key}`, 'has value: ', filters[key]);
         activeFilters.push({
-          key:key, 
+          label:key, 
           value:filters[key],
         })
       }
+      else {
+        console.log(`UPDATE RESULTS WITHOUT FILTERS key: ${key}`, 'has value:, ', filters[key]);
+      }
     })
+
+    console.log('UPDATE RESULTS',activeFilters)
+    const res = await post('http://localhost:8080/search_top/',activeFilters)
+    console.log(`updateResults ~ res:`, res);
+    
     // const results = await post(url,{
     //     (titleRaw) ? titleRaw : '',
     //      (isFast41) && isFast41 : '',
@@ -232,8 +275,7 @@ const SearchApp = (props: SearchAppPropType) => {
     updateResults,
   };
   const { page, limit, sortby, sortdir } = pagination;
-  const { isFast41 } = filters;
-  console.log('FILTERS', filters);
+  const { isFast41,decisions,decisionsRaw, states,agencies,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw,stateRaw,countyRaw,county,actions,actionsRaw } = filters;
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
@@ -249,6 +291,22 @@ const SearchApp = (props: SearchAppPropType) => {
                 <Paper style={{padding: 5, flexGrow: 1}}><SearchFilters /></Paper>
               </Grid>
               <Grid xs={9}>
+                {/* <h4>FILTERS</h4>
+                <ul>
+                  <li><b>Agency</b>{JSON.stringify(agencies)}</li>
+                  <li><b>ActionRwa</b> {JSON.stringify(actionsRaw)}</li>
+                  <li><b>Coop Agency</b>{JSON.stringify(cooperatingAgency)}</li>
+                  <li><b>Decision</b> {JSON.stringify(decisions)}</li>
+                  {/* <li><b>DecisionRaw</b>{JSON.stringify(decisionsRaw)}</li>
+                  <li><b>States</b> {JSON.stringify(states)}</li>
+                  <li><b>StatesRaw</b>{JSON.stringify(stateRaw)}</li>
+                  <li><b>County</b> {JSON.stringify(county)}</li>
+                  <li><b>CountyRaw</b>{JSON.stringify(countyRaw)}</li> 
+                  </ul>
+                  */
+                  
+                  }
+
                 {results.length > 0 
                   ? (
                     <>

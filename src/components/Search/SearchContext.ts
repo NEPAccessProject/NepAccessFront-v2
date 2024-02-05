@@ -9,14 +9,17 @@ import React from "react";
 
 
 const filters: FilterType = {
-  action:[],
-  agency: "",
-  agencyRaw: "",
+  actions:[],
+  agencies: [],
+  agenciesRaw: "",
   cooperatingAgency: [],  
   county: [],
   countyRaw:"",
+  decisions: [],
+  decisionsRaw: "",
   isFast41: false,
-  state: [],
+  states: [],
+  stateRaw: "",
   needsComments: false,
   needsDocument: true,
   typeAll: false,
@@ -30,8 +33,7 @@ const filters: FilterType = {
   startPublish: "",
   endPublish: "",
   titleRaw: [],
-  actionRaw: "",
-  decisionRaw: "",
+  actionsRaw: "",
   endComment: "",
   startComment: "",
   cooperatingAgencyRaw: "",
@@ -40,12 +42,11 @@ const filters: FilterType = {
 
 
 export type SearchContextType = {
+  
   filters: FilterType;
   results: SearchResultType[];
   pagination: PaginiationType;
   loading: boolean;
-  countyOptions: string[]; //Globals.counties,
-  decision: string[];
   fragmentSizeValue: number;
   hideOrganization: boolean;
   iconClassName: string;
@@ -55,8 +56,6 @@ export type SearchContextType = {
   isSearchTipsDialogOpen: false;
   markup: boolean;
   message: string;
-  needsComments: boolean;
-  needsDocument: boolean;
   optionsChecked: boolean;
   proximityDisabled: boolean;
   proximityOption: string;
@@ -81,8 +80,6 @@ const SearchContext = React.createContext<SearchContextType>({
     sortby: "doc.title",
     sortdir: "DESC",
   },
-  countyOptions: [], //Globals.counties,
-  decision: [],
   fragmentSizeValue: 0,
   hideOrganization: false,
   iconClassName: "",
@@ -92,8 +89,6 @@ const SearchContext = React.createContext<SearchContextType>({
   isSearchTipsDialogOpen: false,
   markup: false,
   message: "",
-  needsComments: false,
-  needsDocument: false,
   optionsChecked: false,
   proximityDisabled: false,
   proximityOption: "",

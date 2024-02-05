@@ -1,64 +1,77 @@
 import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {Box, Autocomplete, TextField,FormControlLabel,FormControl,FormLabel} from "@mui/material";
-import {decisionOptions as decisions} from '../data/dropdownValues';
+import {
+  Box,
+  Autocomplete,
+  TextField,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
+import { decisionOptions } from "../data/dropdownValues";
+import { FilterOptionType,InputEvent } from "@/components/interfaces/interfaces";
 export default function DecisionFilter() {
-    const context = useContext(SearchContext);
-    const {
-      pagination,
-      filters,
-      updatePaginationStateValues,
-      updateFilterStateValues,
-    } = context;
-    const { cooperatingAgencyRaw, cooperatingAgency, agencyRaw } = filters;
-
-    const { decision, decisionRaw } = filters;
-    const onDecisionChange = (evt, selected, reason) => {
-      let decisions = [];
-      if (reason === "selectOption") {
-        selected.map((s:any) => {
-            console.log(s.value);
-          decisions.push(s.value)
-        })
-      }
-      else if (reason && reason === "removeOption") {
-        decisions = decision || [];
-        if (decision && decision.length > 0) {
-          selected.map(s => {
-            decisions = decisions.filter(decision => decision !== s.value)
-          })
-        }
-      }
-      updateFilterStateValues("decision", decisions);
-      updateFilterStateValues("decisionRaw", evt);
-    };
-    //[TODO] need to
-    return (<>
+  const context = useContext(SearchContext);
+  const {
+    pagination,
+    filters,
+    updatePaginationStateValues,
+    updateFilterStateValues,
+  } = context;
+  const { decisions, decisionsRaw } = filters;
+  const onDecisionChange = (evt:React.SyntheticEvent, selected, reason) => {
     
-    <FormLabel htmlFor='searchAction'>Decision:</FormLabel>
-                      <Autocomplete
-                        id='decision'
-                        tabIndex={10}
-                        className={'classes.autocomplete'}
-                        options={decisions}
-                        isOptionEqualToValue={(option, value) => decisionRaw === value.value}
-  
-  //                      isOptionEqualToValue={(option, value) => actionRaw === value.value}
-  //                     value={(actions.filter((v) => action.includes(v)))}
-                       onChange={(evt, value, reason) => onDecisionChange("decision", value?.value,reason)}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              placeholder='Type or Select a Action Type(s)'
-                              variant='outlined'
-                              sx={{
-                                width: '100%',
-                                p: 0,
-                              }}
-                            />
-                          );
-                        }}
-                      />
-    </>);
+    let target = evt.target as HTMLInputElement;
+    console.log(`onDecisionChange ~ target:`, target);
+    console.log(`onDecisionChange ~ selected, reason:`, selected, reason);
+    let filteredDecisions: FilterOptionType[] = [];
+
+    if(reason === "selectOption") {
+      filteredDecisions.push(selected);
+    } else if (reason === "removeOption") {
+      const filtered = decisionOptions.filter((v) => v.value !== selected.value);
+      console.log(`onDecisionChange ~ filtered:`, filtered);
+      filtered.map((v) => {
+        filteredDecisions.push(v);
+      });
+    } else if (reason === "clear") {
+      filteredDecisions = [];
+    }
+    console.log(`onDecisionChange ~ filteredDecisions:`, filteredDecisions);
+    updateFilterStateValues("decisions", filteredDecisions);
+    updateFilterStateValues("decisionsRaw", evt);
   };
+  //[TODO] need to
+  return (
+    <>
+      <FormLabel htmlFor="searchAction">Decision:</FormLabel>
+      <Autocomplete
+        id="decision"
+        tabIndex={10}
+        className={"classes.autocomplete"}
+        options={decisionOptions}
+        isOptionEqualToValue={(option, value) => {
+          return option.value === value.value;
+        }} 
+        
+        //                      isOptionEqualToValue={(option, value) => actionRaw === value.value}
+        onChange={(evt, value, reason) =>
+          onDecisionChange(evt, value, reason)
+        }
+        renderInput={(params) => {
+          return (
+            <TextField
+              {...params}
+              placeholder="Type or Select a Decision Type(s)"
+              variant="outlined"
+              sx={{
+                width: "100%",
+                p: 0,
+              }}
+            />
+          );
+        }}
+      />
+    </>
+  );
+}

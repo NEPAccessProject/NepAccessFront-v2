@@ -1,15 +1,14 @@
-import { Pagination } from '@mui/material';
 //[TODO] As these get fleshed out break this down to different files; with the index serving them as exports
 
 //[TOO] maybe 
 export type DocumentType = {
-	action: string
+	action: string;
 	agency: string;
 	commentDate: Date | string;
 	commentsFilename: string;
 	cooperatingAgency: string;
 	county: string ;
-	decision: string ;
+	decisions: string ;
 	decisionRaw: string ;
 	department: string;
 	documentType: string;
@@ -75,25 +74,39 @@ export type SearchTipsPropType = {
 	// Define the type for the props here
   }
 
+export type SearchFilterResultsType = {
+		key: string;
+		value: any;
+}
+
+
+
+export type InputEvent = React.ChangeEvent<HTMLInputElement>;
+export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
 
 export type FilterType = {
-	startPublish: string | Date;
-	endPublish: string | Date;
-	action: [];
-	actionRaw: string;
-	agency: string;
-	agencyRaw: "";
+	
+	actions: string[];
+	actionsRaw: string;
+	agencies: FilterOptionType[];
+	agenciesRaw: "";
 	cooperatingAgency: [];
+	cooperatingAgencyRaw: string;
 	county: [];
 	countyRaw: "";
-	decision: [];
-	decisionRaw: "";
+	decisions:string[];
+	decisionsRaw: "";
+	endComment: Date | string;
+	endPublish: string | Date;
+	filtersHidden: boolean;
 	isFast41: boolean;
-	states: [];
-	stateRaw: "";
-	startComment: "";
 	needsComments: boolean;
 	needsDocument: boolean;
+	startComment: "";
+	startPublish: string | Date;
+	stateRaw: "";
+	states: FilterOptionType[];
+	titleRaw: [];
 	typeAll: boolean;
 	typeDraft: boolean;
 	typeEA: boolean;
@@ -102,24 +115,29 @@ export type FilterType = {
 	typeOther: boolean;
 	typeROD: boolean;
 	typeScoping: boolean;
-	titleRaw: [];
-	endComment: Date | string;
-	cooperatingAgencyRaw: string;
-	filtersHidden: boolean;
   
   };
   
   const filters: FilterType = {
-	agency: "",
-	action: [],
-	agencyRaw: "",
-	decision: [],
-	decisionRaw: "",
+	actionsRaw: "",
+	actions: [],
+	agencies: [],
+	agenciesRaw: "",
+	cooperatingAgency: [],
+	cooperatingAgencyRaw: "",
+	county: [],
+	decisions: [],
+	decisionsRaw: "",
+	endComment: "",
+	endPublish: "",
+	filtersHidden: false,
 	isFast41: false,
-	states: [],
-	stateRaw: "",
 	needsComments: false,
 	needsDocument: true,
+	startPublish: "",
+	stateRaw: "",
+	states: [],
+	titleRaw: [],
 	typeAll: false,
 	typeDraft: false,
 	typeEA: false,
@@ -128,29 +146,10 @@ export type FilterType = {
 	typeOther: false,
 	typeROD: false,
 	typeScoping: false,
-	startPublish: "",
-	endPublish: "",
-	titleRaw: [],
-	actionRaw: "",
-	endComment: "",
-	cooperatingAgencyRaw: "",
-	cooperatingAgency: [],
-	county: [],
     countyRaw: "",
     startComment: "",
-	filtersHidden: false,
   };  
   export type SearchContextType = {
-	action: string[];
-	agency: string[];
-	agencyRaw: string[];
-	cooperatingAgency: string[];
-	cooperatingAgencyRaw: string[];
-	county: string[];
-	countyOptions: string[]; //Globals.counties,
-	countyRaw: string;
-	decision: string[];
-	decisionRaw: string[];
 	filters: FilterType;
 	filtersHidden: boolean;
 	fragmentSizeValue: number;
@@ -163,28 +162,21 @@ export type FilterType = {
 	loading: boolean;
 	markup: boolean;
 	message: string;
-	needsComments: boolean;
-	needsDocument: boolean;
 	optionsChecked: boolean;
 	pagination: PaginiationType;
 	proximityDisabled: boolean;
 	proximityOption: string;
 	results: SearchResultType[];
 	searchOption: string;
-	states: [],
-	stateRaw: [],
 	showContext: boolean;
 	showPDFDialog: boolean;
 	showQuickTipsDialog: boolean;
 	showSearchTipsDialog: boolean;
-	startComment: Date | string | null;
-	startPublish: Date | string | null;
-	state: string[];
 	tooltipOpen: boolean;
   
   };
 
   export type FilterOptionType = {
-	key: string;
+	label: string;
 	value: any;
   }
