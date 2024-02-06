@@ -14,18 +14,12 @@ export default function CooperatingAgenciesFilter(props) {
     const { cooperatingAgencyRaw, cooperatingAgency, agencies,agenciesRaw } = filters;
     
     const onCooperatingAgencyChange = (evt:React.SyntheticEvent, selected, reason) => {
-      {{ 
-          selected
-      }}
-      {{
-        reason
-      }}
-    console.log(`onAgencyChange ~ reason:`, reason);
-    console.log(`onAgencyChange ~ selected:`, selected);
-    console.log(`onAgencyChange ~ evt:`, evt);
+    console.log(`onCooperatingAgencyChange ~ reason:`, reason);
+    console.log(`onCooperatingAgencyChange ~ selected:`, selected);
+    console.log(`onCooperatingAgencyChange ~ evt:`, evt);
     let target = evt.target as HTMLInputElement;
     let raw = (evt.target as HTMLInputElement).value;
-    console.log(`onAgencyChange ~ target:`, raw);
+    console.log(`onCooperatingAgencyChange ~ target:`, raw);
     
     let filteredAgencies:FilterOptionType[] = []; 
         if (reason === "selectOption") {
@@ -41,14 +35,11 @@ export default function CooperatingAgenciesFilter(props) {
         else if (reason === "clear") {
           filteredAgencies = [];
         }
-        {{  
-          filteredAgencies
-          }}
         updateFilterStateValues("cooperatingAgency", filteredAgencies);
+      }
         //updateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);
-    };
     // const onCooperatingAgencyChange = (evt, selected, reason) => {
   
     //   let filteredAgencies:FilterOptionType[] = [];
@@ -65,6 +56,7 @@ export default function CooperatingAgenciesFilter(props) {
     //   //[TODO] Implement This 
     //   //filterResultsBy(this.state);
     // };
+
     return (
       <>
         <Box>

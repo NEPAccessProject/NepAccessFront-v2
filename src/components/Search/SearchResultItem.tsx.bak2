@@ -2,17 +2,18 @@ import { Alert, Button, Box, Divider, Paper, Snackbar, Typography } from '@mui/m
 import Grid from '@mui/material/Unstable_Grid2';
 import { makeStyles } from '@mui/styles';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import theme from '@/themes/theme';
-// import PDFViewerDialog from './Dialogs/PDFViewerDialog';
-// import SearchContext from './SearchContext.ts';
-// import RenderSnippets from './SearchResultSnippets.jsx';
+import theme from '../styles/theme.js';
+import PDFViewerDialog from './Dialogs/PDFViewerDialog.jsx';
+import SearchContext from './SearchContext.js';
+import RenderSnippets from './SearchResultSnippets.jsx';
 import { styled } from '@mui/styles';
-// import DownloadFiles from '../DownloadFiles';
-// import DownloadFile from '../DownloadFile';
+// import DownloadFiles from '../DownloadFiles.js';
+// import DownloadFile from '../DownloadFile.js';
 import { Link } from 'react-router-dom';
-import SearchContext from './SearchContext';
+const _mounted = useRef(false);
+
 const DataCell = styled(Grid)(({ theme }) => ({
-  border: 1,
+   border: 1,
   padding: 2,
   paddingTop: 15,
   paddingBottom: 15,
@@ -54,17 +55,20 @@ export default function SearchResultItem(props) {
   //  const { seachState, setState, showContext } = useContext(SearchContext);
   const classes = useStyles(theme);
   const context = useContext(SearchContext);
-  const  [state, setState] = useState(context);
+  const { state, setState } = context;
   const _mounted = useRef(false);
 
   const [modalOpen, setModal] = useState(false)
-  const [currentModalId, setCurrentModalId] = useState('')
+  const [currentModalId, setCurrentModalId] = useState("")
+  const {id, record, filename} = props;
+
 
   const onCheckboxChange = (evt) => {
-    setState({
-      ...state,
-      showContext: evt.target.checked,
-    });
+    evt.preventDefault();
+    // setState((prevState)=>{
+    //   ...prevState,
+    //   showContext: evt.target.checked,
+    // });
   };
 
   useEffect(() => {
@@ -79,7 +83,7 @@ export default function SearchResultItem(props) {
   //[TODO] Add download functionality
   const handleDownloadClick = (evt, id) => {
     evt.preventDefault();
-    console.log('Download ID Value and filename', id, __filename);
+    console.log('Download ID Value and filename', id, filename);
   };
   const openModal = ((event, id) => {
     event.preventDefault()
@@ -91,7 +95,7 @@ export default function SearchResultItem(props) {
 
 
   const onDialogClose = (evt, id) => {
-    setCurrentModalId(null)
+    setCurrentModalId("")
     setIsOpen(false)
     setModal(false);
   }
@@ -146,6 +150,7 @@ const RenderRecord = (props) => {
   const classes = useStyles(theme);
   const [modalOpen,setModal] = useState(false);
 	const [currentModalId,setCurrentModalId] = useState(0)
+
   function onPDFPreviewToggle(evt, fileId, record) {
 		console.log('PDF VIEW Toggle,evt', evt);
 		evt.preventDefault();
@@ -158,7 +163,7 @@ const RenderRecord = (props) => {
 		setIsOpen(true)
 	}
 	function onDocumentLoadSuccess({ numPages }) {
-		useState({ ...state, numPages: numPages });
+		//setState({ ...state, numPages: numPages });
 	}
 	const handleDownloadClick = (evt, id) => {
 		evt.preventDefault();
@@ -173,7 +178,7 @@ const RenderRecord = (props) => {
 	const openModal = ((event,id) => {
 		event.preventDefault()
 		const { target: { dataset: { modal } } } = event
-		setCurrentModalId(`modal-${id}`)
+		///setCurrentModalId(`modal-${id}`)
 		setIsOpen(true)
 		if (modal) setModal(modal)
 	})
@@ -184,9 +189,9 @@ const RenderRecord = (props) => {
 
 
 	const closeModal = (evt,id) => {
-    setCurrentModalId(null)
+    // setCurrentModalId(null)
     setIsOpen(false)
-		setModal('')
+		// setModal('')
 	}
 	const ModalManager = (props) => {
     const {record={},id=0,modal='',isOpen=false} = props
@@ -198,7 +203,7 @@ const RenderRecord = (props) => {
 			name={`modal-${record.id}`}
 			record={record}
 			//isOpen={isOpen[record.id]}
-			isOpen={isOpen && currentModalId === `modal-${record.id}`}
+			// isOpen={isOpen && currentModalId. === `modal-${record.id}`}
 			onDialogClose={(evt) => closeModal(evt, record.id)}
 			/>
   }
@@ -237,7 +242,7 @@ const RenderRecord = (props) => {
             </Item>
 
             <Item padding={3}  md={3} xs={6} borderLeft={1} borderColor={'#ccc'} id="status-document-type-grid-item">
-              <Typography className={classes.card}>
+              <Typography>
                 {documentType}
               </Typography>
             </Item>
@@ -245,8 +250,8 @@ const RenderRecord = (props) => {
               <Typography id="snippets-title" variant='h5' >{(title) ? title : ''}</Typography>
             </Item>
             <Grid container xs={12} md={3} flexGrow={1} id="button-grid-container">
-              <Item padding={3} id="download-button-grid-item" item display={'flex'} xs={6}>
-                <Button onClick={(evt) => handleDownloadClick(evt)}
+              <Item padding={3} id="download-button-grid-item" display={'flex'} xs={6}>
+                <Button onClick={(evt) => handleDownloadClick(evt,record.id)}
                   variant='contained'
                   color="primary">
                   Download
@@ -268,7 +273,7 @@ const RenderRecord = (props) => {
                   closeFn={closeModal}
                   modal={modalOpen} />
                 <Button
-                  onClick={(evt) => openModal(evt, record.id, record)}
+                  onClick={(evt) => openModal(evt, record.id)}
                   variant='contained'
                   disabled={!record.filename}
                   color="primary">
@@ -278,7 +283,7 @@ const RenderRecord = (props) => {
             </Grid>
           </Grid>
           <Grid container id="render-snippets-record-grid-container" flex={1} overflow={'scroll'}>
-            <RenderSnippets record={record} />
+            {/* <RenderSnippets record={record} /> */}
           </Grid>
 
       </Paper>

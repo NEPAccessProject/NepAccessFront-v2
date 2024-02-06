@@ -16,7 +16,6 @@ export default function StateFilter(){
         //stateValues.push(evt[i].value);
       }
       updateFilterStateValues("stateRaw", evt);
-      updateFilterStateValues("countyRaw", stateValues);
       updateFilterStateValues("county", narrowCountyOptions(stateValues));
   
       //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));

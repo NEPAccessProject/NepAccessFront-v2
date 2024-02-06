@@ -8,7 +8,7 @@ import {
   FormControl,
   FormLabel,
 } from "@mui/material";
-import { decisionOptions } from "../data/dropdownValues";
+import { actionOptions, decisionOptions } from "../data/dropdownValues";
 import { FilterOptionType,InputEvent } from "@/components/interfaces/interfaces";
 export default function DecisionFilter() {
   const context = useContext(SearchContext);
@@ -39,7 +39,7 @@ export default function DecisionFilter() {
     }
     console.log(`onDecisionChange ~ filteredDecisions:`, filteredDecisions);
     updateFilterStateValues("decisions", filteredDecisions);
-    updateFilterStateValues("decisionsRaw", evt);
+    //updateFilterStateValues("decisionsRaw", evt);
   };
   //[TODO] need to
   return (
@@ -52,7 +52,12 @@ export default function DecisionFilter() {
         options={decisionOptions}
         isOptionEqualToValue={(option, value) => {
           return option.value === value.value;
-        }} 
+        }}
+        value={actionOptions.filter((v) => {
+          console.log(`value={actionOptions.filter ~ v:`, v);
+          return actionOptions.map((v) => v.value).includes(decisionsRaw);
+        }
+        )}
         
         //                      isOptionEqualToValue={(option, value) => actionRaw === value.value}
         onChange={(evt, value, reason) =>

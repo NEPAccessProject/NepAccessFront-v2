@@ -16,7 +16,7 @@ const CountyFilter=()=>{
       }
   
       updateFilterStateValues("countyValues", countyValues);
-      updateFilterStateValues("countyRaw", evt);
+      //updateFilterStateValues("countyRaw", evt);
     };
     return (<>
       <FormLabel

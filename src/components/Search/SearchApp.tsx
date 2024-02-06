@@ -21,7 +21,6 @@ import SearchResults from "./SearchResults";
 import SearchHeader from "./SearchHeader";
 import SearchFilters from "../Search/SearchFilters";
 import DecisionFilter from "./filters/DecisionFilter";
-
 import SearchContext from "./SearchContext";
 import {
   SearchResultType,
@@ -107,13 +106,13 @@ const SearchApp = (props: SearchAppPropType) => {
       })
       console.log('FILTERED VALUES',filtered)
 
-      const response = await post(`http://localhost:8080/text/search_no_context/`, {
+      const response = await post(`http://localhost:8080/search_no_context/`, {
         ...filtered
       })
 
       console.log(response)
       //const results = await post(`${process.env.REACT_APP_API_URL}/search/results`, {
-      setResults(results);
+      setResults(results.splice(0,100));
     })
     return () => {
       _mounted.current = false;
@@ -128,7 +127,7 @@ const SearchApp = (props: SearchAppPropType) => {
     const url = urlFromContextPagination(pagination);
     (async function fetchData() {
       const response = await getData(url);
-
+      console.log(`fetchData ~ response:`, response);
       const results = await response.json();
       console.log(`fetchData ~ data:`, results);
       setResults(results);
@@ -153,27 +152,33 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const getData = async (url: string) => {
     console.log(`getData ~ url:`, url);
-    const res = await fetch(url, {
+    const res = await fetch('http://localhost:8080/search_top', {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
+        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
       },
     });
     console.log(`getData ~ res:`, res);
     const data = await res.json();
     console.log(`getData ~ data:`, data);
-    return data;
+    setResults(data.splice(0,10));
+//    return data;
   };
 
   const post = async(url: string, data: any) => {
-    console.log(`post ~ url: string, data: any:`, url, data);
-    fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: data,
-    })
+    });
+    const temp = await res.json();
+    console.log(`post ~ temp:`, temp);
+  
+    setResults(temp);
   }
 
   
@@ -217,7 +222,7 @@ const SearchApp = (props: SearchAppPropType) => {
         })
       })();
     }
-  },[])
+  },[filters])
 
   const updateResults = async () => {
     const url = urlFromContextPagination(pagination);
@@ -237,11 +242,34 @@ const SearchApp = (props: SearchAppPropType) => {
       else {
         console.log(`UPDATE RESULTS WITHOUT FILTERS key: ${key}`, 'has value:, ', filters[key]);
       }
+        
+      })
+      const response = await fetch('http://localhost:8080/search_top', {
+        method: "GET"
+
     })
 
     console.log('UPDATE RESULTS',activeFilters)
-    const res = await post('http://localhost:8080/search_top/',activeFilters)
-    console.log(`updateResults ~ res:`, res);
+    const results = await response.json();
+    console.log(`updateResults ~ results:`, results);
+    setResults(results);
+    
+    // const res = await fetch('http://localhost:8080/text/search_top/',{
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     // agencies,
+    //     // county,
+    //     // actions,
+    //     // states,
+    //     // isFast41,
+    //     "title":titleRaw,
+    //     //cooperatingAgency,
+    //     //activeFilters
+    //   })
+    // })
     
     // const results = await post(url,{
     //     (titleRaw) ? titleRaw : '',
@@ -291,6 +319,8 @@ const SearchApp = (props: SearchAppPropType) => {
                 <Paper style={{padding: 5, flexGrow: 1}}><SearchFilters /></Paper>
               </Grid>
               <Grid xs={9}>
+                <h2>{results.length} Search Results Found</h2>
+                
                 {/* <h4>FILTERS</h4>
                 <ul>
                   <li><b>Agency</b>{JSON.stringify(agencies)}</li>
@@ -317,7 +347,7 @@ const SearchApp = (props: SearchAppPropType) => {
                   : (
                     <>
                     <SearchTips/>
-                    <Button variant="contained" onClick={() => updateResults()}>
+                    <Button variant="contained" onClick={() => getData('http://localhost:8080/search_top')}>
                     Get Data
                   </Button>
                   </>
@@ -327,13 +357,10 @@ const SearchApp = (props: SearchAppPropType) => {
                 
                 <Paper style={{padding: 10, flexGrow: 1}}>
                   <SearchResults results={results} />
-                  <Button variant="contained" onClick={() => updateResults()}>
+                  <Button variant="contained" onClick={() => getData('http://localhost:8080/search_top')}>
                     Get Data
                   </Button>
                   {/* Fast 41 ? {isFast41 ? "Yes" : "No"} */}
-                  <Typography variant="h5">Pagination</Typography>
-                    {JSON.stringify(pagination, null, 2)}
-                  <Typography variant="h5">Filters</Typography>
                   {/* {Object.keys(pagination).map((key) => {
                     return (
                       <li key={key}>
