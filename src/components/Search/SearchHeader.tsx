@@ -1,36 +1,37 @@
 import React, { FormEvent, useContext } from "react";
+
 import {
   Autocomplete,
   Box,
   Button,
-  Container,
   Checkbox,
-  Paper,
+  Chip,
+  Container,
   Divider,
   FormControl,
+  FormControlLabel,
   FormLabel,
+  IconButton,
+  Input,
   Link,
+  Paper,
+  Stack,
   TextField,
   Typography,
-  Stack,
-  Chip,
-  IconButton,
-  FormControlLabel,
 } from "@mui/material";
+import { SearchOutlined } from "@mui/icons-material";
 import Grid from "@mui/material/Unstable_Grid2";
 import styled from "styled-components";
 import SearchContext from "./SearchContext";
+import SortByControl from "./filters/SortByControl";
+import SortDirControl from "./filters/SortDirControl";
 import { AutoComplete } from "material-ui";
-import { BorderRight } from "@mui/icons-material";
-
-
-
-const GridItemProps ={
+const GridItemProps = {
   borderRight: 1,
-  borderColor: '#ddd',
+  borderColor: "#ddd",
   padding: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
+  alignItems: "center",
+  justifyContent: "center",
   paddingRight: 2,
   // elevation: 1,
   // borderRadius: 1,
@@ -41,30 +42,40 @@ const GridItemProps ={
 };
 
 const SearchHeader = () => {
-  //const {titleRaw, onInput, onKeyUp, onKeyDown, onEnter, onSearch} = ctx;
-  const ctx = useContext(SearchContext);
+  //const {titleRaw, onInput, onKeyUp, onKeyDown, onEnter, onSearch} = context;
+  const context = useContext(SearchContext);
   const {
     filters,
     pagination,
     updateFilterStateValues,
     updatePaginationStateValues,
-  } = ctx;
-  const { titleRaw } = filters;
+  } = context;
+  const { proximityDisabled,proximityOption } = filters;
   const { page, limit, sortby, sortdir } = pagination;
 
-  const onInput = (evt: React.FormEvent<HTMLInputElement>) => {
-    console.log("onInput", evt);
+  const onInput = (evt) => { 
     evt.preventDefault();
-    updateFilterStateValues("titleRaw", evt.currentTarget.value);
+    const titleRaw = (evt.target as HTMLInputElement).value;
+    console.log(`onInput ~ searchTerm:`, titleRaw);
+    updateFilterStateValues("titleRaw", titleRaw);
   };
-  const onIconClick = (evt: React.ChangeEvent<HTMLButtonElement>) => {
+  const onIconClick = (evt: React.SyntheticEvent) => {
     evt.preventDefault();
-    console.log("ON ICON CLIKC for evt:", evt);
+    const raw = (evt.target as HTMLInputElement).value;
+    console.log(`onIconClick ~ raw:`, raw);
+    updateFilterStateValues("titleRaw", raw);
   };
 
-  const onKeyDown = (evt: React.FormEvent<HTMLInputElement>) => {
-    console.log("ON KEY DOWN EVT", evt);
+  const onKeyDown = (evt) => {
     evt.preventDefault();
+    console.log("ON KEY DOWN EVT", evt);
+    const titleRaw = (evt.target as HTMLInputElement).value;
+    console.log(`onKeyDown ~ titleRaw:`, titleRaw);
+
+    evt.preventDefault();
+    
+    console.log(`onKeyDown ~ RAW:`, titleRaw);
+    updateFilterStateValues("titleRaw", titleRaw);
   };
   const updateLimit = (key: string, val: any) => {
     console.log(`updateLimit ~ key:string,val:any:`, key, val);
@@ -75,95 +86,61 @@ const SearchHeader = () => {
     console.log(`updateFilters ~ key:string,value:string:`, key, value);
     updateFilterStateValues(key, value);
   };
-
+  const {titleRaw} = filters;
   return (
     <>
       {/* <Grid xs={12}>
           <AppBar />
         </Grid> */}
       <Grid
-        container 
+        container
         display={"flex"}
         justifyContent={"flex-start"}
         borderBottom={1}
         borderColor={"#EEE"}
         padding={1}
-
       >
-        <Grid 
-          xs={2}
-          borderRight={1}
-          borderColor={"#EEE"}   
-
-        >
-          <b>Search Distance control</b>
-          {/* <ul>
-            <li>Link 1</li>
-            <li>Link 2</li>
-            <li>Link 3</li>
-          </ul> */}
-        </Grid>
-        <Grid
+  
+        <Grid id={'distance-filter'}
           display={"flex"}
-          style={{}}
           justifyContent={"center"}
-          xs={9}
+          xs={12}
           alignItems={"center"}
           alignContent={"center"}
           justifyItems={"center"}
-
-        >
-          <TextField
+          >
+          <Input
             fullWidth
-            focused
-            id="main-search-text-field"
+//            onKeyDown={(evt)=>onKeyDown(evt)}
+            //disabled={proximityOption === false}
+            id="titleRaw"
             name="titleRaw"
-            variant="outlined"
-            color="primary"
             onInput={(evt) => onInput(evt)}
-            // onKeyDown={onKeyDown}
-            placeholder="Search for NEPA documents"
-            value={titleRaw ? titleRaw : ""}
+            placeholder="Search for NEPA Documents..."
+//            value={titleRaw}
             sx={{
               padding: 0,
               margin: 1,
-              // "& .MuiOutlinedInput-root": {
-              //   border: "1px solid lightblue",
-              //   borderRadius: "0",
-              //   padding: "0",
-              // },
-              // "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-              //   border: "1px solid lightblue",
-              // },
             }}
-            InputProps={{
-              endAdornment: (
-                  <Grid md={1} xs={0}>
-                    <IconButton
-                      name="titleRaw"
-                        value={
-                          titleRaw
-                            ? titleRaw
-                            : ''
-                        }
-                        onClick={(evt)=>onIconClick(evt)}
-                    >
-                      {/* <SearchOutlined /> */}
-                    </IconButton>
-                  </Grid>
-              ),
-            }}
+            // InputProps={{
+            //   endAdornment: (
+            //     <Grid md={1} xs={0}>
+            //       <IconButton 
+            //         name="titleRaw"
+            //         onClick={(evt) => onIconClick(evt)}
+            //       >
+            //         <SearchOutlined />
+            //       </IconButton>
+            //     </Grid>
+            //   ),
+            // }}
           />
         </Grid>
       </Grid>
-      <Grid container
-        display={"flex"}
-        justifyContent={"flex-start"}
-        style={{  }}
-      >
+      <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
-          Term Distance
-        </Grid>
+          {/* <DistanceFilter /> */}
+          </Grid>
         <Grid {...GridItemProps} xs={3}>
           {/* <SortByControl /> */}
         </Grid>
@@ -171,7 +148,7 @@ const SearchHeader = () => {
           {/* <SortDirControl /> */}
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-          <LimitControl />
+          {/* <LimitControl /> */}
         </Grid>
       </Grid>
     </>
@@ -180,114 +157,69 @@ const SearchHeader = () => {
 export default SearchHeader;
 
 const gridStyle = {
-  display:'flex',
-            justifyContent:'flex-end',
-            alignContent: 'center',
-            alignItems:'center',
-            padding:2,
-}
-const SortByControl = () => {
-  const ctx = useContext(SearchContext);
-  const { pagination, updatePaginationStateValues } = ctx;
-  const { page, limit, sortby, sortdir } = pagination;
-  return (
-      <Grid container style={{display:'flex'}}>
-          <Grid xs={3} style={gridStyle} paddingLeft={1}>
-            <FormLabel  htmlFor="searchAgency">
-              Sort By:
-            </FormLabel>
-          </Grid>
-        
-          <Grid 
-            xs={9}
-            style={gridStyle}
-          >
-            <FormControl fullWidth>
-              <Autocomplete
-                fullWidth
-                id="limit"
-                style={{
-                  width: '100%'
-                }}
-                tabIndex={4}
-                options={["title", "date"]}
-                value={`${sortby}`}
-                onChange={(evt, value, tag) =>
-                  updatePaginationStateValues("sortby", value)
-                }
-                renderInput={(params) => {
-                  return (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      sx={{
-                        wordWrap: "break-word",
-                        overflow: "hidden",
-                        p: 0,
-                      }}
-                    />
-                  );
-                }}
-              />
-            </FormControl>
-          </Grid>
-      </Grid>
-  );
+  display: "flex",
+  justifyContent: "flex-end",
+  alignContent: "center",
+  alignItems: "center",
+  padding: 2,
 };
-const SortDirControl = () => {
-  const ctx = useContext(SearchContext);
-  const { pagination, updatePaginationStateValues } = ctx;
+const DistanceFilter = () => {
+  const context = useContext(SearchContext);
+  const { pagination, updatePaginationStateValues } = context;
   const { page, limit, sortby, sortdir } = pagination;
   return (
-    <Grid container display={'flex'}>
-      <Grid xs={3} style={gridStyle}>
-        <FormLabel htmlFor="searchAgency">
-          Sort Dir:
-        </FormLabel>
+    <Grid container style={{ display: "flex" }}>
+      <Grid xs={3} style={gridStyle} paddingLeft={1}>
+        <FormLabel htmlFor="searchAgency">Search Within...</FormLabel>
       </Grid>
-      <Grid
-        xs={9}
-      >
-      <FormControl fullWidth>
-        <Autocomplete
-          fullWidth
-          id="sortby"
-          tabIndex={5}
-          options={["ASC", "DESC"]}
-          value={`${sortdir}`}
-          onChange={(evt, value, tag) =>
-            updatePaginationStateValues("sortby", value)
-          }
-          renderInput={(params) => {
-            return (
-              <TextField
-                {...params}
-                variant="outlined"
-                sx={{
-                  wordWrap: "break-word",
-                  overflow: "hidden",
-                  p: 0,
-                }}
-              />
-            );
-          }}
-        />
-      </FormControl>
+
+      <Grid xs={9} style={gridStyle}>
+        <FormControl fullWidth>
+          <Autocomplete
+            fullWidth
+            id="limit"
+            style={{
+              width: "100%",
+            }}
+            tabIndex={4}
+            defaultValue={{label: "exact phrase",value:"0"}}
+            options={[{ label: "exact phrase",value:"0" },
+              {label:10,value:10}, 
+              {label:'25', value:25}, 
+              {label:'50', value: 50},
+          ]}
+                          onChange={(evt, value, tag) =>
+              updatePaginationStateValues("distance", value)
+            }
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  sx={{
+                    wordWrap: "break-word",
+                    overflow: "hidden",
+                    p: 0,
+                  }}
+                />
+              );
+            }}
+          />
+        </FormControl>
       </Grid>
     </Grid>
   );
 };
 
+
 const LimitControl = () => {
-  const ctx = useContext(SearchContext);
-  const { pagination, updatePaginationStateValues } = ctx;
+  const context = useContext(SearchContext);
+  const { pagination, updatePaginationStateValues } = context;
   const { page, limit, sortby, sortdir } = pagination;
   return (
     <Grid container>
       <Grid xs={3} style={gridStyle} marginRight={0} paddingRight={0}>
-        <FormLabel htmlFor="searchAgency">
-          # of Results:
-        </FormLabel>
+        <FormLabel htmlFor="searchAgency"># of Results:</FormLabel>
       </Grid>
       <Grid xs={9}>
         <FormControl fullWidth>
@@ -317,6 +249,6 @@ const LimitControl = () => {
           />
         </FormControl>
       </Grid>
-      </Grid>
+    </Grid>
   );
 };

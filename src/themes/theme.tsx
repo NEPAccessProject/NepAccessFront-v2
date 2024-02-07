@@ -64,32 +64,30 @@ declare module "@mui/material/Typography" {
 
 			// },
 			h1: {
-				fontSize: '2.0rem',
-				padding: 4,
+				fontSize: '1.4rem',
+				padding: 2,
 				border: 1,
 				display: 'block',
-				lineHeight: '2.2rem',
 				fontFamily: 'Roboto, sans-serif',
 			},
 			h2: {
-				fontSize: '1.8rem',
-				lineHeight: '2.0rem',
+				fontSize: '1.2rem',
 				fontFamily: 'Roboto, sans-serif',
 			},
 			h3: {
-				fontSize: '1.6rem',
-				lineHeight: '1.8rem',
+				fontSize: '1rem',
+				lineHeight: '2rem',
 				fontFamily: 'Roboto, sans-serif',
+				padding: 0.5,
 			},
 			h4: {
 				fontFamily: 'Roboto, sans-serif',
-				lineHeight: '1.6rem',
-				fontSize: '1.4rem',
+				fontSize: '0.8rem',
 			},
 			h5: {
 				fontFamily: 'Roboto, sans-serif',
-				lineHeight: '1.4rem',
-                fontSize: '1.2rem'
+				lineHeight: '2rem',
+                fontSize: '1.6rem'
 			},
 			h6: {
 				fontSize: '1rem',

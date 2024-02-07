@@ -18,6 +18,8 @@ const filters: FilterType = {
   decisions: [],
   decisionsRaw: "",
   isFast41: false,
+  proximityDisabled: true,
+  proximityOption: "",
   states: [],
   stateRaw: "",
   needsComments: false,
@@ -32,7 +34,7 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  titleRaw: [],
+  titleRaw: "",
   actionsRaw: "",
   endComment: "",
   startComment: "",
@@ -57,8 +59,6 @@ export type SearchContextType = {
   markup: boolean;
   message: string;
   optionsChecked: boolean;
-  proximityDisabled: boolean;
-  proximityOption: string;
   searchOption: string;
   showContext: boolean;
   showPDFDialog: boolean;
@@ -77,7 +77,7 @@ const SearchContext = React.createContext<SearchContextType>({
   pagination: {
     page: 1,
     limit: 25,
-    sortby: "doc.title",
+    sortby: "Title",
     sortdir: "DESC",
   },
   fragmentSizeValue: 0,
@@ -90,8 +90,6 @@ const SearchContext = React.createContext<SearchContextType>({
   markup: false,
   message: "",
   optionsChecked: false,
-  proximityDisabled: false,
-  proximityOption: "",
   searchOption: "",
   showContext: false,
   showPDFDialog: false,

@@ -22,6 +22,7 @@ import SearchHeader from "./SearchHeader";
 import SearchFilters from "../Search/SearchFilters";
 import DecisionFilter from "./filters/DecisionFilter";
 import SearchContext from "./SearchContext";
+
 import {
   SearchResultType,
   PaginiationType,
@@ -31,9 +32,7 @@ import {
 } from "../interfaces/interfaces";
 import { useParams } from "react-router-dom";
 import SearchTips from "./SearchTips";
-import { title } from "process";
 import { agencies } from "./data/dropdownValues";
-import { json } from "stream/consumers";
 
 type SearchAppPropType = {
   results: SearchResultType[];
@@ -49,20 +48,15 @@ const SearchApp = (props: SearchAppPropType) => {
   const [filters, setFilterValues] = useState(context.filters);
   const [titleRaw, setTitleRaw] = useState(context.filters.titleRaw);
   const [pagination, setPaginationValues] = useState(context.pagination);
+  const host = '/'; //TODO need to move this to a
 
   //
   const [options, setOptions] = useState(context);
 
   const _mounted = React.useRef(false);
   let params = useParams();
-  const updateFilterStateValues = (key: string, value: any) => {
-    console.log(`Update Filter Values - key ${key} -- value:`,value)
-    if(!value){
-      console.error('Attempted to update state variable with no value, this might be a bug or legitimate in some value','KEY',key,'VALUE',value);
-      return
-  }
+  const   updateFilterStateValues = (key: string, value: any) => {
     setFilterValues({...filters, [key]: value});
-    console.log(`\r\n !!!!! AFTER FILTER UPDATE Filter Values - key ${key}`,`value:`,value)
   };
   useEffect(() => {
     _mounted.current = true;
@@ -72,27 +66,43 @@ const SearchApp = (props: SearchAppPropType) => {
   });
 
   const updatePaginationStateValues = (key: string, value: any) => {
-    console.log('FILTERING KEY',key);
-    console.log('FILTERING VALUE',value)
-    if(!value){
-      console.error('Attempted to update state variable with no value, this might be a bug or legitimate in some value','KEY',key,'VALUE',value);  
-    return;
-  }
-    console.log(
-      `updatePaginationStateValues ~ key:string,value:any:`,
-      key,
-      value
-    );
     setPaginationValues({
       ...pagination,
       [key]: value,
     });
     console.log('FINSHED FILTERS UPDATE - Filters are now',filters)
   };
+  useEffect(()=>{
+    console.log('FIRING SEARCH_NO_CONTEX - titleRaw',titleRaw);
+    (async () => {
+      const results = await get(`${host}search_no_context/${titleRaw}`);
+        console.log(`.then ~ data:`, results);
+        setResults(results);
+    })
+    },[titleRaw]);
 
+  const get = async (url: string) => {
+    console.log(`get ~ url:`, url);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json", 
+        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+      },
+    });
+    const results = await res.json();
+    console.log(`get ~ temp:`, results);
+    return results;
+  }
   useEffect(() => {
+    console.log('USE EFFECTFILTERS ARE NOW',filters)
     if(!_mounted.current) {
       return;
+    }
+    const title:string = titleRaw || ""
+    if(title && title.length > 3){
+      setTitleRaw(titleRaw);
     }
     (async function fetchData() {
       const filtered:any = [];
@@ -106,7 +116,7 @@ const SearchApp = (props: SearchAppPropType) => {
       })
       console.log('FILTERED VALUES',filtered)
 
-      const response = await post(`http://localhost:8080/search_no_context/`, {
+      const response = await post(`${host}search_no_context/`, {
         ...filtered
       })
 
@@ -117,25 +127,34 @@ const SearchApp = (props: SearchAppPropType) => {
     return () => {
       _mounted.current = false;
     };
-  }, [filters]);
+  }, [titleRaw]);
 
   useEffect(() => {
     if (!_mounted.current) {
       return;
     }
     const { pagination } = context;
-    const url = urlFromContextPagination(pagination);
-    (async function fetchData() {
-      const response = await getData(url);
+    //const url = urlFromContextPagination(pagination);
+    async function fetchData() {
+      console.log('fetching data effect')
+      const response = await fetch(`${host}search_no_context`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          "title": titleRaw
+        }),
+      })
       console.log(`fetchData ~ response:`, response);
       const results = await response.json();
       console.log(`fetchData ~ data:`, results);
-      setResults(results);
-    });
+      setResults(results);  
     return () => {
       _mounted.current = false;
     };
-  }, [pagination, filters]);
+  }}, [pagination, filters,titleRaw]);
   const filterProps = {
     //fullWidth: true,
     multiple: true,
@@ -152,18 +171,17 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const getData = async (url: string) => {
     console.log(`getData ~ url:`, url);
-    const res = await fetch('http://localhost:8080/search_top', {
+    const res = await fetch(`${host}search_no_context`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
+        Accept: "application/json", 
         //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
       },
     });
     console.log(`getData ~ res:`, res);
-    const data = await res.json();
-    console.log(`getData ~ data:`, data);
-    setResults(data.splice(0,10));
+    console.log(`getData ~ res:`, res);
+   // setResults(res);
 //    return data;
   };
 
@@ -201,84 +219,57 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const activeFilters:FilterOptionType[] = [];
 
+  const extractActiveFilters = (filters) => 
   useEffect(()=>{
-    async function fetchData(){
+    (async function fetchData(){
       console.log('FETCHING DATA');
-      (async () => {
-        const url = urlFromContextPagination(pagination);
-        console.log(`updateResults ~ url:`, url);
-        const {agencies,county,actions,states,isFast41,titleRaw,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
+      (
+        async () => {
+          const url = urlFromContextPagination(pagination);
+          console.log(`updateResults ~ url:`, url);
+          const {agencies,county,actions,states,isFast41,titleRaw,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
         const filterKeys = Object.keys(filters);
     
         filterKeys.map((key:string) => {
-          console.log('CHECKING FOR ACTIVE FILTERS',key, filters[key]);
           if(filters[key]!== "" && filters[key] !== 0){
-            console.log(`UPDATE RESULTS WITH FILTERS key: ${key}`, 'has value: ', filters[key]);
-            activeFilters.push({
-              label:key, 
-              value:filters[key],
-            })
+              activeFilters.push({
+                label:key, 
+                value:filters[key],
+              })
+            }
           }
-        })
-      })();
-    }
-  },[filters])
+        )
+          }
+        )
+      }
+    )
+},[filters,_mounted.current])
 
-  const updateResults = async () => {
-    const url = urlFromContextPagination(pagination);
-    console.log(`updateResults ~ url:`, url);
-    const {agencies,county,actions,states,isFast41,titleRaw,agenciesRaw,cooperatingAgency,cooperatingAgencyRaw} = filters;
+  const getActiveFilters = (filters) =>{
     const filterKeys = Object.keys(filters);
-
     filterKeys.map((key:string) => {
       console.log('CHECKING FOR ACTIVE FILTERS',key, filters[key]);
-      if(filters[key]!== "" && filters[key].length !== 0 ||  filters[key] !== 0 || filters[key] !== false){
-        console.log(`UPDATE RESULTS WITH FILTERS key: ${key}`, 'has value: ', filters[key]);
-        activeFilters.push({
-          label:key, 
-          value:filters[key],
-        })
-      }
+          if(filters[key]!== "" && filters[key].length !== 0 ||  filters[key] !== 0){
+            console.log(`UPDATE RESULTS WITH FILTERS key: ${key}`, 'has value: ', filters[key]);
+              activeFilters.push({
+                label:key, 
+                value:filters[key],
+              })
+          }
       else {
         console.log(`UPDATE RESULTS WITHOUT FILTERS key: ${key}`, 'has value:, ', filters[key]);
       }
         
       })
-      const response = await fetch('http://localhost:8080/search_top', {
-        method: "GET"
-
-    })
-
-    console.log('UPDATE RESULTS',activeFilters)
-    const results = await response.json();
+      return activeFilters
+  }
+  const updateResults = async () => {
+    const url = urlFromContextPagination(pagination);
+    console.log(`updateResults ~ url:`, url);
+    const activeFilters = getActiveFilters(filters);
+    
     console.log(`updateResults ~ results:`, results);
     setResults(results);
-    
-    // const res = await fetch('http://localhost:8080/text/search_top/',{
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     // agencies,
-    //     // county,
-    //     // actions,
-    //     // states,
-    //     // isFast41,
-    //     "title":titleRaw,
-    //     //cooperatingAgency,
-    //     //activeFilters
-    //   })
-    // })
-    
-    // const results = await post(url,{
-    //     (titleRaw) ? titleRaw : '',
-    //      (isFast41) && isFast41 : '',
-    //      (agencies) && filters.agency: '',
-    //     (county) && filters.county: '',
-    //     (action) && filters.action: '',
-    //     (state) && filters.state: '', 
-    // });
   };
 
   const urlFromContextPagination = (pagination: PaginiationType): string => {
@@ -288,7 +279,7 @@ const SearchApp = (props: SearchAppPropType) => {
 
     //[TODO] Add loginc for each filtervalue such as agency={agency1,agency2} as well as sort order and direction
 
-    const url = `http://localhost:8080/search_top/?${searchTerms}&_page=${page}&_limit=${limit}`;
+    const url = `/api/search_top/?${searchTerms}&_page=${page}&_limit=${limit}`;
     return url;
   };
 
@@ -319,6 +310,11 @@ const SearchApp = (props: SearchAppPropType) => {
                 <Paper style={{padding: 5, flexGrow: 1}}><SearchFilters /></Paper>
               </Grid>
               <Grid xs={9}>
+              <Button variant="contained" onClick={() => getData('/api/search_top')}>
+                    Get Data
+                  </Button>
+                  <Typography><b>Title Raw</b> {filters.titleRaw} </Typography>
+
                 <h2>{results.length} Search Results Found</h2>
                 
                 {/* <h4>FILTERS</h4>
@@ -347,9 +343,6 @@ const SearchApp = (props: SearchAppPropType) => {
                   : (
                     <>
                     <SearchTips/>
-                    <Button variant="contained" onClick={() => getData('http://localhost:8080/search_top')}>
-                    Get Data
-                  </Button>
                   </>
 
                   )
@@ -357,7 +350,7 @@ const SearchApp = (props: SearchAppPropType) => {
                 
                 <Paper style={{padding: 10, flexGrow: 1}}>
                   <SearchResults results={results} />
-                  <Button variant="contained" onClick={() => getData('http://localhost:8080/search_top')}>
+                  <Button variant="contained" onClick={() => getData('/api/search_top')}>
                     Get Data
                   </Button>
                   {/* Fast 41 ? {isFast41 ? "Yes" : "No"} */}
@@ -400,5 +393,6 @@ const SearchApp = (props: SearchAppPropType) => {
   //     </Grid>
   //     </Paper>
   // )
-};
+}
+
 export default SearchApp;

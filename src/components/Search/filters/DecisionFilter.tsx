@@ -53,11 +53,11 @@ export default function DecisionFilter() {
         isOptionEqualToValue={(option, value) => {
           return option.value === value.value;
         }}
-        value={actionOptions.filter((v) => {
-          console.log(`value={actionOptions.filter ~ v:`, v);
-          return actionOptions.map((v) => v.value).includes(decisionsRaw);
-        }
-        )}
+        // value={actionOptions.filter((v) => {
+        //   console.log(`value={actionOptions.filter ~ v:`, v);
+        //   return actionOptions.map((v) => v.value).includes(decisionsRaw);
+        // }
+        // )}
         
         //                      isOptionEqualToValue={(option, value) => actionRaw === value.value}
         onChange={(evt, value, reason) =>

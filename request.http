@@ -1,7 +1,15 @@
-@host = "http://localhost:8080/data/"
+@host = "http://localhost:8080/"
+#@host="https://bighorn.sbs.arizona.edu:8443/nepaBackend/"
 
 ###
 GET {{host}}?title="copper" HTTP/1.1
 
 ###
-GET http://localhost:8080/search?_page=1&_limit=1&_sort=desc&doc.id=2707 HTTP/1.1
+GET http://localhost:8080/search_no_context?_page=1&_limit=1&_sort=desc&doc.id=170708 HTTP/1.1
+
+###
+POST {{host}}/search_no_context HTTP/1.1
+
+{
+  "title": "copper"
+}

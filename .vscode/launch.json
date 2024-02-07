@@ -10,6 +10,15 @@
             "type": "chrome",
             "url": "http://localhost:4000",
             "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Launch Edge DevTools",
+            "request": "launch",
+            "type": "browse-lite",
+            "url": "http://localhost:4000",
+            "webRoot": "${workspaceFolder}",
+            "trace": "verbose",
+            "devtools": true  
         }
        
     ]

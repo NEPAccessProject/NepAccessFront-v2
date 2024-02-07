@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     padding: 1, //theme.spacing(2),
     textAlign: 'center',
-    color: 'black', //theme.palette.text.secondary,
+    //color: 'black', //theme.palette.text.secondary,
   },
   container: {
     justifyContent: 'center',

@@ -86,7 +86,7 @@ const SearchResults = (props:SearchResultsType) => {
       />
         {results.map((result,idx)=> {
             return (
-              <Box key={result.id} style={{border:'1px solid black'}}>
+              <Box key={result.id}>
                <SearchResult result={result} />
              </Box>
             )

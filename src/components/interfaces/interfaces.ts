@@ -8,8 +8,8 @@ export type DocumentType = {
 	commentsFilename: string;
 	cooperatingAgency: string;
 	county: string ;
-	decisions: string ;
 	decisionRaw: string ;
+	decisions: string ;
 	department: string;
 	documentType: string;
 	draftNoa: Date ;
@@ -17,6 +17,7 @@ export type DocumentType = {
 	finalNoa: Date | string ;
 	firstRodDate: Date | string  ;
 	folder: string;
+	id: number;
 	link: string;
 	noiDate: Date | string;
 	notes: string ;
@@ -28,7 +29,6 @@ export type DocumentType = {
 	subtype: string;
 	summaryText: string;
 	title: string;
-	id: number;
 }
 
   
@@ -94,6 +94,7 @@ export type FilterType = {
 	cooperatingAgencyRaw: string;
 	county: [];
 	countyRaw: "";
+	distance: FilterOptionType[];
 	decisions:string[];
 	decisionsRaw: "";
 	endComment: Date | string;
@@ -102,11 +103,13 @@ export type FilterType = {
 	isFast41: boolean;
 	needsComments: boolean;
 	needsDocument: boolean;
+	proximityDisabled: boolean;
+	proximityOption: string;	
 	startComment: "";
 	startPublish: string | Date;
 	stateRaw: "";
 	states: FilterOptionType[];
-	titleRaw: [];
+	titleRaw: "";
 	typeAll: boolean;
 	typeDraft: boolean;
 	typeEA: boolean;
@@ -126,6 +129,7 @@ export type FilterType = {
 	cooperatingAgency: [],
 	cooperatingAgencyRaw: "",
 	county: [],
+	distance: [],
 	decisions: [],
 	decisionsRaw: "",
 	endComment: "",
@@ -134,6 +138,8 @@ export type FilterType = {
 	isFast41: false,
 	needsComments: false,
 	needsDocument: true,
+	proximityDisabled: false,
+	proximityOption: "",
 	startPublish: "",
 	stateRaw: "",
 	states: [],

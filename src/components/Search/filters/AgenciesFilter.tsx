@@ -34,11 +34,12 @@ export default function AgencyFilter(props) {
   
     return (
       <>
-       <FormControl>
+       <Box>
                   <FormLabel htmlFor='searchAgency'>
                     Lead Agencies:
                   </FormLabel>
                   <Autocomplete
+                    fullWidth
                     id='agency'
                     tabIndex={4}
                     options={agencyOptions}
@@ -59,7 +60,7 @@ export default function AgencyFilter(props) {
                       );
                     }}
                   />
-                </FormControl>
+                </Box>
       </>
     );
   }
