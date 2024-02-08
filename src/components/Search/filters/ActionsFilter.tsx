@@ -1,14 +1,12 @@
+import { FilterOptionType } from "@/components/interfaces/interfaces";
+import {
+  Autocomplete,
+  FormLabel,
+  TextField
+} from "@mui/material";
 import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {
-  Box,
-  Autocomplete,
-  TextField,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
 import { actionOptions } from "../data/dropdownValues";
-import { FilterOptionType, InputEvent } from "@/components/interfaces/interfaces";
 const ActionsFilter = () => {
 
     const context = useContext(SearchContext);
@@ -18,8 +16,6 @@ const ActionsFilter = () => {
       
       let target = evt.target as HTMLInputElement;
       let raw = (evt.target as HTMLInputElement).value;
-      console.log(`onDecisionChange ~ target:`, raw);
-      console.log(`onDecisionChange ~ selected, reason:`, selected, reason);
       let filteredActions: FilterOptionType[] = [];
 
       if(reason === "selectOption") {
@@ -30,7 +26,6 @@ const ActionsFilter = () => {
       } else if (reason === "clear") {
         filteredActions = [];
       }
-      console.log(`onDecisionChange ~ filteredDecisions:`, filteredActions);
       updateFilterStateValues("decisions", filteredActions);
 //      updateFilterStateValues("decisionsRaw", evt);
     }
@@ -48,7 +43,6 @@ const ActionsFilter = () => {
         }}
         onChange={(evt, value, reason) => onActionChange(evt, value, reason)}
         renderInput={(params) => {
-          console.log(`ActionsFilter ~ params:`, params);
           
           return (
             <TextField

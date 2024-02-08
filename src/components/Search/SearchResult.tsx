@@ -1,14 +1,12 @@
-import React, { useContext, useState } from "react";
-import Grid from "@mui/material/Unstable_Grid2";
-import { Typography, Paper, Box, Button, styled } from "@mui/material";
 import {
   DocumentType,
-  SearchResultType,
   SearchResultPropsType,
+  SearchResultType,
 } from "@/components/interfaces/interfaces";
+import { Button, Typography, styled } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
+import { useContext } from "react";
 import SearchContext from "./SearchContext";
-import { BorderLeft, BorderRight } from "@mui/icons-material";
-
 const SearchResult = (props: SearchResultPropsType) => {
   const result: SearchResultType = props.result;
   const doc: DocumentType = result.doc;
@@ -29,15 +27,16 @@ const SearchResult = (props: SearchResultPropsType) => {
   } = filters;
 
   const GridContainer = styled(Grid)(() => ({
-    borderLeft: "1px solid #ccc",
+    borderLeft: "1px solid #eee",
     display: "flex",
     justifyContent: "center",
+    padding: 1,
   }));
 
   const DataCell = styled(Grid)(({ theme }) => ({
-   spacing: 2,
+   spacing: 1,
    borderLeft: 'none',
-   borderRight: '1px solid #ccc',
+   borderRight: '1px solid #eee',
    display: 'flex',
    justifyContent: 'center',
    justifyItems: 'center',
@@ -54,8 +53,8 @@ const SearchResult = (props: SearchResultPropsType) => {
   }));
 
    const style = {
-    BorderRight: "1px solid #aaa",
-    BorderLeft: "1px solid #ccc",
+    BorderRight: "1px solid #eee",
+    BorderLeft: "1px solid #eee",
     justifyContent: "center",
     alignContent: "center",
     alignItems: "center",
@@ -64,11 +63,20 @@ const SearchResult = (props: SearchResultPropsType) => {
   };
   // console.log('RECEIVED RESULT',result)
   return (
-    <GridContainer className="search-result-container" style={{...style}} container xs={12}>
+    <>
+    {result && result.doc  &&
+    (
+    <GridContainer className="search-result-container" borderBottom={1} borderColor={'#eee'} style={{...style}} container xs={12}>
+      <DataCell xs={12}>
+        <Typography variant="h6" color="textSecondary" style={{margin: 0, padding: 0}}>
+          ID:{result.id}
+          
+        </Typography>
+      </DataCell>
       <DataCell xs={12}>
         <Typography variant="h3">{result.doc.title}</Typography>
       </DataCell>
-      <GridContainer display={"flex"} borderBottom={1} borderTop={1} borderColor={"#ccc"} borderLeft={0} container xs={12}>
+      <GridContainer display={"flex"} borderBottom={1} borderTop={1} borderColor={"#eee"} borderLeft={0} container xs={12}>
         <DataCell xs={1} borderLeft={0}>
           <Typography
             justifyContent={"center"}
@@ -80,9 +88,10 @@ const SearchResult = (props: SearchResultPropsType) => {
           </Typography>
         </DataCell>
         <DataCell xs={1} flex={1}>
-          {doc.commentDate
+          <Typography>
+            {doc.commentDate
             ? new Date(doc.commentDate).toLocaleDateString()
-            : "N/A"}
+            : "N/A"}</Typography>
         </DataCell>
         <DataCell xs={6}>
           {`${doc.title}`}
@@ -92,9 +101,13 @@ const SearchResult = (props: SearchResultPropsType) => {
         </DataCell>
       </GridContainer>
       <DataCell xs={12}>
-        <Typography>Snippets here</Typography>
+        <Typography variant="body2">
+          urna molestie at. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Quam quisque id diam vel quam elementum pulvinar. Elit pellentesque habitant morbi tristique senectus.
+        </Typography>
       </DataCell>
     </GridContainer>
+    )}
+    </>
   );
 };
 export default SearchResult;

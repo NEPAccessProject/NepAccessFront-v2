@@ -1,14 +1,14 @@
+import { Box, Paper, TablePagination } from '@mui/material';
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import { Box, Paper, Typography, Pagination, TablePagination, Link,Divider } from '@mui/material';
+import React, { useRef } from 'react';
+
+import Grid from '@mui/material/Unstable_Grid2';
 import { styled } from '@mui/material/styles';
-import theme from '../../themes/theme';
 import { makeStyles } from '@mui/styles';
+import theme from '../../themes/theme';
+import { SearchResultType, SearchResultsType } from '../interfaces/interfaces';
 import SearchContext from './SearchContext';
 import SearchResult from './SearchResult';
-import SearchTips from './SearchTips';
-import Grid from '@mui/material/Unstable_Grid2';
-import {DocumentType, SearchResultType,SearchResultsType ,SearchResultPropsType } from '../interfaces/interfaces';
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -63,27 +63,54 @@ const SearchResults = (props:SearchResultsType) => {
   const _mounted = useRef(false);
   const context = React.useContext(SearchContext);
   const results = context.results;
+  const {filters,pagination,updatePaginationStateValues} = context;
+  const {page,sortby,limit,sortdir} = pagination;
 
-  const onPaginationChange = (evt) => {
+  const handleChangePage = (evt,newPage:number) => {
+    console.log("🚀 ~ handleChangePage ~ number:", newPage);
+    //setPage(newPage);
+    updatePaginationStateValues("page", newPage);
+  };
+  const handleChangeRowsPerPage = (evt) => {
+    console.log(`handleChangeRowsPerPage ~ event:`, event);
+    //setRowsPerPage(parseInt(event.target.value, 10));
+    const rowsPerPage:Number = parseInt((evt.target as HTMLInputElement).value, 10);
+    updatePaginationStateValues("limit", rowsPerPage);
+    //setPage(0);
+  };
+  const onPaginationChange = (evt,page) =>{
+    updatePaginationStateValues("page", parseInt(page));
     evt.preventDefault();
     console.log('onPaginationChange', evt)
   }
 
-  const {filters} = context;
   return (
     <Paper elevation={0} id="search-results-root">
-      <Pagination
-        shape='rounded'
-        boundaryCount={2}
-        count={results.length}
-        hideNextButton={false}
-        hidePrevButton={false}
-        onChange={onPaginationChange}
+        <ul>
+        <li><b>Page:</b>{page}</li>
+        <li><b>Sort By:</b>{sortby}</li>
+        <li><b>Sort Dir</b>{sortdir}</li>
+        <li><b>Limit:</b>{limit}</li>
+      </ul>
+     {/* <Box border={1} borderColor={'#eee'} display={'flex'} alignContent={'flex-start'}> */}
+     {/* <Pagination 
+      count={limit} 
+      page={page} 
+      onChange={(evt,page)=> onPaginationChange(evt,page)} /> */}
+      <React.Fragment><TablePagination
+        rowsPerPageOptions={[1,5,10,20, 25, 100]}
+        //count={results.length} [TODO] Need to get count from the server
+        count={100}
+        rowsPerPage={limit}//{limit}
+        page={page}
+        onPageChange={(evt,page)=>handleChangePage(evt,page)}
+        onRowsPerPageChange={(evt)=>handleChangeRowsPerPage(evt)}
         showFirstButton={true}
         showLastButton={true}
-        size='large'
-        style={{border:'1px solid #ddd', marginBottom: 8, marginTop: 1,}}
-      />
+
+      /></React.Fragment>
+
+      {/* </Box> */}
         {results.map((result,idx)=> {
             return (
               <Box key={result.id}>
@@ -131,7 +158,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
      
      <Grid padding={2} container xs={12} flexDirection={'row'} flex={1}>
        <Item
-        className={classes.itemHeader}
+//        className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -141,7 +168,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Status:
       </Item>
       <Item
-        className={classes.itemHeader}
+ //       className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -151,17 +178,17 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Date:
       </Item>
       <Item
-        className={classes.itemHeader}
+ //       className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
           elevation: 1,
         }}
       >
-        State: <b>{state ? state : 'N/A'}</b>
+        State: <b>{states ? states : 'N/A'}</b>
       </Item>
       <Item
-        className={classes.itemHeader}
+//        className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -171,7 +198,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         County: <b>{county ? county : 'N/A'}</b>
       </Item>
       <Item
-        className={classes.itemHeader}
+       // className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -181,7 +208,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Action: <b>{action ? action : 'N/A'}</b>
       </Item>
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -193,7 +220,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
       {/* {(commentDate)
             ? ( */}
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -203,7 +230,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Project Start Date:
       </Item>
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -213,7 +240,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Project Endate Date:
       </Item>
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -223,7 +250,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Final NOA:
       </Item>
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,
@@ -233,7 +260,7 @@ const SearchResultCards = (props:ISearchResultCardsProps) => {
         Draft NOA:
       </Item>
       <Item
-        className={classes.itemHeader}
+        //className={classes.itemHeader}
         sx={{
           margin: 0.5,
           padding: 1,

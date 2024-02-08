@@ -1,5 +1,8 @@
 {
-  "search_top": [
+    "get_count": 125,
+    "earliest_year": 2018,
+    "latest_year": 2024,
+    "search_top": [
     {
       "ids": [
         8870

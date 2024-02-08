@@ -1,8 +1,9 @@
 import react from '@vitejs/plugin-react-swc';
-import { defineConfig } from 'vite';
 import * as path from 'path';
+import { defineConfig, loadEnv } from 'vite';
 /// <reference types="vite/client" />
-
+const env = loadEnv(path.resolve(__dirname, '.env'), process.env.NODE_ENV);
+console.log("🚀 ~ env:", env)
 export default defineConfig({
   plugins: [react()],
   build: {},
@@ -26,7 +27,8 @@ export default defineConfig({
   },
   envPrefix: 'NEPA',
   define: {
-   // __VALUE__: `${process.env.VALUE}`,
+    __APP_ENV__: JSON.stringify(env.APP_ENV),
+
   }
 
 });

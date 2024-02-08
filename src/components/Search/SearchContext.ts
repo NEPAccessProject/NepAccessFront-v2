@@ -1,7 +1,6 @@
-import { Pagination } from '@mui/material';
 
-import {SearchResultPropsType,SearchResultType,SearchResultsType,FilterType,PaginiationType} from '../interfaces/interfaces';
 import React from "react";
+import { FilterType, PaginiationType, SearchResultType } from '../interfaces/interfaces';
 
 
 //[] Maybe break the structure down to smaller pieces
@@ -12,9 +11,10 @@ const filters: FilterType = {
   actions:[],
   agencies: [],
   agenciesRaw: "",
-  cooperatingAgency: [],  
+  cooperatingAgency: [],
   county: [],
   countyRaw:"",
+  distance: 0,
   decisions: [],
   decisionsRaw: "",
   isFast41: false,
@@ -44,7 +44,6 @@ const filters: FilterType = {
 
 
 export type SearchContextType = {
-  
   filters: FilterType;
   results: SearchResultType[];
   pagination: PaginiationType;
@@ -56,6 +55,7 @@ export type SearchContextType = {
   isDirty: false;
   isQuickStartDialogOpen: false;
   isSearchTipsDialogOpen: false;
+  totalCount: number;
   markup: boolean;
   message: string;
   optionsChecked: boolean;
@@ -76,9 +76,10 @@ const SearchContext = React.createContext<SearchContextType>({
   loading: false,
   pagination: {
     page: 1,
-    limit: 25,
-    sortby: "Title",
+    limit: 10,
+    sortby: "doc.title", //temporay for json-server
     sortdir: "DESC",
+    totalCount: 0,
   },
   fragmentSizeValue: 0,
   hideOrganization: false,

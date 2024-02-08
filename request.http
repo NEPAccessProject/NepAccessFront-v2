@@ -5,7 +5,7 @@
 GET {{host}}?title="copper" HTTP/1.1
 
 ###
-GET http://localhost:8080/search_no_context?_page=1&_limit=1&_sort=desc&doc.id=170708 HTTP/1.1
+GET http://localhost:8080/search_no_context?_page=1&_limit=1&_sort=desc HTTP/1.1
 
 ###
 POST {{host}}/search_no_context HTTP/1.1

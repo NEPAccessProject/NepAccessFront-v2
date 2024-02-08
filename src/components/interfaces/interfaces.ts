@@ -94,7 +94,7 @@ export type FilterType = {
 	cooperatingAgencyRaw: string;
 	county: [];
 	countyRaw: "";
-	distance: FilterOptionType[];
+	distance: number;
 	decisions:string[];
 	decisionsRaw: "";
 	endComment: Date | string;

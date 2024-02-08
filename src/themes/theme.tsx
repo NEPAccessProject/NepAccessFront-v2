@@ -69,6 +69,7 @@ declare module "@mui/material/Typography" {
 				border: 1,
 				display: 'block',
 				fontFamily: 'Roboto, sans-serif',
+				
 			},
 			h2: {
 				fontSize: '1.2rem',
@@ -78,7 +79,7 @@ declare module "@mui/material/Typography" {
 				fontSize: '1rem',
 				lineHeight: '2rem',
 				fontFamily: 'Roboto, sans-serif',
-				padding: 0.5,
+				padding: 2,
 			},
 			h4: {
 				fontFamily: 'Roboto, sans-serif',
