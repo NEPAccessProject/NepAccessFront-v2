@@ -26,6 +26,7 @@ import SearchContext from "./SearchContext";
 import SortByControl from "./filters/SortByControl";
 import SortDirControl from "./filters/SortDirControl";
 import { AutoComplete } from "material-ui";
+import _ from "lodash";
 const GridItemProps = {
   borderRight: 1,
   borderColor: "#ddd",
@@ -47,35 +48,34 @@ const SearchHeader = () => {
   const {
     filters,
     pagination,
-    updateFilterStateValues,
+    debouncedUpdateFilterStateValues,
     updatePaginationStateValues,
   } = context;
   const { proximityDisabled,proximityOption } = filters;
   const { page, limit, sortby, sortdir } = pagination;
-
   const onInput = (evt) => { 
     evt.preventDefault();
     const titleRaw = (evt.target as HTMLInputElement).value;
     console.log(`onInput ~ searchTerm:`, titleRaw);
-    updateFilterStateValues("titleRaw", titleRaw);
+    debouncedUpdateFilterStateValues("titleRaw", titleRaw);
   };
+  //[TODO] 
+
   const onIconClick = (evt: React.SyntheticEvent) => {
     evt.preventDefault();
     const raw = (evt.target as HTMLInputElement).value;
     console.log(`onIconClick ~ raw:`, raw);
-    updateFilterStateValues("titleRaw", raw);
+    debouncedUpdateFilterStateValues("titleRaw", raw);
   };
 
   const onKeyDown = (evt) => {
     evt.preventDefault();
-    console.log("ON KEY DOWN EVT", evt);
-    const titleRaw = (evt.target as HTMLInputElement).value;
-    console.log(`onKeyDown ~ titleRaw:`, titleRaw);
-
-    evt.preventDefault();
-    
-    console.log(`onKeyDown ~ RAW:`, titleRaw);
-    updateFilterStateValues("titleRaw", titleRaw);
+    const key = (evt.target as HTMLInputElement).value;
+    //check if it's the enter key otherwise ignore
+    if (evt.key === "Enter") {
+      console.log(`onKeyDown ~ key:`, key);
+      debouncedUpdateFilterStateValues("titleRaw", key);
+    }
   };
   const updateLimit = (key: string, val: any) => {
     console.log(`updateLimit ~ key:string,val:any:`, key, val);
@@ -84,7 +84,7 @@ const SearchHeader = () => {
 
   const updateFilters = (key: string, value: string) => {
     console.log(`updateFilters ~ key:string,value:string:`, key, value);
-    updateFilterStateValues(key, value);
+    debouncedUpdateFilterStateValues(key, value);
   };
   const {titleRaw} = filters;
   return (
@@ -116,6 +116,7 @@ const SearchHeader = () => {
             id="titleRaw"
             name="titleRaw"
             onInput={(evt) => onInput(evt)}
+            onKeyDown={(evt) => onKeyDown(evt)}
             placeholder="Search for NEPA Documents..."
 //            value={titleRaw}
             sx={{

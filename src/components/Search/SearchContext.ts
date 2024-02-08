@@ -65,7 +65,7 @@ export type SearchContextType = {
   showQuickTipsDialog: boolean;
   showSearchTipsDialog: boolean;
   tooltipOpen: boolean;
-  updateFilterStateValues : (key:string, value:any) => void;
+  debouncedUpdateFilterStateValues : (key:string, value:any) => void;
   updatePaginationStateValues : (key:string, value:any) => void;
 
 };
@@ -98,7 +98,7 @@ const SearchContext = React.createContext<SearchContextType>({
   showSearchTipsDialog: false,
   tooltipOpen: false,
   updatePaginationStateValues : ()=> {},
-  updateFilterStateValues: () => {},
+  debouncedUpdateFilterStateValues: () => {},
 });
 
 export default SearchContext;

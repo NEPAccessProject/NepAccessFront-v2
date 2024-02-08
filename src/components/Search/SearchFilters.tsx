@@ -41,6 +41,8 @@ import {
 } from "./data/dropdownValues";
 import CountyFilter from "./filters/CountyFilter";
 import ActionFilter from "./filters/ActionsFilter";
+import _debounce from "lodash/debounce";
+
 //console.log(actions.length, agencies.length, decisions.length, locations.length, counties.length);
 // const actions = Array.from(new Set(actionOptions));
 // const agencies = Array.from(new Set(agencyOptions));
@@ -151,7 +153,7 @@ const SearchFilters = (props) => {
         <Checkbox
           id="is_fast41"
           name="is_fast41"
-          onChange={(e) => updateFilterStateValues("is_fast41", !isFast41)}
+          onChange={(e) => updatePaginationStateValues("is_fast41", !isFast41)}
         />
       </Box>
       <Box>
@@ -330,14 +332,14 @@ export default SearchFilters;
 // const onLocationChange = (evt, item) => {
 //   var stateValues = [];
 //   const context = useContext(SearchContext);
-//   const { updateFilterStateValues, filters } = context;
+//   const { debouncedUpdateFilterStateValues, filters } = context;
 
 //   for (var i = 0; i < evt.length; i++) {
 //     //stateValues.push(evt[i].value);
 //   }
 //   //[TODO] need to update the countyOptions array to include all counties in the state selected
-//   updateFilterStateValues("countyOptions", narrowCountyOptions(stateValues));
-//   updateFilterStateValues("stateRaw", evt);
+//   debouncedUpdateFilterStateValues("countyOptions", narrowCountyOptions(stateValues));
+//   debouncedUpdateFilterStateValues("stateRaw", evt);
 //   countyOptions: narrowCountyOptions(stateValues);
 
 // };

@@ -4,7 +4,7 @@ import {Box, Autocomplete, TextField,FormControlLabel,FormControl,FormLabel} fro
 import { counties } from "../data/dropdownValues";
 const CountyFilter=()=>{
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters } = context;
+    const { debouncedUpdateFilterStateValues, filters } = context;
     const { county, countyRaw } = filters;
   
     const onCountyChange = (evt, item,tag) => {
@@ -15,8 +15,8 @@ const CountyFilter=()=>{
         // countyValues.push(evt[i].value);
       }
   
-      updateFilterStateValues("countyValues", countyValues);
-      //updateFilterStateValues("countyRaw", evt);
+      debouncedUpdateFilterStateValues("countyValues", countyValues);
+      //debouncedUpdateFilterStateValues("countyRaw", evt);
     };
     return (<>
       <FormLabel

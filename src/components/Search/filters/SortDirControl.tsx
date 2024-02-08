@@ -9,7 +9,7 @@ const options = [
 ]
 const SortDirControl = (evt,selected,reason) => {
     const ctx = useContext(SearchContext);
-    const { pagination, updateFilterStateValues,filters } = ctx;
+    const { pagination, debouncedUpdateFilterStateValues,filters } = ctx;
     const {sortby,sortdir} = pagination;
     
     const onSortDirChange = (evt: React.SyntheticEvent,value: string,reason) => {
@@ -26,7 +26,7 @@ const SortDirControl = (evt,selected,reason) => {
         else if (reason === "clear") {
           filteredValues = [];
         }
-        updateFilterStateValues("distance", filteredValues);
+        debouncedUpdateFilterStateValues("distance", filteredValues);
     }
     return (
       <Grid container display={"flex"}>

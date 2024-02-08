@@ -3,6 +3,9 @@ import SearchContext from "../SearchContext";
 import {Box, Autocomplete, TextField} from "@mui/material";
 import {agencies} from '../data/dropdownValues';
 import { FilterOptionType } from "@/components/interfaces/interfaces";
+//import _ from "underscore";
+import _debounce from "lodash/debounce";
+
 export default function CooperatingAgenciesFilter(props) {
     const context = useContext(SearchContext);
     const {
@@ -21,6 +24,7 @@ export default function CooperatingAgenciesFilter(props) {
     let raw = (evt.target as HTMLInputElement).value;
     console.log(`onCooperatingAgencyChange ~ target:`, raw);
     
+
     let filteredAgencies:FilterOptionType[] = []; 
         if (reason === "selectOption") {
           selected.map((agency:any) => {  
@@ -37,7 +41,7 @@ export default function CooperatingAgenciesFilter(props) {
         }
         updateFilterStateValues("cooperatingAgency", filteredAgencies);
       }
-        //updateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
+        //debouncedUpdateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);
     // const onCooperatingAgencyChange = (evt, selected, reason) => {
@@ -51,8 +55,8 @@ export default function CooperatingAgenciesFilter(props) {
     //   else if (reason === "removeOption") {
     //     filteredAgencies = cooperatingAgency.filter((v) => selected.value !== v);
     //   }
-    //   updateFilterStateValues("cooperatingAgency", filteredAgencies);
-    //   updateFilterStateValues("cooperatingAgencyRaw", evt);
+    //   debouncedUpdateFilterStateValues("cooperatingAgency", filteredAgencies);
+    //   debouncedUpdateFilterStateValues("cooperatingAgencyRaw", evt);
     //   //[TODO] Implement This 
     //   //filterResultsBy(this.state);
     // };

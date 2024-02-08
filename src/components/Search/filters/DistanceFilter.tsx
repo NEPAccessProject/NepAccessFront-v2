@@ -13,7 +13,7 @@ import { FilterOptionType, InputEvent } from "@/components/interfaces/interfaces
 const DistanceFilter = () => {
 
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters } = context;
+    const { debouncedUpdateFilterStateValues, filters } = context;
     const { distance } = filters;
     const onDistanceFilterChange = (evt:React.SyntheticEvent, selected, reason) => {
       
@@ -31,8 +31,8 @@ const DistanceFilter = () => {
         filteredDistances = [];
       }
       console.log(`onDecisionChange ~ filteredDistances:`, filteredDistances);
-      updateFilterStateValues("distance", filteredDistances);
-//      updateFilterStateValues("decisionsRaw", evt);
+      debouncedUpdateFilterStateValues("distance", filteredDistances);
+//      debouncedUpdateFilterStateValues("decisionsRaw", evt);
     }
 
   return (

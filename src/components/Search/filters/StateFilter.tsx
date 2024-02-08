@@ -2,12 +2,14 @@ import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
 import {Box, Autocomplete, TextField,FormControlLabel,FormControl,FormLabel} from "@mui/material";
 import {decisionOptions as decisions,counties,locations} from '../data/dropdownValues';
-   
+import _debounce from "lodash/debounce";
+
 export default function StateFilter(){
     const context = useContext(SearchContext);
     const { updateFilterStateValues, filters } = context;
     const { states, stateRaw, countyRaw, county } = filters;
-      const { cooperatingAgencyRaw, cooperatingAgency, agencyRaw } = filters;
+
+      const { cooperatingAgencyRaw, cooperatingAgency } = filters;
   
     const onLocationChange = (evt, item, reason) => {
       console.log(`onLocationChange ~ evt,item,reason:`, evt, item, reason);

@@ -16,7 +16,7 @@ export default function DecisionFilter() {
     pagination,
     filters,
     updatePaginationStateValues,
-    updateFilterStateValues,
+    debouncedUpdateFilterStateValues,
   } = context;
   const { decisions, decisionsRaw } = filters;
   const onDecisionChange = (evt:React.SyntheticEvent, selected, reason) => {
@@ -38,8 +38,8 @@ export default function DecisionFilter() {
       filteredDecisions = [];
     }
     console.log(`onDecisionChange ~ filteredDecisions:`, filteredDecisions);
-    updateFilterStateValues("decisions", filteredDecisions);
-    //updateFilterStateValues("decisionsRaw", evt);
+    debouncedUpdateFilterStateValues("decisions", filteredDecisions);
+    //debouncedUpdateFilterStateValues("decisionsRaw", evt);
   };
   //[TODO] need to
   return (

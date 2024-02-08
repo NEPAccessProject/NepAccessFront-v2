@@ -3,10 +3,15 @@ import SearchContext from "../SearchContext";
 import {Box, Autocomplete, TextField,FormControl,FormLabel} from "@mui/material";
 import {agencies, agencyOptions} from '../data/dropdownValues';
 import { FilterOptionType } from "@/components/interfaces/interfaces";
+//import _ from "lodash";
+import _debounce from "lodash/debounce";
+
+
 export default function AgencyFilter(props) {
     const context = useContext(SearchContext);
     const { updateFilterStateValues, filters } = context;
     const { agenciesRaw, agencies, cooperatingAgency, cooperatingAgencyRaw } = filters;
+
     const onAgencyChange = (evt, selected, reason) => {
     console.log(`onAgencyChange ~ evt, selected, reason:`, evt, selected, reason);
   
@@ -27,7 +32,7 @@ export default function AgencyFilter(props) {
           agencies = [];
         }
         updateFilterStateValues("agency", agencies);
-        //updateFilterStateValues("agencyRaw", evt);
+        //debouncedUpdateFilterStateValues("agencyRaw", evt);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);
       };

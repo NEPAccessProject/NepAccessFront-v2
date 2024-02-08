@@ -37,6 +37,7 @@ export type DocumentType = {
 	limit: number;
 	sortby: string;
 	sortdir: string;
+	totalCount: number;
   }
 
 export type SearchResultType = {

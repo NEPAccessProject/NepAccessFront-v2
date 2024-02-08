@@ -11,7 +11,7 @@ import SearchFilters from "../Search/SearchFilters";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
-
+import _debounce from 'lodash/debounce';
 import { useParams } from "react-router-dom";
 import {
   PaginiationType,
@@ -41,9 +41,6 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const _mounted = React.useRef(false);
   let params = useParams();
-  const   updateFilterStateValues = (key: string, value: any) => {
-    setFilterValues({...filters, [key]: value});
-  };
   useEffect(() => {
     _mounted.current = true;
     return () => {
@@ -51,7 +48,85 @@ const SearchApp = (props: SearchAppPropType) => {
     };
   });
 
-  const updatePaginationStateValues = (key: string, value: any) => {
+// #Start useEffects
+
+// Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
+useEffect(() => {
+  async function fetchCounts() {
+    //[TODO] Need to revise so we don't have to do the temp thing.
+    let temp = await fetch(`${host}/earliest_year`)
+    //[TODO] update urls so its /stats/earliest_year when hooked up to the server
+    let firstYear = await temp.json();
+    temp = await fetch(`${host}latest_year`)
+    let lastYear = await temp.json();
+    temp = await fetch(`${host}eis_count`);
+    let EISCount = await temp.json();
+    // let eaCount = (await fetch(`${host}stats/ea_count`)).json();
+    // let finalCount = await fetch(`${host}stats/final_count`);
+    // let noiCount = await fetch(`${host}stats/noi_count`);
+    // let rodCount = await fetch(`${host}stats/rod_count`);
+    // let scopingCount = await fetch(`${host}stats/scoping_count`);
+    
+    const totalCount = parseInt(firstYear) + parseInt(lastYear)+ parseInt(EISCount);
+    console.log("🚀 ~ fetchCounts ~ totalCount:", totalCount)
+    updatePaginationStateValues("limit", totalCount);
+    console.log(`fetchCounts ~ totalCount:`, totalCount);
+  }
+  fetchCounts();
+}),[filters]
+
+
+// Get the search results based on the filters
+// [TODO] Refactor urlFromContextPagination to handle active filters
+useEffect(() => {
+  console.log('USE EFFECTFILTERS ARE NOW',filters)
+  const url:string = urlFromContextPaginationAndFilters(pagination);
+  setIsLoading(true);
+  if(!_mounted.current) {
+    return;
+  }
+  const title:string = titleRaw || ""
+  if(title && title.length > 3){
+    setTitleRaw(titleRaw);
+  }
+  async function fetchData() {
+    console.log(`fetchData ~ url:`, url);
+    
+    console.log('FILTERED VALUES',filtered)
+    // [TODO] ONLY FOR MOCKING  Probalby need to have different function for search_no_context and search_top etc which in turn call a wrapper function for GET and POST
+      console.log('CALLING WITH URL',url)
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          //"Content-Type": "application/json",
+          //"Accept": "application/json", 
+          //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        },
+      });
+      const results =  await response.json();
+      setResults(results)
+      setIsLoading(false);
+  }
+  fetchData();
+  //[TODO] we don't want to search on every filter change - we will need to debounce this and add a search button
+  }, [pagination]);
+
+// #End useEffects
+
+  // useEffect(() => {
+ 
+  //   //get a count of document types and add up the total
+  //   (async function fetchData() {
+  //     const url:string = urlFromContextPagination(pagination);
+  //     const count = await getResultsCount(url);
+  //     console.log(`fetchData ~ count:`, count);
+  //     const total = count.reduce((acc,cur) => acc + cur.count,0) || 0;
+  //     console.log(`fetchData ~ total:`, total);
+  //     setPaginationValues({...'total': total});
+  //   })
+  // })
+
+  const updatePaginationStateValues = _debounce((key: string, value: any) => {
 
     console.log(`updatePaginationStateValues ~ key:string,value:any:`, key, value);
     setPaginationValues({
@@ -59,7 +134,12 @@ const SearchApp = (props: SearchAppPropType) => {
       [key]: value,
     });
     console.log('FINSHED FILTERS UPDATE - Filters are now',filters)
+  }, 1000);
+
+  const   updateFilterStateValues = (key: string, value: any) => {
+    setFilterValues({...filters, [key]: value});
   };
+
  
   const get = async (url: string) => {
     console.log(`get ~ url:`, url);
@@ -90,91 +170,27 @@ const SearchApp = (props: SearchAppPropType) => {
   
 
   }
-  useEffect(() => {
-    console.log('USE EFFECTFILTERS ARE NOW',filters)
-    const url:string = urlFromContextPagination(pagination);
-    setIsLoading(true);
-    if(!_mounted.current) {
-      return;
-    }
-    const title:string = titleRaw || ""
-    if(title && title.length > 3){
-      setTitleRaw(titleRaw);
-    }
-    async function fetchData() {
-      console.log(`fetchData ~ url:`, url);
-      const filtered:any = [];
-        Object.keys(filters).forEach((key) => {
-            const filterValue = filters[key]
-//            console.log(`key: ${key}`, 'has value: ', filters[key]);
-            if(filterValue){
-              filtered.push(filterValue)
-            }
 
-        })
-      console.log('FILTERED VALUES',filtered)
-      // [TODO] ONLY FOR MOCKING  Probalby need to have different function for search_no_context and search_top etc which in turn call a wrapper function for GET and POST
-        console.log('CALLING WITH URL',url)
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            //"Content-Type": "application/json",
-            //"Accept": "application/json", 
-            //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
-          },
-        });
-        const results =  await response.json();
-        setResults(results)
-        setIsLoading(false);
-    }
-    fetchData();
-    }, [pagination,filters]);
 
-  const urlFromContextPagination = (pagination: PaginiationType) => {
+  const urlFromContextPaginationAndFilters = (pagination: PaginiationType) => {
     console.log("🚀 ~ urlFromContextPagination ~ pagination:", pagination)
     const { page, limit, sortby, sortdir } = pagination;
+    //Get currently set filters to use in search query
+    const activeFilters = getActiveFilters(filters)
+    const queryString = `${host}`
+    activeFilters.forEach((filter) => {
+      queryString
+        .concat(`&${filter.field}=${filter.value}`)
+    })
+    console.log(`GENTERATED QUERY STRING:`, queryString);
+    //TODO temporary hack this should be part of retriving active filters
     const searchTerm  =  titleRaw.length ? `&doc.title=${titleRaw}`: "";
     const url:string = `${host}search_top/?_start=${page*limit}&_end=${limit*page+limit}${searchTerm}`;
     console.log("🚀 ~ urlFromContextPagination ~ url:", url)
     return url;
   }
 
-  useEffect(() => {
- 
-    //get a count of document types and add up the total
-    (async function fetchData() {
-      const url:string = urlFromContextPagination(pagination);
-      const count = await getResultsCount(url);
-      console.log(`fetchData ~ count:`, count);
-      const total = count.reduce((acc,cur) => acc + cur.count,0);
-      console.log(`fetchData ~ total:`, total);
-      setPaginationValues({...pagination, total: total});
-    })
-  })
-
-  useEffect(() => {
-    async function fetchCounts() {
-      //[TODO] Need to revise so we don't have to do the temp thing.
-      let temp = await fetch(`${host}/earliest_year`)
-      //[TODO] update urls so its /stats/earliest_year when hooked up to the server
-      let firstYear = await temp.json();
-      temp = await fetch(`${host}latest_year`)
-      let lastYear = await temp.json();
-      temp = await fetch(`${host}eis_count`);
-      let EISCount = await temp.json();
-      // let eaCount = (await fetch(`${host}stats/ea_count`)).json();
-      // let finalCount = await fetch(`${host}stats/final_count`);
-      // let noiCount = await fetch(`${host}stats/noi_count`);
-      // let rodCount = await fetch(`${host}stats/rod_count`);
-      // let scopingCount = await fetch(`${host}stats/scoping_count`);
-      
-      const totalCount = parseInt(firstYear) + parseInt(lastYear)+ parseInt(EISCount);
-      console.log("🚀 ~ fetchCounts ~ totalCount:", totalCount)
-      updatePaginationStateValues("limit", totalCount);
-      console.log(`fetchCounts ~ totalCount:`, totalCount);
-    }
-    fetchCounts();
-  }),[filters]
+  
 
   // useEffect(() => {
   //   if (!_mounted.current) {
@@ -304,7 +320,7 @@ const SearchApp = (props: SearchAppPropType) => {
       return activeFilters
   }
   const updateResults = async () => {
-    const url:string = urlFromContextPagination(pagination);
+    const url:string = urlFromContextPaginationAndFilters(pagination);
     console.log(`updateResults ~ url:`, url);
     const activeFilters = getActiveFilters(filters);
     
