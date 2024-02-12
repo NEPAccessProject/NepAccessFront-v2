@@ -1,8 +1,6 @@
 
 import React from "react";
-import { FilterType, SearchContextType,SearchFilterResultsType, SearchResultType } from '../interfaces/interfaces';
-import SearchResults from "./SearchResults";
-import SearchResult from "./SearchResult";
+import { FilterType, SearchContextType } from '../interfaces/interfaces';
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
 const filters: FilterType = {
@@ -47,7 +45,7 @@ const SearchContext = React.createContext<SearchContextType>({
   results: [],
   loading: false,
   pagination: {
-    page: 1,
+    page: 0,
     limit: 10,
     sortby: "Relavancy", //temporay for json-server
     sortdir: "DESC",

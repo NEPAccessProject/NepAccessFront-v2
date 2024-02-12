@@ -1,9 +1,10 @@
-import { Grid, Paper, TablePagination } from '@mui/material';
+import { Grid, Paper } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useRef } from 'react';
 import theme from '../../themes/theme';
 import { SearchResultsType } from '../interfaces/interfaces';
 import SearchContext from './SearchContext';
+import SearchResult from './SearchResult';
 
 const GridItemProps = {
   padding: 0.5,
@@ -52,31 +53,23 @@ const sortByRelevance = (a, b) => {
 
 
 //not having a dependency should... only run once per result set
-const SearchResults = (props:SearchResultsType) => {
+const SearchResults = (props: SearchResultsType) => {
   const classes = useStyles(theme);
   const _mounted = useRef(false);
   const context = React.useContext(SearchContext);
   const results = context.results;
-  const {filters,pagination,updatePaginationStateValues} = context;
-  const {page,sortby,limit,sortdir} = pagination;
+  const { filters, pagination, updatePaginationStateValues } = context;
+  const { page, sortby, limit, sortdir } = pagination;
 
-  //[TODO] These are somewhat temporary to check if we can get rid results with a low relvancy score
-//  const allScores: number[] = getScores(results);
- 
-
-  const handleChangePage = (evt,newPage:number) => {
-    console.log("🚀 ~ handleChangePage ~ number:", newPage);
+  const handleChangePage = (evt, newPage: number) => {
     //setPage(newPage);
     updatePaginationStateValues("page", newPage);
   };
   const handleChangeRowsPerPage = (evt) => {
-    console.log(`handleChangeRowsPerPage ~ event:`, event);
-    //setRowsPerPage(parseInt(event.target.value, 10));
-    const rowsPerPage:Number = parseInt((evt.target as HTMLInputElement).value, 10);
+    const rowsPerPage: Number = parseInt((evt.target as HTMLInputElement).value, 10);
     updatePaginationStateValues("limit", rowsPerPage);
-    //setPage(0);
   };
-  const onPaginationChange = (evt,page) =>{
+  const onPaginationChange = (evt, page) => {
     updatePaginationStateValues("page", parseInt(page));
     evt.preventDefault();
     console.log('onPaginationChange', evt)
@@ -84,35 +77,31 @@ const SearchResults = (props:SearchResultsType) => {
 
   return (
     <Paper elevation={0} id="search-results-root">
-        <ul>
-        <li><b>Page:</b>{page}</li>
-        <li><b>Sort By:</b>{sortby}</li>
-        <li><b>Sort Dir</b>{sortdir}</li>
-        <li><b>Limit:</b>{limit}</li>
-      </ul>
       <>
-        <TablePagination
-            rowsPerPageOptions={[1,5,10,20, 25, 100]}
+        {/* <TablePagination
+          rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
           //count={results.length} [TODO] Need to get count from the server
-            count={results.length}
-            rowsPerPage={limit}//{limit}
-            page={page}
-            onPageChange={(evt,page)=>handleChangePage(evt,page)}
-            onRowsPerPageChange={(evt)=>handleChangeRowsPerPage(evt)}
-            showFirstButton={true}
-            showLastButton={true}
-            color='primary'
-            component={`div`}
+          count={results.length}
+          rowsPerPage={limit}//{limit}
+          page={page}
+          onPageChange={(evt, page) => handleChangePage(evt, page)}
+          onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
+          showFirstButton={true}
+          showLastButton={true}
+          color='primary'
+          component={`div`} */}
 
-      /></>
-        {results.map((result,idx)=> {
-          {
+        />
+      </>
+      {results.map((result, idx) => {
+        {
           return (
             <Grid {...GridItemProps} key={`${result.doc.id}`}>
-              <>{result.doc.title}</>
-              {/* <SearchResult result={result} /> */}
+              <SearchResult result={result} />
             </Grid>
-          )}}
+          )
+        }
+      }
       )}
     </Paper>
   );

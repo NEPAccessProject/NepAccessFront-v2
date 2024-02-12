@@ -1,11 +1,11 @@
-import { Button, Container, Grid, Paper } from "@mui/material";
+import { Alert, Box, Button, Container, Grid, Paper, Snackbar } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 //import Grid from "@mui/material/Unstable_Grid2";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SearchFilters from "../Search/SearchFilters";
-import { FilterType, SearchResultType } from "../interfaces/interfaces";
+import { SearchResultType } from "../interfaces/interfaces";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
@@ -21,7 +21,7 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const [results, setResults] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
-  const [titleRaw, setTitleRaw] = useState(context.filters.titleRaw);
+  //const [titleRaw, setTitleRaw] = useState("");
   const [pagination, setPaginationValues] = useState(context.pagination);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState(context);
@@ -84,9 +84,11 @@ const SearchApp = (props: SearchAppPropType) => {
     }
     const currentResults = results
     console.log('TOP UNSORTED RESULT',results[0])
-    const sorted:SearchResultType[] = sortSearchResults(currentResults,sortby)
+    //const sorted:SearchResultType[] = 
+    //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
+    sortSearchResults(currentResults,sortby)
     console.log('After Sort Results')
-    setResults(sorted)
+    //setResults(sorted)
   },[sortby,sortdir])
 
   // Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
@@ -133,14 +135,15 @@ const SearchApp = (props: SearchAppPropType) => {
       setError(err);
     }
   };
-  function getActiveFilters(input: FilterType[]): FilterType[] {
-    return input.filter(
-      (item) =>
-        item !== null &&
-        item !== undefined &&
-        !(Array.isArray(item) && item.length === 0)
-    );
-  }
+
+  // function getActiveFilters(input: FilterType): FilterType[] {
+  //   return input input.filter(
+  //     (item) =>
+  //       item !== null &&
+  //       item !== undefined &&
+  //       !(Array.isArray(item) && item.length === 0)
+  //   );
+  // }
   //[TODO] experiment with score relavancy and dump the irrelevant results, ideally from the backend
   function filterResults(results: SearchResultType[]): SearchResultType[] {
     if (!Array.isArray(results)) {
@@ -161,39 +164,11 @@ const SearchApp = (props: SearchAppPropType) => {
 
     return filteredResults;
   }
-  // Get the search results based on the filters
-  // [TODO] Refactor urlFromContextPagination to handle active filtersx
-
-  async function fetchData() {
-    try {
-      const keys = Object.keys(filters);
-      console.log(`fetchData ~ keys:`, keys);
-      const filtered: FilterType[] = getActiveFilters([filters]);
-      console.log("FILTERED VALUES", filtered);
-      const url = urlFromContextPaginationAndFilters(pagination, filtered);
-
-      // [TODO] ONLY FOR MOCKING  Probalby need to have different function for search_no_context and search_top etc which in turn call a wrapper function for GET and POST
-      console.log("CALLING WITH URL", url);
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        },
-      });
-    } catch (error) {
-      setError(`Error fetching data: ${error}`);
-    } finally {
-      setLoading(false);
-    }
-    //        setLoading(false);
-  }
 
   // #End useEffects
   const updateFilterStateValues = (key: string, value: any) => {
     console.log(
-      `Updating filter with the key of ${key} and value of ${JSON.stringify(value)}`
+      `UPDATING ${key} with the ` + `following value: ${value}`
     );
     setFilterValues({ ...filters, [key]: value });
   };
@@ -226,24 +201,25 @@ const SearchApp = (props: SearchAppPropType) => {
     return results;
   };
 
+  //[TODO] Temp hack untill connected to the backend
   const urlFromContextPaginationAndFilters = (
     pagination: any,
     filters: any,
-    searchType : "search_top" | "search_no_context" = "search_top"
+    searchType : "search_top" | "search_no_context" | "text/search_no_context" | "text/search_top"
   ) => {
     console.log("🚀 ~ urlFromContextPagination ~ pagination:", pagination);
     const { page, limit, sortby, sortdir } = pagination;
     //Get currently set filters to use in search query
-    const activeFilters = getActiveFilters(filters);
+    //const activeFilters = getActiveFilters(filters);
     const queryString = `${host}`;
-    activeFilters.forEach((filter) => {
-      queryString.concat(`&${filter[field]}=${filter.value}`);
-    });
+    // activeFilters.forEach((filter) => {
+    //   queryString.concat(`&${filter[field]}=${filter.value}`s);
+    // });
     console.log(`GENTERATED QUERY STRING:`, queryString);
     //TODO temporary hack this should be part of retriving active filters
-    const searchTerm = titleRaw.length ? `&doc.title=${titleRaw}` : "";
+    const searchTerm = context.filters.titleRaw.length ? `&title=${context.filters.titleRaw}` : "";
 
-    const url: string = `${host}${searchType}/?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
+    const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
     console.log("🚀 ~ urlFromContextPagination ~ url:", url);
     return url;
   };
@@ -272,50 +248,65 @@ const SearchApp = (props: SearchAppPropType) => {
   };
 
   const searchTop = async () => {
-    //const url = urlFromContextPaginationAndFilters(pagination,context.filters);
-    //[TIDI] should refactor so all Gets and Post use the same functions
+    console.log('Starting Search Top')
+    try{
     setLoading(true);
-    //const url = `${host}text/search_top`;
-    //const url = `${host}search_top`;
     const url = urlFromContextPaginationAndFilters(pagination, filters,`search_top`);
-    const results = await axios.post(url, {
-      method: "POST",
-      body: JSON.stringify({
-        title: "xxxxxxx",
-      }),
-    });
-    console.log(`searchTop ~ results:`, results);
-    setResults(results.data.results);
+    // const results = await axios.post(url, {
+    //       title: "xxxxxxx",
+    //   }),
+      axios.get(url)
+      .then((resp) => {
+        console.log('SEARCH TOP RESPONSE',resp.data)
+        setResults(resp.data);
+        setLoading(false);
+
+      })
+      .catch((err) => {
+          setError(`${err}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      })
+
+    //[TODO] We need to add 
     setLoading(false);
+  }
+  catch(error){
+    setError(`${error}`);
+  }
+  finally{
+    setLoading(false);
+  }
   };
   const searchNoContext = async () => {
-    //const url = urlFromContextPaginationAndFilters(pagination,context.filters);
-    //[TIDI] should refactor so all Gets and Post use the same functions
+    try{
     setLoading(true);
-    //   function calculateAverage(array) {
-    //   const sum = array.reduce((a, b) => a + b, 0);
-    //   const average = sum / array.length;
-    //   console.log('The average scores per result is: ', average);
-    //   return average;
-    // }
     console.log("IS LOADING", loading);
     //const url = `${host}text/search_no_context`;
     //const url = `${host}search_no_context`;
     const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
     console.log("🚀 ~ searchNoContext ~ url:", url);
-    const response = await axios.post(url, {
-      title: "copper mine",
-    })
+    // const response = await axios.post(url, {
+    //   title: titleRaw
+    // })
+    const response = await axios.get(url);
     updatePaginationStateValues("total", response.data.length);
-    console.log("🚀 ~ searchNoContext ~ data:", response);
 
     //[TODO][CRITICAL][WTF]  Currently the result set returns
-    const data = response.data.splice(0, limit * 3);
-
+    const data = response.data;
     const results: SearchResultType[] = filterResults(data);
     setSearched(true);
     setResults(results);
     setLoading(false);
+  }
+  catch(error){
+    console.error(`searchNoContext ~ error:`, error);
+    setError("Error Searching for Results!")
+  }
+  finally{
+    setLoading(false);
+  }
   };
   const post = async (url: string, data: any) => {
     const res = await fetch(url, {
@@ -342,7 +333,8 @@ const SearchApp = (props: SearchAppPropType) => {
     });
     console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
-
+  const titleRaw = context.filters.titleRaw;
+  console.log("🚀 ~ SearchApp ~ titleRaw:", titleRaw)
   const value = {
     ...context,
     results,
@@ -363,6 +355,12 @@ const SearchApp = (props: SearchAppPropType) => {
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
+        <Box sx={{display:'flex', justifyContent:'center'}}>
+          <Snackbar>
+            <Alert severity="error" onClose={() => {}}>
+              {error}
+            </Alert>
+        </Snackbar></Box>
         <Paper elevation={1}>
           <Grid container>
             <Grid item xs={12} flex={1}>
@@ -385,18 +383,24 @@ const SearchApp = (props: SearchAppPropType) => {
               <Button
                 variant="contained"
                 disabled={
-                  loading || error || titleRaw.length === 0 ? true : false
+                  error.length > 0 || filters.titleRaw.length === 0
                 }
-                onClick={async () => await searchNoContext()}
+                onClick={async () => await searchTop()}
               >
                 Search
               </Button>
+              <Box>
+                  Title : {titleRaw} vs {context.filters.titleRaw} vs {filters.titleRaw}
+              </Box>
+                
+
               <h2>
                 {results?.length ? results.length : 0} Search Results Found
               </h2>
 
               <>
                 {loading && (
+                  <>
                   <Grid container display={"flex"}>
                     <Grid
                       item
@@ -409,6 +413,7 @@ const SearchApp = (props: SearchAppPropType) => {
                       <CircularProgress size={100} />
                     </Grid>
                   </Grid>
+                  </>
                 )}
                 {!loading && results && results.length > 0 ? (
                   <>
@@ -421,6 +426,19 @@ const SearchApp = (props: SearchAppPropType) => {
                 )}
               </>
             </Grid>
+          </Grid>
+          <Grid container style={{
+            border: '1px solid #ccc',
+            backgroundColor: '#f5f5f5',
+          }}>
+
+                <h6>Has Searched ? {searched ? "Yes" : "No"}</h6>
+                <h6>Has Error ? {error.length > 0 ? "Yes" : "No"}</h6>
+                <h6>Has Title ? {titleRaw.length > 0 ? "Yes" : "No"}</h6>
+                <h6>Has # of Results {results.length > 0 ? "Yes" : "No"} </h6>
+                <h6>loading ? {loading ? "Yes" : "No"} </h6>
+              <h5> Title from context.filter  {context.filters.titleRaw}</h5>
+              <h5> Deconstruced title:   {titleRaw}</h5>
           </Grid>
         </Paper>
       </Container>

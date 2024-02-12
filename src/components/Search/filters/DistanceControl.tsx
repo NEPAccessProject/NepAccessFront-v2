@@ -9,11 +9,13 @@ import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
 //import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { FilterOptionType } from "@/components/interfaces/interfaces";
-const DistanceFilter = () => {
-
-    const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters,sortSearchResults } = context;
-    const {sortby,sortdir} = context.filters
+const DistanceControl = () => {
+  const context = useContext(SearchContext);
+  const results = context.results;
+  const { updateFilterStateValues, filters,sortSearchResults } = context;
+  console.log("🚀 ~ DistanceControl ~ # of results:", results.length)
+  
+    const {sortby,sortdir} = context.pagination;
     const { distance } = filters;
     const onDistanceFilterChange = (evt:React.SyntheticEvent, selected, reason) => {
       
@@ -30,8 +32,7 @@ const DistanceFilter = () => {
       } else if (reason === "clear") {
         filteredDistances = [];
       }
-      console.log(`onDecisionChange ~ filteredDistances:`, filteredDistances);
-      const results = sortSearchResults(filteredDistances,sortby);
+
       updateFilterStateValues("distance", filteredDistances);
 //      updateFilterStateValues("decisionsRaw", evt);
     }
@@ -39,17 +40,20 @@ const DistanceFilter = () => {
   return (
     <>
           <Grid container style={{ display: "flex" }}>
-      <Grid xs={3}paddingLeft={1}>
+      <Grid item xs={3}paddingLeft={1}>
         <FormLabel htmlFor="searchAgency">Search Within...</FormLabel>
       </Grid>
 
-      <Grid xs={9}>
+      <Grid item xs={9}>
         <FormControl fullWidth>
           <Autocomplete
             fullWidth
             id="limit"
             style={{
               width: "100%",
+            }}
+            isOptionEqualToValue={(option, value) => {
+              return option === value
             }}
             tabIndex={4}
             options={["Exact Phrase", "10", "25", "50", "100"]}
@@ -77,4 +81,4 @@ const DistanceFilter = () => {
     </>
   );
 }
-export default DistanceFilter;
+export default DistanceControl;

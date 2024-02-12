@@ -1,19 +1,21 @@
 import { SearchOutlined } from "@mui/icons-material";
-import CheckIcon from "@mui/icons-material/Check";
 import {
-  Alert,
   Autocomplete,
   FormControl,
   FormLabel,
   Grid,
   IconButton,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 //import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
 import SearchContext from "./SearchContext";
+import DistanceControl from "./filters/DistanceControl";
+import LimitControl from "./filters/LimitControl";
 import SortByControl from "./filters/SortByControl";
+import SortDirControl from "./filters/SortDirControl";
+
 const GridItemProps = {
   borderRight: 1,
   borderColor: "#ddd",
@@ -21,6 +23,7 @@ const GridItemProps = {
   alignItems: "center",
   justifyContent: "center",
   paddingRight: 2,
+  item: true,
   // elevation: 1,
   // borderRadius: 1,
   // justifyContent: 'flex-start',
@@ -52,7 +55,6 @@ const SearchHeader = () => {
     console.log("🚀 ~ onexChange ~ evt:", evt)
     evt.preventDefault();
     const titleRaw = (evt.target as HTMLInputElement).value;
-    setTitleRaw(titleRaw);
     // console.log("🚀 ~ onChange ~ titleRaw:", titleRaw)
     updateFilterStateValues("titleRaw", titleRaw);
     //clear existing error if any since the user has typed
@@ -63,17 +65,17 @@ const SearchHeader = () => {
   const onError = (evt: React.SyntheticEvent) => {
     setError(`Please enter a search term(s) to start searching`);
   }
-  const onIconClick = (evt: React.SyntheticEvent) => {
+  const onIconClick = async(evt: React.SyntheticEvent) => {
 
     if (!titleRaw || titleRaw === "") {
       setError("Please enter a search term");
       return;
     }
-    // evt.preventDefault();
+    evt.preventDefault();
     // const raw = (evt.target as HTMLInputElement).value;
     // console.log(`onIconClick ~ raw:`, raw);
     // updatePaginationStateValues("titleRaw", raw);
-    searchNoContext()
+    const done = await searchNoContext();
   };
 
   const onKeyDown = (evt: React.KeyboardEvent) => {
@@ -101,14 +103,9 @@ const SearchHeader = () => {
       >
 
         <Grid 
-          item
+          {...GridItemProps}
           id={'distance-filter'}
-          display={"flex"}
-          justifyContent={"center"}
           xs={12}
-          alignItems={"center"}
-          alignContent={"center"}
-          justifyItems={"center"}
         >
           <TextField
             fullWidth
@@ -140,26 +137,26 @@ const SearchHeader = () => {
             }}
           />
         </Grid>
-        <Grid xs={12} item>
+        {/* <Grid xs={12} {...GridItemProps}>
           {error && (
             <Alert variant="filled" icon={<CheckIcon fontSize="inherit" />} severity="error">
               Error! Please enter a search term(s) to continue searching
             </Alert>
           )}
-        </Grid>
+        </Grid> */}
       </Grid>
       <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
-          {/* <DistanceFilter /> */}
+          <DistanceControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
           <SortByControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-          {/* <SortDirControl /> */}
+            <SortDirControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-          {/* <LimitControl /> */}
+          <LimitControl />
         </Grid>
       </Grid>
     </>
@@ -180,11 +177,11 @@ const DistanceFilter = () => {
   const { page, limit, sortby, sortdir } = pagination;
   return (
     <Grid container style={{ display: "flex" }}>
-      <Grid xs={3} style={gridStyle} paddingLeft={1}>
+      <Grid item xs={3} style={gridStyle} paddingLeft={1}>
         <FormLabel htmlFor="searchAgency">Search Within...</FormLabel>
       </Grid>
 
-      <Grid xs={9} style={gridStyle}>
+      <Grid item xs={9} style={gridStyle}>
         <FormControl fullWidth>
           <Autocomplete
             fullWidth
@@ -218,48 +215,6 @@ const DistanceFilter = () => {
           />
         </FormControl>
       </Grid>
-    </Grid>
-  );
-};
-
-
-const LimitControl = () => {
-  const context = useContext(SearchContext);
-  const { pagination, updatePaginationStateValues } = context;
-  const { page, limit, sortby, sortdir } = pagination;
-  return (
-    <Grid container>
-      <Grid xs={3} item style={gridStyle} marginRight={0} paddingRight={0}>
-        <FormLabel htmlFor="searchAgency"># of Results:</FormLabel>
-      </Grid>
-      <Grid xs={9} item>
-        <FormControl fullWidth>
-          <Autocomplete
-            fullWidth
-            id="limit"
-            tabIndex={4}
-            options={["1", "10", "25", "50", "100"]}
-            value={`${limit}`}
-            onChange={(evt, value, tag) =>
-              updatePaginationStateValues("limit", value)
-            }
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  placeholder="Set A limit"
-                  variant="outlined"
-                  sx={{
-                    wordWrap: "break-word",
-                    overflow: "hidden",
-                    p: 0,
-                  }}
-                />
-              );
-            }}
-          />
-        </FormControl>
-      </Grid>
-    </Grid>
+    </Grid> 
   );
 };

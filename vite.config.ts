@@ -29,6 +29,6 @@ export default defineConfig({
   define: {
     __APP_ENV__: JSON.stringify(env.APP_ENV),
 
-  }
+  },
 
 });
