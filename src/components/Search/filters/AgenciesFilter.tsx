@@ -32,7 +32,7 @@ export default function AgencyFilter(props) {
           agencies = [];
         }
         updateFilterStateValues("agency", agencies);
-        //debouncedUpdateFilterStateValues("agencyRaw", evt);
+        //updateFilterStateValues("agencyRaw", evt);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);
       };

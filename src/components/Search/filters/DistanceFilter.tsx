@@ -1,19 +1,19 @@
-import React, { useContext } from "react";
-import SearchContext from "../SearchContext";
 import {
-  Box,
   Autocomplete,
-  TextField,
   FormControl,
   FormLabel,
+  Grid,
+  TextField
 } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import { actionOptions } from "../data/dropdownValues";
-import { FilterOptionType, InputEvent } from "@/components/interfaces/interfaces";
+import React, { useContext } from "react";
+import SearchContext from "../SearchContext";
+//import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import { FilterOptionType } from "@/components/interfaces/interfaces";
 const DistanceFilter = () => {
 
     const context = useContext(SearchContext);
-    const { debouncedUpdateFilterStateValues, filters } = context;
+    const { updateFilterStateValues, filters,sortSearchResults } = context;
+    const {sortby,sortdir} = context.filters
     const { distance } = filters;
     const onDistanceFilterChange = (evt:React.SyntheticEvent, selected, reason) => {
       
@@ -31,8 +31,9 @@ const DistanceFilter = () => {
         filteredDistances = [];
       }
       console.log(`onDecisionChange ~ filteredDistances:`, filteredDistances);
-      debouncedUpdateFilterStateValues("distance", filteredDistances);
-//      debouncedUpdateFilterStateValues("decisionsRaw", evt);
+      const results = sortSearchResults(filteredDistances,sortby);
+      updateFilterStateValues("distance", filteredDistances);
+//      updateFilterStateValues("decisionsRaw", evt);
     }
 
   return (

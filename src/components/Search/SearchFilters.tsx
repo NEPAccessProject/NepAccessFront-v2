@@ -1,47 +1,24 @@
 import {
-  Autocomplete,
   Box,
   Button,
-  Container,
   Checkbox,
-  Paper,
   Divider,
-  FormControl,
-  FormLabel,
-  Link,
-  TextField,
-  Typography,
-  Stack,
-  Chip,
   FormControlLabel,
-  FormLabelOwnProps,
-  FormLabelProps,
+  FormLabel,
+  Typography
 } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2";
-import { styled, makeStyles } from "@mui/styles";
-import React, { useContext, useState } from "react";
+import { useContext } from "react";
 //import { ThemeProvider, createUseStyles } from "react-jss";
+import { makeStyles } from "@mui/styles";
 import SearchContext from "./SearchContext";
 //import Grid from '@mui/material/Grid'; // Grid version 1
-import { ThemeProvider } from "@material-ui/core";
-import SearchDatePickers from "./SearchDatePickers";
-import { FilterType } from "../interfaces/interfaces";
 import ActionsFilter from "./filters/ActionsFilter";
 import AgencyFilter from "./filters/AgenciesFilter";
+import CooperatingAgenciesFilter from "./filters/CooperatingAgenciesFilter";
 import DecisionFilter from "./filters/DecisionFilter";
 import StatesFilter from "./filters/StateFilter";
-import CooperatingAgenciesFilter from "./filters/CooperatingAgenciesFilter";
 
-import {
-  actionOptions as actions,
-  agencyOptions as agencies,
-    decisionOptions as decisions,
-    locations,
-  counties,
-} from "./data/dropdownValues";
 import CountyFilter from "./filters/CountyFilter";
-import ActionFilter from "./filters/ActionsFilter";
-import _debounce from "lodash/debounce";
 
 //console.log(actions.length, agencies.length, decisions.length, locations.length, counties.length);
 // const actions = Array.from(new Set(actionOptions));
@@ -332,14 +309,14 @@ export default SearchFilters;
 // const onLocationChange = (evt, item) => {
 //   var stateValues = [];
 //   const context = useContext(SearchContext);
-//   const { debouncedUpdateFilterStateValues, filters } = context;
+//   const { updateFilterStateValues, filters } = context;
 
 //   for (var i = 0; i < evt.length; i++) {
 //     //stateValues.push(evt[i].value);
 //   }
 //   //[TODO] need to update the countyOptions array to include all counties in the state selected
-//   debouncedUpdateFilterStateValues("countyOptions", narrowCountyOptions(stateValues));
-//   debouncedUpdateFilterStateValues("stateRaw", evt);
+//   updateFilterStateValues("countyOptions", narrowCountyOptions(stateValues));
+//   updateFilterStateValues("stateRaw", evt);
 //   countyOptions: narrowCountyOptions(stateValues);
 
 // };

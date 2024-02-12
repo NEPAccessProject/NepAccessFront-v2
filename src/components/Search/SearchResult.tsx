@@ -3,14 +3,17 @@ import {
   SearchResultPropsType,
   SearchResultType,
 } from "@/components/interfaces/interfaces";
-import { Button, Typography, styled } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useContext } from "react";
 import SearchContext from "./SearchContext";
+import SearchResultCards from "./SearchResultCards";
+
 const SearchResult = (props: SearchResultPropsType) => {
   const result: SearchResultType = props.result;
   const doc: DocumentType = result.doc;
   const context = useContext(SearchContext);
+  console.log("🚀 ~ SearchResult ~ context:", context)
   //const {action,commentDate,agency} = doc;
   const { filters } = context;
   const {
@@ -26,15 +29,17 @@ const SearchResult = (props: SearchResultPropsType) => {
     decisionsRaw,
   } = filters;
 
-  const GridContainer = styled(Grid)(() => ({
+  const GridContainerProps = {
     borderLeft: "1px solid #eee",
     display: "flex",
     justifyContent: "center",
     padding: 1,
-  }));
+    container: true,
+  }
 
-  const DataCell = styled(Grid)(({ theme }) => ({
+  const GridItemProps = {
    spacing: 1,
+   item: true,
    borderLeft: 'none',
    borderRight: '1px solid #eee',
    display: 'flex',
@@ -50,7 +55,7 @@ const SearchResult = (props: SearchResultPropsType) => {
        color: 'purple',
      },
     },
-  }));
+  }
 
    const style = {
     BorderRight: "1px solid #eee",
@@ -61,23 +66,22 @@ const SearchResult = (props: SearchResultPropsType) => {
     justifyItems: "center",
     display: "flex",
   };
-  // console.log('RECEIVED RESULT',result)
+  console.log('Search Result RECEIVED RESULT',result)
   return (
     <>
     {result && result.doc  &&
     (
-    <GridContainer className="search-result-container" borderBottom={1} borderColor={'#eee'} style={{...style}} container xs={12}>
-      <DataCell xs={12}>
+    <Grid  className="search-result-container" {...GridContainerProps} borderBottom={1} borderColor={'#eee'} style={{...style}} container xs={12}>
+      <Grid {...GridItemProps} xs={12}>
         <Typography variant="h6" color="textSecondary" style={{margin: 0, padding: 0}}>
-          ID:{result.id}
-          
         </Typography>
-      </DataCell>
-      <DataCell xs={12}>
+        <SearchResultCards result={result} />
+      </Grid>
+      <Grid {...GridItemProps} xs={12}>
         <Typography variant="h3">{result.doc.title}</Typography>
-      </DataCell>
-      <GridContainer display={"flex"} borderBottom={1} borderTop={1} borderColor={"#eee"} borderLeft={0} container xs={12}>
-        <DataCell xs={1} borderLeft={0}>
+      </Grid>
+      <Grid {...GridContainerProps} display={"flex"} borderBottom={1} borderTop={1} borderColor={"#eee"} borderLeft={0} container xs={12}>
+        <Grid {...GridItemProps} xs={1} borderLeft={0}>
           <Typography
             justifyContent={"center"}
             alignContent={"center"}
@@ -86,26 +90,26 @@ const SearchResult = (props: SearchResultPropsType) => {
           >
             {doc.documentType}
           </Typography>
-        </DataCell>
-        <DataCell xs={1} flex={1}>
+        </Grid>
+        <Grid {...GridItemProps} xs={1} flex={1}>
           <Typography>
             {doc.commentDate
             ? new Date(doc.commentDate).toLocaleDateString()
             : "N/A"}</Typography>
-        </DataCell>
-        <DataCell xs={6}>
+        </Grid>
+        <Grid {...GridItemProps} xs={6}>
           {`${doc.title}`}
-        </DataCell>
-        <DataCell xs={2} flex={1} style={{ ...style }}>
+        </Grid>
+        <Grid  {...GridItemProps} xs={2} flex={1} style={{ ...style }}>
           <Button variant="contained">Download</Button>
-        </DataCell>
-      </GridContainer>
-      <DataCell xs={12}>
+        </Grid>
+      </Grid>
+      <Grid {...GridItemProps} xs={12}>
         <Typography variant="body2">
           urna molestie at. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Quam quisque id diam vel quam elementum pulvinar. Elit pellentesque habitant morbi tristique senectus.
         </Typography>
-      </DataCell>
-    </GridContainer>
+      </Grid>
+    </Grid>
     )}
     </>
   );

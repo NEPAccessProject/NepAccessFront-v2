@@ -6,7 +6,7 @@ import _debounce from "lodash/debounce";
 
 export default function StateFilter(){
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters } = context;
+    const {  updateFilterStateValues,updatePaginationStateValues, filters } = context;
     const { states, stateRaw, countyRaw, county } = filters;
 
       const { cooperatingAgencyRaw, cooperatingAgency } = filters;

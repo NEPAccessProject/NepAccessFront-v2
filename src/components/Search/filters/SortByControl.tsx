@@ -5,8 +5,26 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 
 const SortByControl = () => {
     const ctx = useContext(SearchContext);
-    const { pagination, updatePaginationStateValues } = ctx;
+    const { pagination, updatePaginationStateValues,results,sortSearchResults } = ctx;
     const { page, limit, sortby } = pagination;
+
+    const onSortByChange = (evt, value, reason) => {
+
+
+      if(value.toLowerCase() === "relevance") {
+        sortSearchResults(results,`${value}`);
+      }
+      else if (value.toLowerCase() === "date") {
+        sortSearchResults(results,`${value}`);
+      }
+      else if (value.toLowerCase() === "title") {
+        sortSearchResults(results,`${value}`);
+      }
+
+      console.log(`onSortByChange ~ value:`, value,"reason:", reason);
+      updatePaginationStateValues("sortby", value);
+      sortSearchResults(results,`${value}`);
+    }
     return (
       <Grid container display={"flex"}>
         <Grid xs={3} display={'flex'} style={{justifyContent: 'center',alignItems: 'center'}}>
@@ -19,10 +37,10 @@ const SortByControl = () => {
               id="sortby"
               tabIndex={5}
               defaultValue={"relevance"}
-              options={["Relevance", "Title","Lead Agency" ,"Date","State"]}
+              options={['Relevance', 'Date', 'Title']}
               value={`${sortby}`}
               onChange={(evt, value, tag) =>
-                updatePaginationStateValues("sortby", value)
+                onSortByChange(evt, value, tag)
               }
               renderInput={(params) => {
                 return (

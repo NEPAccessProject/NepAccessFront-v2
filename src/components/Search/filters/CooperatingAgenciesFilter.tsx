@@ -41,7 +41,7 @@ export default function CooperatingAgenciesFilter(props) {
         }
         updateFilterStateValues("cooperatingAgency", filteredAgencies);
       }
-        //debouncedUpdateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
+        //updateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);
     // const onCooperatingAgencyChange = (evt, selected, reason) => {
@@ -55,8 +55,8 @@ export default function CooperatingAgenciesFilter(props) {
     //   else if (reason === "removeOption") {
     //     filteredAgencies = cooperatingAgency.filter((v) => selected.value !== v);
     //   }
-    //   debouncedUpdateFilterStateValues("cooperatingAgency", filteredAgencies);
-    //   debouncedUpdateFilterStateValues("cooperatingAgencyRaw", evt);
+    //   updateFilterStateValues("cooperatingAgency", filteredAgencies);
+    //   updateFilterStateValues("cooperatingAgencyRaw", evt);
     //   //[TODO] Implement This 
     //   //filterResultsBy(this.state);
     // };

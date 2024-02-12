@@ -1,26 +1,13 @@
-import { SortOutlined } from '@mui/icons-material';
-import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import { useMediaQuery } from '@mui/material'
-import Grid from '@mui/material/Unstable_Grid2';
+import CloudDownload from '@mui/icons-material/CloudDownload';
 import {
   Checkbox,
   FormControl,
-  FormControlLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Hidden,
-  Typography,
+  FormControlLabel, Grid, MenuItem, Select, Typography, useMediaQuery
 } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 //import Grid from '@mui/material/Grid'; // Grid version
-import { styled } from '@mui/material/styles';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import SearchContext from './SearchContext';
 // height: 75,
 const useStyles = makeStyles((theme) => ({
@@ -94,24 +81,24 @@ function SearchResultOptions(props) {
       // justifyContent={isDesktop ? 'center' : 'flex-start'}
       >
 
-          <Grid xs={12} border={1} md={6} border={0} id="result-options-grid-top-container">
-            <Grid xs={12}
+          <Grid item xs={12} border={1} md={6} id="result-options-grid-top-container">
+            <Grid item xs={12}
               borderRight={1} style={gridItemStyle} id="show-checkbox-grid-item" className={classes.container}
             >
               <ShowTextCheckbox showContext={showContext} onCheckboxChecked={(evt) => onCheckboxChecked(evt)} />
             </Grid>
-            <Grid xs={12} borderRight={1} style={gridItemStyle} id="sort-by-grid-item"
+            <Grid xs={12} item borderRight={1} style={gridItemStyle} id="sort-by-grid-item"
             >
               <SortByControl onSortByChangeHandler={onSortByChangeHandler} orderBy={sortBy} />
             </Grid>
           </Grid>
 
-          <Grid xs={12} md={6} borderRight={1} style={gridItemStyle} id="sort-by-grid-item">
+          <Grid item xs={12} md={6} borderRight={1} style={gridItemStyle} id="sort-by-grid-item">
             <SortDirControl onSortDirectionChangeHandler={onSortDirectionChangeHandler} sortDirection={sortDirection} />
           </Grid>
-          <Grid xs={12} md={1} style={gridItemStyle}>
-            <CloudDownloadIcon
-              value={sortDirection}
+          <Grid item xs={12} md={1} style={gridItemStyle}>
+            <CloudDownload
+//              value={sortDirection}
               onChange={onDownloadClick}
             />
           </Grid>

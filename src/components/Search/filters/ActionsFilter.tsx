@@ -29,7 +29,7 @@ const ActionsFilter = () => {
         filteredActions = [];
       }
       updateFilterStateValues("decisions", filteredActions);
-//      debouncedUpdateFilterStateValues("decisionsRaw", evt);
+//      updateFilterStateValues("decisionsRaw", evt);
     }
 
   return (

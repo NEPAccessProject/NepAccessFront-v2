@@ -12,17 +12,18 @@ export type DocumentType = {
 	decisions: string ;
 	department: string;
 	documentType: string;
-	draftNoa: Date ;
+	draftNoa: string;
 	filename: string; 
-	finalNoa: Date | string ;
-	firstRodDate: Date | string  ;
+	finalNoa: string; //Date | string ;
+	finalNoaDate: string ;
+	firstRodDate:  string;
 	folder: string;
 	id: number;
 	link: string;
-	noiDate: Date | string;
+	noiDate: string; //Date | string;
 	notes: string ;
 	processId: number ;
-	registerDate: Date ;
+	registerDate: string ;
 	size: number;
 	states: string;
 	status: string;
@@ -44,9 +45,9 @@ export type SearchResultType = {
   id: number;
   ids: number[];
   doc: DocumentType;
-  highlights?: string[];
-  filenames?: string[];
-  score?: number;
+  highlights: string[];
+  filenames: string[];
+  score: number;
 }
 
 export type SearchResultsType = {
@@ -90,14 +91,14 @@ export type FilterType = {
 	actions: string[];
 	actionsRaw: string;
 	agencies: FilterOptionType[];
-	agenciesRaw: "";
+	agenciesRaw: string;
 	cooperatingAgency: [];
 	cooperatingAgencyRaw: string;
 	county: [];
-	countyRaw: "";
+	countyRaw: string;
 	distance: number;
 	decisions:string[];
-	decisionsRaw: "";
+	decisionsRaw: string
 	endComment: Date | string;
 	endPublish: string | Date;
 	filtersHidden: boolean;
@@ -105,12 +106,12 @@ export type FilterType = {
 	needsComments: boolean;
 	needsDocument: boolean;
 	proximityDisabled: boolean;
-	proximityOption: string;	
-	startComment: "";
+	proximityOption: string
+	startComment: string | Date;
 	startPublish: string | Date;
-	stateRaw: "";
+	stateRaw: string;
 	states: FilterOptionType[];
-	titleRaw: "";
+	titleRaw: string;
 	typeAll: boolean;
 	typeDraft: boolean;
 	typeEA: boolean;
@@ -130,7 +131,7 @@ export type FilterType = {
 	cooperatingAgency: [],
 	cooperatingAgencyRaw: "",
 	county: [],
-	distance: [],
+	distance: 0,
 	decisions: [],
 	decisionsRaw: "",
 	endComment: "",
@@ -144,7 +145,7 @@ export type FilterType = {
 	startPublish: "",
 	stateRaw: "",
 	states: [],
-	titleRaw: [],
+	titleRaw: "",
 	typeAll: false,
 	typeDraft: false,
 	typeEA: false,
@@ -156,9 +157,45 @@ export type FilterType = {
     countyRaw: "",
     startComment: "",
   };  
-  export type SearchContextType = {
+//   export type SearchContextType = {
+// 	filters: FilterType;
+// 	filtersHidden: boolean;
+// 	fragmentSizeValue: number;
+// 	hideOrganization: boolean;
+// 	iconClassName: string;
+// 	isAvailableFilesDialogOpen: boolean;
+// 	isDirty: boolean;
+// 	loading:boolean
+// 	isQuickStartDialogOpen: boolean;
+// 	isSearchTipsDialogOpen: boolean;
+// 	markup: boolean;
+// 	message: string;
+// 	optionsChecked: boolean;
+// 	pagination: PaginiationType;
+// 	proximityDisabled: boolean;
+// 	proximityOption: string;
+// 	results: SearchResultType[];
+// 	searchOption: string;
+// 	showContext: boolean;
+// 	showPDFDialog: boolean;
+// 	showQuickTipsDialog: boolean;
+// 	showSearchTipsDialog: boolean;
+// 	tooltipOpen: boolean;
+// 	setError: (message: string) => void;
+// 	error: string;
+// 	updatePaginationStateValues : (key:string, value:any) => void;
+// 	updateFilterStateValues : (key:string, value:any) => void;
+// 	setTitleRaw: (titleRaw:string) => void;
+// 	searchTop: () => {},
+// 	searchNoContext: () => {},
+// 	showLoading: () => {},
+// 	getData: () => {},
+//   };
+
+
+export type SearchContextType = {
+	error: string;
 	filters: FilterType;
-	filtersHidden: boolean;
 	fragmentSizeValue: number;
 	hideOrganization: boolean;
 	iconClassName: string;
@@ -171,16 +208,23 @@ export type FilterType = {
 	message: string;
 	optionsChecked: boolean;
 	pagination: PaginiationType;
-	proximityDisabled: boolean;
-	proximityOption: string;
 	results: SearchResultType[];
+	searchNoContext: () => void;
 	searchOption: string;
+	searched: boolean;
+	searchTop: () => void;
+	setTitleRaw: (titleRaw:string) => void;
 	showContext: boolean;
 	showPDFDialog: boolean;
 	showQuickTipsDialog: boolean;
 	showSearchTipsDialog: boolean;
 	tooltipOpen: boolean;
-  
+	updateFilterStateValues : (key:string, value:any) => void;
+	updatePaginationStateValues : (key:string, value:any) => void;
+	setError: (error:string) => void;
+	sortSearchResults: (results:SearchResultType[], sortBy:string) => SearchResultType[]
+	setLoading: () => void;
+	setSearched: (searched:boolean) => void;
   };
 
   export type FilterOptionType = {

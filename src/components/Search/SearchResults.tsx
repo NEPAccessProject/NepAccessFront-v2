@@ -1,24 +1,17 @@
-import { Box, Paper, TablePagination } from '@mui/material';
-import PropTypes from 'prop-types';
-import React, { useRef } from 'react';
-
-import Grid from '@mui/material/Unstable_Grid2';
-import { styled } from '@mui/material/styles';
+import { Grid, Paper, TablePagination } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import React, { useRef } from 'react';
 import theme from '../../themes/theme';
-import { SearchResultType, SearchResultsType } from '../interfaces/interfaces';
+import { SearchResultsType } from '../interfaces/interfaces';
 import SearchContext from './SearchContext';
-import SearchResult from './SearchResult';
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  // textAlign: 'center',
-  color: theme.palette.text.secondary,
+
+const GridItemProps = {
+  padding: 0.5,
+  item: true,
   elevation: 1,
   border: 0,
   borderRadius: 1,
-}));
+};
 const useStyles = makeStyles(() => ({
   resultsHeader: {
     fontFamily: 'open sans',
@@ -57,6 +50,7 @@ const sortByRelevance = (a, b) => {
   return a.score > b.score;
 };
 
+
 //not having a dependency should... only run once per result set
 const SearchResults = (props:SearchResultsType) => {
   const classes = useStyles(theme);
@@ -65,6 +59,10 @@ const SearchResults = (props:SearchResultsType) => {
   const results = context.results;
   const {filters,pagination,updatePaginationStateValues} = context;
   const {page,sortby,limit,sortdir} = pagination;
+
+  //[TODO] These are somewhat temporary to check if we can get rid results with a low relvancy score
+//  const allScores: number[] = getScores(results);
+ 
 
   const handleChangePage = (evt,newPage:number) => {
     console.log("🚀 ~ handleChangePage ~ number:", newPage);
@@ -92,184 +90,32 @@ const SearchResults = (props:SearchResultsType) => {
         <li><b>Sort Dir</b>{sortdir}</li>
         <li><b>Limit:</b>{limit}</li>
       </ul>
-     {/* <Box border={1} borderColor={'#eee'} display={'flex'} alignContent={'flex-start'}> */}
-     {/* <Pagination 
-      count={limit} 
-      page={page} 
-      onChange={(evt,page)=> onPaginationChange(evt,page)} /> */}
-      <React.Fragment><TablePagination
-        rowsPerPageOptions={[1,5,10,20, 25, 100]}
-        //count={results.length} [TODO] Need to get count from the server
-        count={100}
-        rowsPerPage={limit}//{limit}
-        page={page}
-        onPageChange={(evt,page)=>handleChangePage(evt,page)}
-        onRowsPerPageChange={(evt)=>handleChangeRowsPerPage(evt)}
-        showFirstButton={true}
-        showLastButton={true}
+      <>
+        <TablePagination
+            rowsPerPageOptions={[1,5,10,20, 25, 100]}
+          //count={results.length} [TODO] Need to get count from the server
+            count={results.length}
+            rowsPerPage={limit}//{limit}
+            page={page}
+            onPageChange={(evt,page)=>handleChangePage(evt,page)}
+            onRowsPerPageChange={(evt)=>handleChangeRowsPerPage(evt)}
+            showFirstButton={true}
+            showLastButton={true}
+            color='primary'
+            component={`div`}
 
-      /></React.Fragment>
-
-      {/* </Box> */}
+      /></>
         {results.map((result,idx)=> {
-            return (
-              <Box key={result.id}>
-               <SearchResult result={result} />
-             </Box>
-            )
-          })}
+          {
+          return (
+            <Grid {...GridItemProps} key={`${result.doc.id}`}>
+              <>{result.doc.title}</>
+              {/* <SearchResult result={result} /> */}
+            </Grid>
+          )}}
+      )}
     </Paper>
   );
 }
-SearchResults.propTypes = {
-  results: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string,
-      processId: PropTypes.number.isRequired,
-      decisionType: PropTypes.string.isRequired,
-      filename: PropTypes.string.isRequired,
-      folder: PropTypes.string.isRequired,
-      records: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          title: PropTypes.string,
-          processId: PropTypes.number.isRequired,
-          decisionType: PropTypes.string.isRequired,
-          filename: PropTypes.string.isRequired,
-          folder: PropTypes.string.isRequired,
-        })),
-    })),
-};
 export default SearchResults;
 
-
-export interface ISearchResultCardsProps {
-  result: SearchResultType;
-}
-const SearchResultCards = (props:ISearchResultCardsProps) => {
-  const {result} = props;
-  const {doc,highlights,score }= result;
-
-  
-  console.log('Search Result Card Props', result);
-  return (
-    <Paper elevation={1}>
-     
-     <Grid padding={2} container xs={12} flexDirection={'row'} flex={1}>
-       <Item
-//        className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Status:
-      </Item>
-      <Item
- //       className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Date:
-      </Item>
-      <Item
- //       className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        State: <b>{states ? states : 'N/A'}</b>
-      </Item>
-      <Item
-//        className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        County: <b>{county ? county : 'N/A'}</b>
-      </Item>
-      <Item
-       // className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Action: <b>{action ? action : 'N/A'}</b>
-      </Item>
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Decision <b>{decision ? decision : 'N/A'}</b>
-      </Item>
-      {/* {(commentDate)
-            ? ( */}
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Project Start Date:
-      </Item>
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Project Endate Date:
-      </Item>
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Final NOA:
-      </Item>
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Draft NOA:
-      </Item>
-      <Item
-        //className={classes.itemHeader}
-        sx={{
-          margin: 0.5,
-          padding: 1,
-          elevation: 1,
-        }}
-      >
-        Process ID: <b>{processId ? processId : 'N/A'}</b>
-      </Item>
-    </Grid>
-    </Paper>
-  );
-}

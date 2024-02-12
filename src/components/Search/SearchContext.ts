@@ -1,12 +1,10 @@
 
 import React from "react";
-import { FilterType, PaginiationType, SearchResultType } from '../interfaces/interfaces';
+import { FilterType, SearchContextType,SearchFilterResultsType, SearchResultType } from '../interfaces/interfaces';
+import SearchResults from "./SearchResults";
+import SearchResult from "./SearchResult";
 
-
-//[] Maybe break the structure down to smaller pieces
-
-
-
+//[TODO][REFACTOR] does the fooRaw values still needed after the refactor
 const filters: FilterType = {
   actions:[],
   agencies: [],
@@ -43,32 +41,6 @@ const filters: FilterType = {
 };
 
 
-export type SearchContextType = {
-  filters: FilterType;
-  results: SearchResultType[];
-  pagination: PaginiationType;
-  loading: boolean;
-  fragmentSizeValue: number;
-  hideOrganization: boolean;
-  iconClassName: string;
-  isAvailableFilesDialogOpen: boolean;
-  isDirty: false;
-  isQuickStartDialogOpen: false;
-  isSearchTipsDialogOpen: false;
-  totalCount: number;
-  markup: boolean;
-  message: string;
-  optionsChecked: boolean;
-  searchOption: string;
-  showContext: boolean;
-  showPDFDialog: boolean;
-  showQuickTipsDialog: boolean;
-  showSearchTipsDialog: boolean;
-  tooltipOpen: boolean;
-  debouncedUpdateFilterStateValues : (key:string, value:any) => void;
-  updatePaginationStateValues : (key:string, value:any) => void;
-
-};
 
 const SearchContext = React.createContext<SearchContextType>({
   filters,
@@ -77,7 +49,7 @@ const SearchContext = React.createContext<SearchContextType>({
   pagination: {
     page: 1,
     limit: 10,
-    sortby: "doc.title", //temporay for json-server
+    sortby: "Relavancy", //temporay for json-server
     sortdir: "DESC",
     totalCount: 0,
   },
@@ -97,8 +69,17 @@ const SearchContext = React.createContext<SearchContextType>({
   showQuickTipsDialog: false,
   showSearchTipsDialog: false,
   tooltipOpen: false,
-  updatePaginationStateValues : ()=> {},
-  debouncedUpdateFilterStateValues: () => {},
+  setLoading: () => {},
+	setError: (message: string) => {},
+  setSearched: (boolean) => {},
+  searched: false,
+	error: "",
+	updatePaginationStateValues : (key:string, value:any) => {},
+	updateFilterStateValues : (key:string, value:any) => {},
+	setTitleRaw: (titleRaw:string) => {},
+	searchTop: () => {},
+	searchNoContext: () => {},
+  sortSearchResults: (results: any, sortby: string) => results,
 });
 
 export default SearchContext;
