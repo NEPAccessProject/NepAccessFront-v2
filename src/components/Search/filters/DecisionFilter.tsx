@@ -44,7 +44,7 @@ export default function DecisionFilter() {
   //[TODO] need to
   return (
     <>
-      <FormLabel htmlFor="searchAction">Decision:</FormLabel>
+      {/* <FormLabel htmlFor="searchAction">Decision:</FormLabel> */}
       <Autocomplete
         id="decision"
         tabIndex={10}

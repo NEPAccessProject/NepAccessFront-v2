@@ -34,7 +34,7 @@ const ActionsFilter = () => {
 
   return (
     <>
-      <FormLabel htmlFor="searchAction">Action Type:</FormLabel>
+      {/* <FormLabel htmlFor="searchAction">Action Type:</FormLabel> */}
       <Autocomplete
         id="searchAction"
         tabIndex={10}

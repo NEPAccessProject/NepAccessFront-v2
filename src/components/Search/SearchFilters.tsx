@@ -7,6 +7,7 @@ import {
   FormLabel,
   Typography
 } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { useContext } from "react";
 //import { ThemeProvider, createUseStyles } from "react-jss";
 import { makeStyles } from "@mui/styles";
@@ -19,6 +20,7 @@ import DecisionFilter from "./filters/DecisionFilter";
 import StatesFilter from "./filters/StateFilter";
 
 import CountyFilter from "./filters/CountyFilter";
+import { Padding } from "@mui/icons-material";
 
 //console.log(actions.length, agencies.length, decisions.length, locations.length, counties.length);
 // const actions = Array.from(new Set(actionOptions));
@@ -114,11 +116,35 @@ const SearchFilters = (props) => {
     mb: 1,
     mt: 1,
   };
-
+  const formLabelProps = {
+    margin:1,
+    border:'1px solid black',
+  }
+  const gridItemProps = {
+    spacing: 1,
+    flex: 1,
+    xs:12,
+    // borderLeft: "none",
+    // borderRight: "1px solid #eee",
+    border: "1px solid #eee",
+    display: "flex",
+    justifyContent: "center",
+    justifyItems: "center",
+    alignContent: "center",
+    alignItems: "center",
+    "&:hover": {
+      //           backgroundColor: //theme.palette.grey[200],
+      boxShadow: "0px 4px 8px rgba(0.5, 0.5, 0.5, 0.15)",
+      cursor: "pointer",
+      "& .addIcon": {
+        color: "purple",
+      },
+    },
+  };
   return (
     <>
       <Box alignItems={"center"}>
-        <FormLabel>
+        <FormLabel {...formLabelProps}>
           <Typography variant="filterLabel">
             {" "}
             Search Only Within titles
@@ -126,7 +152,7 @@ const SearchFilters = (props) => {
         </FormLabel>
       </Box>
       <Box>
-        <FormLabel htmlFor="is_fast41">Fast 41 Documents Only</FormLabel>
+        <FormLabel {...formLabelProps} htmlFor="is_fast41">Fast 41 Documents Only</FormLabel>
         <Checkbox
           id="is_fast41"
           name="is_fast41"
@@ -143,27 +169,33 @@ const SearchFilters = (props) => {
           Clear Filters
         </Button>
       </Box>
-      <Box>
-        <Box>
+      <Grid flex={1} container xs={12} border={1}>
+        <Grid  {...gridItemProps}>
+          <Typography fontWeight={'bolder'} variant="filterLabel">Lead Agencies</Typography>
           <AgencyFilter />
-        </Box>
+        </Grid>
 
-        <Box>
+        <Grid {...gridItemProps}>
+          <Typography variant="filterLabel">Cooperating Agencies</Typography>
           <CooperatingAgenciesFilter />
-        </Box>
-        <Box>
+        </Grid>
+        <Grid {...gridItemProps}>
+          <Typography variant="filterLabel">State(s) / Region(s)</Typography>
           <StatesFilter />
-        </Box>
-        <Box>
+        </Grid>
+        <Grid {...gridItemProps}>
+          <Typography variant="filterLabel">Counties / Locations</Typography>
           <CountyFilter />
-        </Box>
-        <Box>
+        </Grid>
+        <Grid {...gridItemProps}>
+          <Typography variant="filterLabel">Actions</Typography>
           <ActionsFilter />
-        </Box>
-        <Box>
+        </Grid>
+        <Grid {...gridItemProps}>
+          <Typography variant="filterLabel">Decisions</Typography>
           <DecisionFilter />
-        </Box> 
-      </Box>
+        </Grid> 
+      </Grid>
       <FormLabel htmlFor="searchDecision"></FormLabel>
       <Divider />
       <Box>

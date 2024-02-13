@@ -1,7 +1,20 @@
 import { createTheme, Theme } from '@mui/material';
 import { common, grey, orange, red } from '@mui/material/colors';
 import { ThemeOptions } from '@mui/material/styles';
+declare module "@mui/material/styles" {
+  
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    h1Bold?: React.CSSProperties;
+  }
+}
 
+// Update the Typography's variant prop options
+declare module "@mui/material/Typography" {
+  interface TypographyPropsVariantOverrides {
+    h1Bold: true;
+  }
+}
 declare module "@mui/material/styles" {
   interface TypographyVariants {
 		filterLabel: React.CSSProperties;
@@ -17,6 +30,7 @@ declare module "@mui/material/styles" {
 declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
 		filterLabel: true;
+		error: true;
 	}
 }
 
@@ -55,6 +69,7 @@ declare module "@mui/material/Typography" {
 			fontSize: 12,
 			filterLabel: {
 				fontSize: '0.9rem',
+				padding: 2,
 			},
 			// resultsTitle: {
 			//   fontSize: "1.6rem",
@@ -64,7 +79,7 @@ declare module "@mui/material/Typography" {
 
 			// },
 			h1: {
-				fontSize: '1.4rem',
+				fontSize: '1.5rem',
 				padding: 2,
 				border: 1,
 				display: 'block',
@@ -72,26 +87,26 @@ declare module "@mui/material/Typography" {
 				
 			},
 			h2: {
-				fontSize: '1.2rem',
+				fontSize: '1.3rem',
 				fontFamily: 'Roboto, sans-serif',
 			},
 			h3: {
-				fontSize: '1rem',
+				fontSize: '1.2rem',
 				lineHeight: '2rem',
 				fontFamily: 'Roboto, sans-serif',
 				padding: 2,
 			},
 			h4: {
 				fontFamily: 'Roboto, sans-serif',
-				fontSize: '0.8rem',
+				fontSize: '1.1rem',
 			},
 			h5: {
 				fontFamily: 'Roboto, sans-serif',
 				lineHeight: '2rem',
-                fontSize: '1.6rem'
+                fontSize: '1rem'
 			},
 			h6: {
-				fontSize: '1rem',
+				fontSize: '0.9rem',
 				lineHeight: '1.2rem',
 				fontFamily: 'Roboto, sans-serif',
 			},

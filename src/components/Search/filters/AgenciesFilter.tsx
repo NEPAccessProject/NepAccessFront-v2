@@ -40,9 +40,9 @@ export default function AgencyFilter(props) {
     return (
       <>
        <Box>
-                  <FormLabel htmlFor='searchAgency'>
+                  {/* <FormLabel htmlFor='searchAgency'>
                     Lead Agencies:
-                  </FormLabel>
+                  </FormLabel> */}
                   <Autocomplete
                     fullWidth
                     id='agency'

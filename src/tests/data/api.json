@@ -1,8 +1,8 @@
 {
-    "get_count": 125,
-    "earliest_year": 2018,
-    "latest_year": 2024,
-    "search_top": [
+  "get_count": 125,
+  "earliest_year": 2018,
+  "latest_year": 2024,
+  "search_top": [
     {
       "ids": [
         8870
@@ -38,7 +38,7 @@
       "highlights": [],
       "filenames": "Copper Flat Copper Mine Draft EIS Volume 1.pdf",
       "score": 7.6437206,
-      "id": "6488"
+      "id": "4b30"
     },
     {
       "ids": [
@@ -78,7 +78,7 @@
       "highlights": [],
       "filenames": "Copper Flat Final EIS.pdf>Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 2.pdf>Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf>Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf",
       "score": 7.6437206,
-      "id": "a80f"
+      "id": "38d3"
     },
     {
       "ids": [],
@@ -113,7 +113,7 @@
       "highlights": [],
       "filenames": "",
       "score": 6.0496626,
-      "id": "dc6c"
+      "id": "a3a2"
     },
     {
       "ids": [
@@ -155,7 +155,7 @@
       "highlights": [],
       "filenames": "rosemont-feis-vol-1.pdf>rosemont-feis-vol-3.pdf>rosemont-feis-vol-2.pdf>rosemont-feis-vol-6-appendix.pdf>rosemont-feis-vol-4.pdf>rosemont-feis-vol-5-appendix.pdf",
       "score": 6.0496626,
-      "id": "8097"
+      "id": "605c"
     },
     {
       "ids": [
@@ -199,7 +199,7 @@
       "highlights": [],
       "filenames": "deis-ch2vol1.pdf>deis-ch3vol1.pdf>deis-ch3vol2.pdf>deis-execsummaryvol1.pdf>deis-ch1vol1.pdf>deis-complete-appendix.pdf>deis-ch6vol2.pdf>deis-ch7vol2.pdf",
       "score": 5.525419,
-      "id": "8197"
+      "id": "c19b"
     },
     {
       "ids": [],
@@ -234,7 +234,7 @@
       "highlights": [],
       "filenames": "",
       "score": 5.2250404,
-      "id": "1491"
+      "id": "016a"
     },
     {
       "ids": [],
@@ -269,7 +269,7 @@
       "highlights": [],
       "filenames": "",
       "score": 5.2250404,
-      "id": "fb55"
+      "id": "5779"
     },
     {
       "ids": [],
@@ -304,7 +304,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.9172807,
-      "id": "c1ff"
+      "id": "a305"
     },
     {
       "ids": [],
@@ -339,7 +339,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.9172807,
-      "id": "fb2a"
+      "id": "34c2"
     },
     {
       "ids": [],
@@ -374,7 +374,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.6371946,
-      "id": "9a7d"
+      "id": "7720"
     },
     {
       "ids": [],
@@ -409,7 +409,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.3098764,
-      "id": "751a"
+      "id": "112e"
     },
     {
       "ids": [],
@@ -444,7 +444,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.3098764,
-      "id": "63e4"
+      "id": "c316"
     },
     {
       "ids": [],
@@ -479,7 +479,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.3098764,
-      "id": "f8ed"
+      "id": "3360"
     },
     {
       "ids": [],
@@ -514,7 +514,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.3098764,
-      "id": "6c5b"
+      "id": "5ccc"
     },
     {
       "ids": [],
@@ -549,7 +549,7 @@
       "highlights": [],
       "filenames": "",
       "score": 4.0257196,
-      "id": "9a77"
+      "id": "0967"
     },
     {
       "ids": [],
@@ -584,7 +584,7 @@
       "highlights": [],
       "filenames": "",
       "score": 3.8360336,
-      "id": "f5ed"
+      "id": "cfdd"
     },
     {
       "ids": [],
@@ -619,7 +619,7 @@
       "highlights": [],
       "filenames": "",
       "score": 3.8360336,
-      "id": "9cb7"
+      "id": "6a84"
     },
     {
       "ids": [],
@@ -654,7 +654,7 @@
       "highlights": [],
       "filenames": "",
       "score": 3.8360336,
-      "id": "967c"
+      "id": "a50e"
     },
     {
       "ids": [],
@@ -689,7 +689,7 @@
       "highlights": [],
       "filenames": "",
       "score": 3.7767153,
-      "id": "2666"
+      "id": "1e74"
     },
     {
       "ids": [
@@ -729,7 +729,7 @@
       "highlights": [],
       "filenames": "Volume_1-DraftEIS_Resolution.pdf>Volume_2-DraftEIS_Resolution.pdf>Volume_4-Appendices_Resolution.pdf>Volume_3-Appendices_Resolution.pdf",
       "score": 3.2665343,
-      "id": "a70d"
+      "id": "638b"
     },
     {
       "ids": [
@@ -766,7 +766,7 @@
       "highlights": [],
       "filenames": "Final EIS Troy Mine Revised Reclamation Plan.pdf",
       "score": 3.2577093,
-      "id": "2e8f"
+      "id": "e798"
     },
     {
       "ids": [
@@ -806,7 +806,7 @@
       "highlights": [],
       "filenames": "January 2016 - Appendix D Regional Activity.pdf>January 2016 - Appendix H Cultural Resources.pdf>Ray_Mine_DEIS (1).pdf>January 2016 - Appendix B Alternatives Screening and Clean Water Act Section 404(b)(1) Alternatives Analysis (2).pdf",
       "score": 3.2574773,
-      "id": "b604"
+      "id": "f1f5"
     },
     {
       "ids": [
@@ -843,7 +843,7 @@
       "highlights": [],
       "filenames": "Ray_Land_Exchange-Plan_Amendment_Draft_Supplmental_EIS.pdf",
       "score": 3.2573693,
-      "id": "ad52"
+      "id": "f50c"
     },
     {
       "ids": [
@@ -884,7 +884,7 @@
       "highlights": [],
       "filenames": "508-Appendix-D-Regional-Activity.pdf>508-Appendix-H-Cultural-Resources.pdf>508-Final-EIS-Chapters-1-9.pdf>508-Appendix-B-Alternative-Screening-and-Clean-Water-Act-Section-404(b)(1)-Alternative Analysis.pdf>508-Executive-Summary.pdf",
       "score": 3.2563624,
-      "id": "2abf"
+      "id": "1614"
     },
     {
       "ids": [
@@ -921,7 +921,7 @@
       "highlights": [],
       "filenames": "2019.0627_RayLXSEIS-Final Combined Report.pdf",
       "score": 3.2551193,
-      "id": "a9b7"
+      "id": "3711"
     },
     {
       "ids": [
@@ -960,7 +960,7 @@
       "highlights": [],
       "filenames": "20180726_GreaterPhoenixFEIS_VolumeI_508.pdf>20180726_GreaterPhoenixFEIS_VolumeIII_508_r.pdf>20180726_GreaterPhoenixFEIS_VolumeII_508.pdf",
       "score": 3.2518504,
-      "id": "7b31"
+      "id": "4b34"
     },
     {
       "ids": [
@@ -998,7 +998,7 @@
       "highlights": [],
       "filenames": "2017 08 23_Greater_Phoenix_DEIS_Volume_I.pdf>2017 08 23_Greater_Phoenix_DEIS_Volume_II.pdf",
       "score": 3.2516832,
-      "id": "2aaa"
+      "id": "f797"
     },
     {
       "ids": [
@@ -1036,7 +1036,7 @@
       "highlights": [],
       "filenames": "Volume I Summary through Chapter 3 Rock Creek Project Draft SEIS.pdf>Volume II Chapter 4 through Chapter 9 and Appendices Rock Creek Project Draft SEIS.pdf",
       "score": 3.2514038,
-      "id": "3684"
+      "id": "cc49"
     },
     {
       "ids": [
@@ -1075,7 +1075,7 @@
       "highlights": [],
       "filenames": "Final SEIS Volume I March 2018.pdf>Appendices A through R Volume II March 2018.pdf>Appendix S Comment Responses Volume III March 2018.pdf",
       "score": 3.2432952,
-      "id": "6fa9"
+      "id": "4e75"
     },
     {
       "ids": [
@@ -1118,7 +1118,7 @@
       "highlights": [],
       "filenames": "Sec4.27_SpillRisk.pdf>AppN_PD.pdf>Sec3.18_Water_and_Sediment_Quality.pdf>ExecutiveSummary.pdf>AppK3.18_WaterQuality.pdf>Sec4.1_IntroEC.pdf>AppA_ScopingReport.pdf",
       "score": 3.2399735,
-      "id": "344a"
+      "id": "d555"
     },
     {
       "ids": [
@@ -1164,7 +1164,7 @@
       "highlights": [],
       "filenames": "Sec3.18_Water&SedimentQuality.pdf>AppN_ProjectDescription.pdf>Sec4.27_SpillRisk.pdf>AppK4.24_Fish.pdf>AppK4.18_Water&SedimentQuality.pdf>AppK4.10_Health&Safety.pdf>Sec4.1_IntroEnvironConsequences.pdf>AppK3.18_Water&SedimentQuality.pdf>AppB_Alternatives.pdf>ExecutiveSummary.pdf",
       "score": 3.23688,
-      "id": "5932"
+      "id": "bd5a"
     },
     {
       "ids": [
@@ -1202,7 +1202,7 @@
       "highlights": [],
       "filenames": "Volume 4 Figures and Appendices A through L.pdf>Volume 2 Sections 3.7 through 3.24 of Chapter 3.pdf",
       "score": 3.2335835,
-      "id": "f22e"
+      "id": "17c6"
     },
     {
       "ids": [
@@ -1239,7 +1239,7 @@
       "highlights": [],
       "filenames": "10_TCM_FEIS_Chap4_eNEPA_011615.pdf",
       "score": 3.2268791,
-      "id": "b5a1"
+      "id": "6a34"
     },
     {
       "ids": [
@@ -1276,7 +1276,7 @@
       "highlights": [],
       "filenames": "Lone_Star_Draft_EIS_June_2016(508).pdf",
       "score": 3.2267094,
-      "id": "3286"
+      "id": "0ffd"
     },
     {
       "ids": [
@@ -1314,7 +1314,7 @@
       "highlights": [],
       "filenames": "PVM_Draft_EIS_2019_1213_Vol_1-508.pdf>PVM_Draft_EIS_2019_1213_Vol_2-508.pdf",
       "score": 3.2265997,
-      "id": "6c26"
+      "id": "f793"
     },
     {
       "ids": [
@@ -1352,7 +1352,7 @@
       "highlights": [],
       "filenames": "NMet FEIS 7 - Chapter 3 Proposed Action and Alternatives.pdf>NMet FEIS 17 - Appendix B Underground Mining Alternative Position Paper.pdf",
       "score": 3.2256167,
-      "id": "d8b5"
+      "id": "dd91"
     },
     {
       "ids": [
@@ -1389,7 +1389,7 @@
       "highlights": [],
       "filenames": "TCM_DEIS_Ch_4_eNEPA_031114.pdf",
       "score": 3.2231739,
-      "id": "eb3a"
+      "id": "4c1f"
     },
     {
       "ids": [
@@ -1426,7 +1426,7 @@
       "highlights": [],
       "filenames": "Final_Lone_Star_EIS_April_2017_508.pdf",
       "score": 3.220341,
-      "id": "7341"
+      "id": "8978"
     },
     {
       "ids": [
@@ -1464,7 +1464,7 @@
       "highlights": [],
       "filenames": "Apndx H Geochemistry.pdf>Sec 3.7 Water Quality.pdf",
       "score": 3.215035,
-      "id": "0f10"
+      "id": "3417"
     },
     {
       "ids": [
@@ -1502,7 +1502,7 @@
       "highlights": [],
       "filenames": "AppH_Geochemistry.pdf>3.7_Water Quality.pdf",
       "score": 3.2133896,
-      "id": "3289"
+      "id": "9f38"
     },
     {
       "ids": [
@@ -1539,7 +1539,7 @@
       "highlights": [],
       "filenames": "Mineral Resource Potential and Reasonably Foreseeable Development Report_01-11-10.pdf",
       "score": 3.2120233,
-      "id": "c423"
+      "id": "7fb6"
     },
     {
       "ids": [
@@ -1576,7 +1576,7 @@
       "highlights": [],
       "filenames": "20181017_Gemfield_rr_water_geochem_clean_508.pdf",
       "score": 3.2098641,
-      "id": "8e5f"
+      "id": "377c"
     },
     {
       "ids": [
@@ -1613,7 +1613,7 @@
       "highlights": [],
       "filenames": "2-20190528_Gemfield_ser_water_geochem_clean_508.pdf",
       "score": 3.20509,
-      "id": "22cf"
+      "id": "621e"
     },
     {
       "ids": [
@@ -1650,7 +1650,7 @@
       "highlights": [],
       "filenames": "Appendix_J_Supporting_Information_for_Surface_Water_Resources_DEIS.pdf",
       "score": 3.2033846,
-      "id": "c560"
+      "id": "e0ec"
     },
     {
       "ids": [
@@ -1687,7 +1687,59 @@
       "highlights": [],
       "filenames": "Volume 5 ¿ Appendices 3RA through 4A.pdf",
       "score": 3.2032127,
-      "id": "c94b"
+      "id": "62b0"
+    },
+    {
+      "id": "f036",
+      "titleRaw": ""
+    },
+    {
+      "id": "461f",
+      "titleRaw": ""
+    },
+    {
+      "id": "d2d4",
+      "titleRaw": ""
+    },
+    {
+      "id": "49d5",
+      "titleRaw": ""
+    },
+    {
+      "id": "dabf",
+      "titleRaw": ""
+    },
+    {
+      "id": "38ab",
+      "titleRaw": ""
+    },
+    {
+      "id": "bf30",
+      "titleRaw": ""
+    },
+    {
+      "id": "b5fd",
+      "titleRaw": ""
+    },
+    {
+      "id": "1298",
+      "titleRaw": ""
+    },
+    {
+      "id": "052a",
+      "titleRaw": ""
+    },
+    {
+      "id": "7867",
+      "titleRaw": ""
+    },
+    {
+      "id": "6266",
+      "titleRaw": ""
+    },
+    {
+      "id": "9d24",
+      "titleRaw": ""
     }
   ],
   "get_highlightsFVH": [],

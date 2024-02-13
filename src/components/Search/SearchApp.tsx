@@ -44,7 +44,7 @@ const SearchApp = (props: SearchAppPropType) => {
     county,
     actions,
     actionsRaw,
-  } = filters;
+} = filters;
   const [error, setError] = useState("");
   const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
@@ -252,18 +252,38 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const searchTop = async () => {
     console.log('Starting Search Top')
+    const start = page * limit
+    const end = (page * limit) + (limit + 1)
     try{  
     setLoading(true);
-    const url = urlFromContextPaginationAndFilters(pagination, filters,`text/search_top`);
-    // const results = await axios.post(url, {
-    //       title: titleRaw
-    //   })
-    const results = response.search_top;
-      console.log("��� ~ searchTop ~ results:", results);
-    setResults(results);
+    const hostUrl = urlFromContextPaginationAndFilters(pagination, filters,`search_top`);
+    //[TODO] prototyping - replace with call from above
+    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=5`;
+
+    console.log(`searchTop ~ url:`, url);
+    const response = await axios.get(url);
+
+    console.log('RESPONSE DATA',response)
+    const results = response.data;
+      console.log(`searchTop ~ results:`, results);
+      setResults(results);
     setLoading(false);
+     
+    //  ).then((response) => {
+    //   console.log(`searchTop ~ response:`, response);
+    //   return response.data;
+    // }).then((data) => {
+    //   console.log(`searchTop ~ data:`, data);
+    //   setResults(data);
+    //   setLoading(false);
+    // }).catch((error) => {
+    //   setError(`${error}`);
+    //   setLoading(false);
+    // })
+
   }
   catch(error){
+    console.error(`searchTop ~ error:`, error);
     setError(`${error}`);
   }
   finally{
@@ -274,7 +294,7 @@ const SearchApp = (props: SearchAppPropType) => {
     try{
     setLoading(true);
     console.log("IS LOADING", loading);
-    const url = urlFromContextPaginationAndFilters(pagination, filters,"text/search_no_context");
+    const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
     console.log("🚀 ~ searchNoContext ~ url:", url);
     const data = response.search_no_top;
     console.log(`searchNoContext ~ data:`, data);
@@ -329,6 +349,11 @@ const SearchApp = (props: SearchAppPropType) => {
     console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
   const titleRaw = context.filters.titleRaw;
+  const onSearchClick = async() => {
+    console.log("🚀 ~ ON SEARCH CLICK ~ titleRaw:", titleRaw)
+    setSearched(true);
+      await searchTop();
+  }
   console.log("🚀 ~ SearchApp ~ titleRaw:", titleRaw)
   const value = {
     ...context,
@@ -350,7 +375,7 @@ const SearchApp = (props: SearchAppPropType) => {
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
         <Box sx={{display:'flex', justifyContent:'center'}}>
-          <Snackbar>
+          <Snackbar open={error.length > 0}>
             <Alert severity="error" onClose={() => {}}>
               {error}
             </Alert>
@@ -382,16 +407,11 @@ const SearchApp = (props: SearchAppPropType) => {
                 onClick={async () => await searchTop()}
               >
                 Search
-              </Button>
-              <Box>
-                  Title : {titleRaw} vs {context.filters.titleRaw} vs {filters.titleRaw}
-              </Box>
-                
+              </Button>                
 
               <h2>
-                {results?.length ? results.length : 0} Search Results Found
+                {results.length ? results.length : 0} Search Results Found
               </h2>
-
               <>
                 {loading && (
                   <>
@@ -409,12 +429,10 @@ const SearchApp = (props: SearchAppPropType) => {
                   </Grid>
                   </>
                 )}
-                {results && results.length > 0 && (
                   <>
                     <SearchResults results={results} />
                   </>
-                )} 
-                {results.length===0  &&
+                {results.length === 0  &&
                 (
                   <>
                     <SearchTips />

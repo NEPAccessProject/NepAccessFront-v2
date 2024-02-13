@@ -26,7 +26,7 @@ export default function StateFilter(){
     
     return (
       <>
-        <FormLabel htmlFor="state">State(s) and Location(s):</FormLabel>
+        {/* <FormLabel htmlFor="state">State(s) and Location(s):</FormLabel> */}
         <Autocomplete
           id="state"
           options={locations}

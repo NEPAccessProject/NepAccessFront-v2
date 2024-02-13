@@ -4,12 +4,11 @@
 export type DocumentType = {
 	action: string;
 	agency: string;
-	commentDate: Date | string;
+	commentDate: Date;
 	commentsFilename: string;
 	cooperatingAgency: string;
 	county: string ;
-	decisionRaw: string ;
-	decisions: string ;
+	decision: string ;
 	department: string;
 	documentType: string;
 	draftNoa: string;
@@ -213,7 +212,6 @@ export type SearchContextType = {
 	searchOption: string;
 	searched: boolean;
 	searchTop: () => void;
-	setTitleRaw: (titleRaw:string) => void;
 	showContext: boolean;
 	showPDFDialog: boolean;
 	showQuickTipsDialog: boolean;
@@ -222,8 +220,8 @@ export type SearchContextType = {
 	updateFilterStateValues : (key:string, value:any) => void;
 	updatePaginationStateValues : (key:string, value:any) => void;
 	setError: (error:string) => void;
-	sortSearchResults: (results:SearchResultType[], sortBy:string) => SearchResultType[]
-	setLoading: () => void;
+	// sortSearchResults: (results:SearchResultType[], sortBy:string) => SearchResultType[]
+	setLoading: (loading:boolean) => void;
 	setSearched: (searched:boolean) => void;
   };
 
