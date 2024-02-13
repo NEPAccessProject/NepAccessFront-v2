@@ -66,10 +66,10 @@ const SearchResultCards = (props) => {
     const classes = useStyles(theme);
         return (
               <Paper elevation={1}>
-               <Grid xs={12} container spacing={2}>
+               <Grid container spacing={2}>
                     <SearchResultCards result={result} />
                </Grid>
-               <Grid padding={2} container xs={12} flexDirection={'row'} flex={1}>
+               <Grid padding={2} item xs={12} flexDirection={'row'} flex={1}>
                <Grid item
           //        className={classes.itemHeader}
                   sx={{

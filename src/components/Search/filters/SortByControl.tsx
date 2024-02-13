@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import SearchContext from "../SearchContext";
-import {  FormControl, FormLabel, Autocomplete, TextField } from "@mui/material";
-import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
+import {  FormControl, FormLabel, Autocomplete, TextField,Grid } from "@mui/material";
+//import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 
 const SortByControl = () => {
     const ctx = useContext(SearchContext);
@@ -27,10 +27,10 @@ const SortByControl = () => {
     }
     return (
       <Grid container display={"flex"}>
-        <Grid xs={3} display={'flex'} style={{justifyContent: 'center',alignItems: 'center'}}>
+        <Grid item xs={3} display={'flex'} style={{justifyContent: 'center',alignItems: 'center'}}>
           <FormLabel htmlFor="searchAgency">Sort By:</FormLabel>
         </Grid>
-        <Grid xs={9}>
+        <Grid item xs={9}>
           <FormControl fullWidth>
             <Autocomplete
               fullWidth

@@ -1,11 +1,11 @@
-import { Grid, Paper } from '@mui/material';
+import { Grid, Paper,TablePagination } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import React, { useRef } from 'react';
 import theme from '../../themes/theme';
 import { SearchResultsType } from '../interfaces/interfaces';
 import SearchContext from './SearchContext';
 import SearchResult from './SearchResult';
-
+import response from '../../tests/data/api'; 
 const GridItemProps = {
   padding: 0.5,
   item: true,
@@ -57,8 +57,9 @@ const SearchResults = (props: SearchResultsType) => {
   const classes = useStyles(theme);
   const _mounted = useRef(false);
   const context = React.useContext(SearchContext);
-  const results = context.results;
-  const { filters, pagination, updatePaginationStateValues } = context;
+//  const results = response.search_top; //context.results  
+// console.log(`SearchResults ~ results:`, results);
+  const { filters, pagination, updatePaginationStateValues,results } = context;
   const { page, sortby, limit, sortdir } = pagination;
 
   const handleChangePage = (evt, newPage: number) => {
@@ -78,7 +79,7 @@ const SearchResults = (props: SearchResultsType) => {
   return (
     <Paper elevation={0} id="search-results-root">
       <>
-        {/* <TablePagination
+        <TablePagination
           rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
           //count={results.length} [TODO] Need to get count from the server
           count={results.length}
@@ -89,10 +90,11 @@ const SearchResults = (props: SearchResultsType) => {
           showFirstButton={true}
           showLastButton={true}
           color='primary'
-          component={`div`} */}
+          component={`div`}
 
         />
       </>
+      <h5># of Results {results.length}</h5>
       {results.map((result, idx) => {
         {
           return (

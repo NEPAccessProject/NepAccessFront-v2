@@ -69,6 +69,7 @@ const SearchResult = (props: SearchResultPropsType) => {
   console.log('Search Result RECEIVED RESULT',result)
   return (
     <>
+    {JSON.stringify(result)}
     {result && result.doc  &&
     (
     <Grid  className="search-result-container" {...GridContainerProps} borderBottom={1} borderColor={'#eee'} style={{...style}} container xs={12}>

@@ -10,6 +10,9 @@ import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
 import SearchTips from "./SearchTips";
+//import data from "../../tests/data/api.json";
+import response from '../../tests/data/api'; 
+//console.log(`data:`, data);
 type SearchAppPropType = {
   results: SearchResultType[];
   setResults: () => void;
@@ -17,7 +20,6 @@ type SearchAppPropType = {
 
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
-
 
   const [results, setResults] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
@@ -77,19 +79,19 @@ const SearchApp = (props: SearchAppPropType) => {
 
   //This effect looks at the sort by values and updates the result with the new sorted results
 
-  useEffect(()=>{
-    if(results && results.length === 0 && _mounted.current === false){
-      // If there is no results to sort or the component is not mounted then do nothing
-      return;
-    }
-    const currentResults = results
-    console.log('TOP UNSORTED RESULT',results[0])
-    //const sorted:SearchResultType[] = 
-    //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
-    sortSearchResults(currentResults,sortby)
-    console.log('After Sort Results')
-    //setResults(sorted)
-  },[sortby,sortdir])
+  // useEffect(()=>{
+  //   if(results && results.length === 0 && _mounted.current === false){
+  //     // If there is no results to sort or the component is not mounted then do nothing
+  //     return;
+  //   }
+  //   const currentResults = results
+  //   console.log('TOP UNSORTED RESULT',results[0])
+  //   //const sorted:SearchResultType[] = 
+  //   //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
+  //   sortSearchResults(currentResults,sortby)
+  //   console.log('After Sort Results')
+  //   //setResults(sorted)
+  // },[sortby,sortdir])
 
   // Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
   //useEffect(() => {
@@ -219,7 +221,8 @@ const SearchApp = (props: SearchAppPropType) => {
     //TODO temporary hack this should be part of retriving active filters
     const searchTerm = context.filters.titleRaw.length ? `&title=${context.filters.titleRaw}` : "";
 
-    const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
+    //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
+    const url: string = `${host}${searchType}`;
     console.log("🚀 ~ urlFromContextPagination ~ url:", url);
     return url;
   };
@@ -249,27 +252,15 @@ const SearchApp = (props: SearchAppPropType) => {
 
   const searchTop = async () => {
     console.log('Starting Search Top')
-    try{
+    try{  
     setLoading(true);
-    const url = urlFromContextPaginationAndFilters(pagination, filters,`search_top`);
+    const url = urlFromContextPaginationAndFilters(pagination, filters,`text/search_top`);
     // const results = await axios.post(url, {
-    //       title: "xxxxxxx",
-    //   }),
-      axios.get(url)
-      .then((resp) => {
-        console.log('SEARCH TOP RESPONSE',resp.data)
-        setResults(resp.data);
-        setLoading(false);
-
-      })
-      .catch((err) => {
-          setError(`${err}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      })
-
-    //[TODO] We need to add 
+    //       title: titleRaw
+    //   })
+    const results = response.search_top;
+      console.log("��� ~ searchTop ~ results:", results);
+    setResults(results);
     setLoading(false);
   }
   catch(error){
@@ -283,19 +274,23 @@ const SearchApp = (props: SearchAppPropType) => {
     try{
     setLoading(true);
     console.log("IS LOADING", loading);
-    //const url = `${host}text/search_no_context`;
-    //const url = `${host}search_no_context`;
-    const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
+    const url = urlFromContextPaginationAndFilters(pagination, filters,"text/search_no_context");
     console.log("🚀 ~ searchNoContext ~ url:", url);
+    const data = response.search_no_top;
+    console.log(`searchNoContext ~ data:`, data);
+    //const results = data
     // const response = await axios.post(url, {
     //   title: titleRaw
     // })
-    const response = await axios.get(url);
-    updatePaginationStateValues("total", response.data.length);
-
+    // const response = await axios.post(url,{
+    //   title: titleRaw
+    // });
+//    updatePaginationStateValues("total", response.data.length);
+    updatePaginationStateValues("total", data.length);
     //[TODO][CRITICAL][WTF]  Currently the result set returns
-    const data = response.data;
-    const results: SearchResultType[] = filterResults(data);
+    //const data = response.data;
+    //const results: SearchResultType[] = filterResults(data);
+    let results = data.splice(0,100);
     setSearched(true);
     setResults(results);
     setLoading(false);
@@ -348,7 +343,6 @@ const SearchApp = (props: SearchAppPropType) => {
     error,
     setError,
     searchNoContext,
-    sortSearchResults,
     searched,
     setSearched,
   };
@@ -415,11 +409,13 @@ const SearchApp = (props: SearchAppPropType) => {
                   </Grid>
                   </>
                 )}
-                {!loading && results && results.length > 0 ? (
+                {results && results.length > 0 && (
                   <>
                     <SearchResults results={results} />
                   </>
-                ) : (
+                )} 
+                {results.length===0  &&
+                (
                   <>
                     <SearchTips />
                   </>

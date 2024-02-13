@@ -147,7 +147,8 @@ const SearchHeader = () => {
       </Grid>
       <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
-          <DistanceControl />
+          {/* <DistanceControl /> */}
+          {/* <DistanceFilter/> */}
         </Grid>
         <Grid {...GridItemProps} xs={3}>
           <SortByControl />

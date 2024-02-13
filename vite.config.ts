@@ -18,6 +18,7 @@ export default defineConfig({
       clientPort: 4000,
     },
     host: 'localhost',
+    strictPort:true,
     port:  4000,
   },
   resolve: {
