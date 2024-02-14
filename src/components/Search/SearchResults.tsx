@@ -36,32 +36,9 @@ const useStyles = makeStyles(() => ({
     padding: 1,
     elevation: 1,
     p: 1,
-    // "&:hover": {
-    //   //textDecoration: 'underline'
-    //   boxShadow: "0px 4px 8px rgba(0.5, 0.5, 0.5, 0.15)",
-    // },
-    // infoCard: {
-    //   padding: 1,
-    //   margin: 1,
-    // },
   },
 }));
 
-const sortByRelevance = (a, b) => {
-  return a.score > b.score;
-};
-
-
-// function paginateResults(results: SearchResultsType[], pageNumber: number, pageSize: number): SearchResultsType[] {
-//   // Calculate start and end indices for the slice
-//   const start = (pageNumber - 1) * pageSize;
-//   const end = pageNumber * pageSize;
-
-//   // Return a slice of the results array
-//   return results.slice(start, end);
-// }
-
-//not having a dependency should... only run once per result set
 const SearchResults = (props: SearchResultsType) => {
   const classes = useStyles(theme);
   const _mounted = useRef(false);
