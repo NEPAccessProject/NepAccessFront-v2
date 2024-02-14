@@ -18,7 +18,10 @@ const LimitControl = () => {
             fullWidth
             id="limit"
             tabIndex={4}
-            options={[1, 10, 25, 50, 100]}
+            isOptionEqualToValue={(option, value) => option === value}
+            options={
+              [1,10,25,50]
+            }
             value={limit}
             onChange={(evt, value, tag) =>
               updatePaginationStateValues("limit", value)

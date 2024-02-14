@@ -68,8 +68,10 @@ declare module "@mui/material/Typography" {
 			fontFamily: ['open-sans','sans-serif'].join(','),
 			fontSize: 12,
 			filterLabel: {
-				fontSize: '0.9rem',
-				padding: 2,
+				fontSize: '0.8rem',
+				marginTop:2,
+				marginBottom:2,
+				display: 'block',
 			},
 			// resultsTitle: {
 			//   fontSize: "1.6rem",

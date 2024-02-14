@@ -12,7 +12,7 @@ import { FilterOptionType } from "@/components/interfaces/interfaces";
 const DistanceControl = () => {
   const context = useContext(SearchContext);
   const results = context.results;
-  const { updateFilterStateValues, filters, sortSearchResults } = context;
+  const { updateFilterStateValues, filters } = context;
   console.log("🚀 ~ DistanceControl ~ # of results:", results.length);
 
   const { sortby, sortdir } = context.pagination;
@@ -57,12 +57,12 @@ const DistanceControl = () => {
               style={{
                 width: "100%",
               }}
-              // isOptionEqualToValue={(option, value) => {
-              //   return option === value
-              // }}
+              value={distance}
               tabIndex={4}
-              options={["Exact Phrase", "10", "25", "50", "100"]}
+              options={['Exact Phrase', '1','5','10','20']
+}
               defaultValue={"Exact phrase"}
+             // value={parseInt(distance) || 0}
               onChange={(evt, value, tag) =>
                 onDistanceFilterChange(evt, value, tag)
               }

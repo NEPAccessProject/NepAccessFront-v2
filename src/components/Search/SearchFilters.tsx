@@ -122,16 +122,18 @@ const SearchFilters = (props) => {
   }
   const gridItemProps = {
     spacing: 1,
-    flex: 1,
-    xs:12,
+    marginTop: 1,
+    marginBottom: 1,
+//    flex: 1,
+ //   xs:12,
     // borderLeft: "none",
     // borderRight: "1px solid #eee",
-    border: "1px solid #eee",
-    display: "flex",
-    justifyContent: "center",
-    justifyItems: "center",
-    alignContent: "center",
-    alignItems: "center",
+ //   border: "1px solid #eee",
+//    display: "flex",
+    // justifyContent: "center",
+    // justifyItems: "center",
+    // alignContent: "center",
+    // alignItems: "center",
     "&:hover": {
       //           backgroundColor: //theme.palette.grey[200],
       boxShadow: "0px 4px 8px rgba(0.5, 0.5, 0.5, 0.15)",
@@ -169,34 +171,39 @@ const SearchFilters = (props) => {
           Clear Filters
         </Button>
       </Box>
-      <Grid flex={1} container xs={12} border={1}>
-        <Grid  {...gridItemProps}>
-          <Typography fontWeight={'bolder'} variant="filterLabel">Lead Agencies</Typography>
-          <AgencyFilter />
+      <Grid >
+        <Grid xs={12} marginTop={1}>
+          <Grid xs={12}>
+            <Typography variant="filterLabel">Lead Agencies:</Typography>
+          </Grid>
+          <Grid xs={12}>
+            <AgencyFilter />
+          </Grid>
         </Grid>
 
-        <Grid {...gridItemProps}>
-          <Typography variant="filterLabel">Cooperating Agencies</Typography>
-          <CooperatingAgenciesFilter />
+        <Grid {...gridItemProps} xs={12}>
+          <Grid xs={12}><Typography variant="filterLabel">Cooperating Agencies:</Typography></Grid>
+          <Grid xs={12}><CooperatingAgenciesFilter /></Grid>
         </Grid>
-        <Grid {...gridItemProps}>
-          <Typography variant="filterLabel">State(s) / Region(s)</Typography>
-          <StatesFilter />
+        <Grid {...gridItemProps} xs={12}>
+          <Grid xs={12}><Typography variant="filterLabel">State(s) / Region(s):</Typography></Grid>
+          <Grid xs={12}><StatesFilter /></Grid>
         </Grid>
-        <Grid {...gridItemProps}>
-          <Typography variant="filterLabel">Counties / Locations</Typography>
-          <CountyFilter />
+        <Grid {...gridItemProps} xs={12}>
+          <Grid xs={12}>
+            <Typography variant="filterLabel">Counties / Locations:</Typography>
+            </Grid>
+          <Grid xs={12}><CountyFilter /></Grid>
         </Grid>
-        <Grid {...gridItemProps}>
-          <Typography variant="filterLabel">Actions</Typography>
-          <ActionsFilter />
+        <Grid {...gridItemProps} xs={12}>
+          <Grid xs={12}><Typography variant="filterLabel">Actions:</Typography></Grid>
+          <Grid xs={12}><ActionsFilter /></Grid>
         </Grid>
-        <Grid {...gridItemProps}>
-          <Typography variant="filterLabel">Decisions</Typography>
-          <DecisionFilter />
+        <Grid {...gridItemProps} xs={12}>
+          <Grid xs={12}><Typography variant="filterLabel">Decision(s):</Typography></Grid>
+          <Grid xs={12}><DecisionFilter /></Grid>
         </Grid> 
       </Grid>
-      <FormLabel htmlFor="searchDecision"></FormLabel>
       <Divider />
       <Box>
         <FormControlLabel

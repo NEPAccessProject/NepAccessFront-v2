@@ -22,6 +22,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
 
   const [results, setResults] = useState(context.results);
+  const [resultsToDisplay, setResultsToDisplay] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
   //const [titleRaw, setTitleRaw] = useState("");
   const [pagination, setPaginationValues] = useState(context.pagination);
@@ -49,8 +50,8 @@ const SearchApp = (props: SearchAppPropType) => {
   const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
+ 
   const _mounted = React.useRef(false);
-  let params = useParams();
   useEffect(() => {
     _mounted.current = true;
     return () => {
@@ -58,7 +59,7 @@ const SearchApp = (props: SearchAppPropType) => {
     };
   });
   function sortSearchResults(results: SearchResultType[], sortBy:string | 'relavancy'){
-    console.log(`sortSearchResults ~ results:`, results);
+    //console.log(`sortSearchResults ~ results:`, results);
     
     const sortedResults = results.sort((a:any, b:any) => {
         if (sortBy === 'title') {
@@ -209,8 +210,7 @@ const SearchApp = (props: SearchAppPropType) => {
     filters: any,
     searchType : "search_top" | "search_no_context" | "text/search_no_context" | "text/search_top"
   ) => {
-    console.log("🚀 ~ urlFromContextPagination ~ pagination:", pagination);
-    const { page, limit, sortby, sortdir } = pagination;
+    const { page, limit, sortby, sortdir,rowsPerPage } = pagination;
     //Get currently set filters to use in search query
     //const activeFilters = getActiveFilters(filters);
     const queryString = `${host}`;
@@ -227,67 +227,92 @@ const SearchApp = (props: SearchAppPropType) => {
     return url;
   };
 
-  const getData = async (url: string) => {
-    console.log(`getData ~ url:`, url);
-    const response = await fetch(url, {
-      method: "GET",
+  useEffect(()=>{
+    console.log('FIRING PAGINATION EFFECT');
+      if(_mounted.current !== true){
+        return;
+      }
+      if(results.length === 0){
+        console.info('No results to show - Stopping pagination effect');
+        return;
+      }
+      const {limit,rowsPerPage,page} = pagination;
+      console.log(`useEffect ~ pagination:`, pagination);
+      const start = page * rowsPerPage || 0;
+      const end =   page * rowsPerPage + rowsPerPage;
+  
+      console.log(`PAGINATE RESULTS # ${results.length} results... - Start: ${start} - end: ${end}`)
+      const paginatedResults = results.slice(start, end) || results;
+      console.log(`paginateResults ~ start:${start}, end:${end}`);
+      // Return a slice of the results array
+      setResultsToDisplay(paginatedResults);
+  },[pagination])
+//   useEffect(() => {
+//     (async () => {
+//       const start = page * limit
+//       const end = (page * limit) + (limit)
+  
+//       let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=100`;
+//       const response = await axios.get(url);
+//       console.log(`response:`, response);
+//       setResults(response.data);
+// //      await searchTop();
+//     })()
+//   },[pagination])
+const SearchTopPost = async() => {
+  let url = urlFromContextPaginationAndFilters(pagination, filters, "search_top");
+  console.log('CALLING POST TO SEARCH_TOP', url);
+  const response = await axios.post(url,{
+   "title": titleRaw, 
+  },{
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+    },
+  });
+  const results = response.data || [];
+  console.log(`SearchTopPost ~ results:`, results);
+  setResults(results);
+  setResultsToDisplay(results);
+  setLoading(false);
+  setSearched(true);
+}
+  const searchTop = async () => {
+    try{  
+    const start = page * limit
+    const end = (page + limit) + (limit)
+    setLoading(true);
+    const hostUrl = urlFromContextPaginationAndFilters(pagination, filters,`text/search_top`);
+    //[TODO] prototyping - replace with call from above
+//    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
+    let url = `/api/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
+    console.log(`PAGINATION EFFECT ~ url:`, url);
+
+    const response = await axios.post(url,{
+      "title": "copper mine",
+    },{
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "application/json",
-        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        "Accept": "application/json",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
       },
     });
-    const results = await response.json();
-    console.log("🚀 ~ getData ~ results:", results);
-    console.log(`GET DATA RETURNING RESPONS:`, results);
-    const { page, limit, sortby, sortdir } = pagination;
-    let start = page * limit;
-    console.log(`getData ~ start:`, start);
-    let end = page * limit + limit;
-    console.log(`getData ~ end:`, end);
 
-    setResults(results.splice(start, end));
-    //    return data;
-  };
-
-  const searchTop = async () => {
-    console.log('Starting Search Top')
-    const start = page * limit
-    const end = (page * limit) + (limit + 1)
-    try{  
-    setLoading(true);
-    const hostUrl = urlFromContextPaginationAndFilters(pagination, filters,`search_top`);
-    //[TODO] prototyping - replace with call from above
-    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=5`;
-
-    console.log(`searchTop ~ url:`, url);
-    const response = await axios.get(url);
-
-    console.log('RESPONSE DATA',response)
     const results = response.data;
-      console.log(`searchTop ~ results:`, results);
       setResults(results);
-    setLoading(false);
-     
-    //  ).then((response) => {
-    //   console.log(`searchTop ~ response:`, response);
-    //   return response.data;
-    // }).then((data) => {
-    //   console.log(`searchTop ~ data:`, data);
-    //   setResults(data);
-    //   setLoading(false);
-    // }).catch((error) => {
-    //   setError(`${error}`);
-    //   setLoading(false);
-    // })
-
+      setResultsToDisplay(results);
+      console.log(`FILTER EFFECT GOT ${results.length}:`,);
   }
   catch(error){
-    console.error(`searchTop ~ error:`, error);
-    setError(`${error}`);
+    const msg = `Error Searching for Results! ${error}`
+    setError(msg);
   }
   finally{
     setLoading(false);
+    setSearched(true);
   }
   };
   const searchNoContext = async () => {
@@ -296,24 +321,27 @@ const SearchApp = (props: SearchAppPropType) => {
     console.log("IS LOADING", loading);
     const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
     console.log("🚀 ~ searchNoContext ~ url:", url);
-    const data = response.search_no_top;
-    console.log(`searchNoContext ~ data:`, data);
-    //const results = data
-    // const response = await axios.post(url, {
-    //   title: titleRaw
-    // })
-    // const response = await axios.post(url,{
-    //   title: titleRaw
-    // });
-//    updatePaginationStateValues("total", response.data.length);
+    const response = await axios.post('/api/text/search_no_context',{
+      "title": "copper mine",
+    },{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+      },
+    });
+    const data = response.data || [];
+    console.log(`GOT ${data.length} Results`);
     updatePaginationStateValues("total", data.length);
     //[TODO][CRITICAL][WTF]  Currently the result set returns
     //const data = response.data;
     //const results: SearchResultType[] = filterResults(data);
-    let results = data.splice(0,100);
+//    let results = data.splice(0,100);
     setSearched(true);
-    setResults(results);
-    setLoading(false);
+    //[TODO] Need to rething, we need to have all results, but also a selected subset of results without overwritting the orginal
+    setResults(data);
+    setResultsToDisplay(data);
   }
   catch(error){
     console.error(`searchNoContext ~ error:`, error);
@@ -323,6 +351,19 @@ const SearchApp = (props: SearchAppPropType) => {
     setLoading(false);
   }
   };
+//   function paginateResults(results: SearchResultType[], pageNumber: number, pageSize: number): SearchResultType[] {
+//     // Calculate start and end indices for the slice
+//     const start = pageNumber * limit;limit;
+//     const end =  ((pageNumber * pageSize) + limit < results.length) ? (pageNumber * pageSize)+limit : results.length;
+
+//     console.log(`Paginating ${results.length} results... - Start: ${start} - end: ${end}`)
+//     const paginatedResults = results.slice(start, end);
+//     console.log(`First Result ID ${results[0].id} vs Paginated Result ID ${paginatedResults[0].id}`)
+//     console.log(`paginateResults ~ start:${start}, end:${end}`);
+//     // Return a slice of the results array
+//     setResultsToDisplay(paginatedResults);
+// }
+
   const post = async (url: string, data: any) => {
     const res = await fetch(url, {
       method: "POST",
@@ -346,13 +387,13 @@ const SearchApp = (props: SearchAppPropType) => {
       ...pagination,
       [key]: value,
     });
-    console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
+//    console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
   const titleRaw = context.filters.titleRaw;
   const onSearchClick = async() => {
     console.log("🚀 ~ ON SEARCH CLICK ~ titleRaw:", titleRaw)
     setSearched(true);
-      await searchTop();
+      await SearchTopPost();
   }
   console.log("🚀 ~ SearchApp ~ titleRaw:", titleRaw)
   const value = {
@@ -370,12 +411,17 @@ const SearchApp = (props: SearchAppPropType) => {
     searchNoContext,
     searched,
     setSearched,
+    setResultsToDisplay,
+    resultsToDisplay,
   };
+
+
+
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
         <Box sx={{display:'flex', justifyContent:'center'}}>
-          <Snackbar open={error.length > 0}>
+          <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={error.length > 0}>
             <Alert severity="error" onClose={() => {}}>
               {error}
             </Alert>
@@ -401,14 +447,16 @@ const SearchApp = (props: SearchAppPropType) => {
             <Grid xs={9} item>
               <Button
                 variant="contained"
-                disabled={
-                  error.length > 0 || filters.titleRaw.length === 0
-                }
-                onClick={async () => await searchTop()}
+                // disabled={
+                //   error.length > 0 || filters.titleRaw.length === 0
+                // }
+                onClick={async () => await SearchTopPost()}
               >
                 Search
               </Button>                
-
+              <Button variant="contained" onClick={async () => await searchNoContext()}>
+                Search Not Context 
+              </Button>
               <h2>
                 {results.length ? results.length : 0} Search Results Found
               </h2>
@@ -430,9 +478,11 @@ const SearchApp = (props: SearchAppPropType) => {
                   </>
                 )}
                   <>
-                    <SearchResults results={results} />
+                    {resultsToDisplay.length > 0 &&
+                      (<SearchResults results={resultsToDisplay} />)
+                    }
                   </>
-                {results.length === 0  &&
+                {resultsToDisplay.length === 0  &&
                 (
                   <>
                     <SearchTips />

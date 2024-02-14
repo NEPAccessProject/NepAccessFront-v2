@@ -17,8 +17,6 @@ import SortByControl from "./filters/SortByControl";
 import SortDirControl from "./filters/SortDirControl";
 
 const GridItemProps = {
-  borderRight: 1,
-  borderColor: "#ddd",
   padding: 1,
   alignItems: "center",
   justifyContent: "center",
@@ -43,7 +41,6 @@ const SearchHeader = () => {
     setError,
     updatePaginationStateValues,
     updateFilterStateValues,
-    setTitleRaw,
     searchNoContext,
     searched,
     setSearched
@@ -117,6 +114,7 @@ const SearchHeader = () => {
             onChange={(evt) => {
               return onChange(evt)
             }}
+            onError={(evt) => onError(evt)}
             placeholder="Search for NEPA Documents..."
             InputProps={{
               endAdornment: (
@@ -129,9 +127,6 @@ const SearchHeader = () => {
                       <SearchOutlined />
                     </IconButton>
                   </Grid>
-                  <Typography color={'red'}>
-                    {error ? error : ""}
-                  </Typography>
                 </>
               ),
             }}
@@ -145,10 +140,9 @@ const SearchHeader = () => {
           )}
         </Grid> */}
       </Grid>
-      <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
+      {/* <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
-          {/* <DistanceControl /> */}
-          {/* <DistanceFilter/> */}
+          <DistanceControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
           <SortByControl />
@@ -159,7 +153,7 @@ const SearchHeader = () => {
         <Grid {...GridItemProps} xs={3}>
           <LimitControl />
         </Grid>
-      </Grid>
+      </Grid> */}
     </>
   );
 };

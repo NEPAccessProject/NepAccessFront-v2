@@ -38,6 +38,7 @@ export type DocumentType = {
 	sortby: string;
 	sortdir: string;
 	totalCount: number;
+	rowsPerPage: number;
   }
 
 export type SearchResultType = {
@@ -95,7 +96,7 @@ export type FilterType = {
 	cooperatingAgencyRaw: string;
 	county: [];
 	countyRaw: string;
-	distance: number;
+	distance: string;
 	decisions:string[];
 	decisionsRaw: string
 	endComment: Date | string;
@@ -130,7 +131,7 @@ export type FilterType = {
 	cooperatingAgency: [],
 	cooperatingAgencyRaw: "",
 	county: [],
-	distance: 0,
+	distance: "",
 	decisions: [],
 	decisionsRaw: "",
 	endComment: "",
@@ -208,6 +209,8 @@ export type SearchContextType = {
 	optionsChecked: boolean;
 	pagination: PaginiationType;
 	results: SearchResultType[];
+	resultsToDisplay: SearchResultType[];
+	setResultsToDisplay: (results:SearchResultType[]) => void;
 	searchNoContext: () => void;
 	searchOption: string;
 	searched: boolean;
@@ -223,6 +226,8 @@ export type SearchContextType = {
 	// sortSearchResults: (results:SearchResultType[], sortBy:string) => SearchResultType[]
 	setLoading: (loading:boolean) => void;
 	setSearched: (searched:boolean) => void;
+	setResults: (results:SearchResultType[]) => void;
+	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
   };
 
   export type FilterOptionType = {
