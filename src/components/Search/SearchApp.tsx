@@ -57,7 +57,7 @@ const SearchApp = (props: SearchAppPropType) => {
     return () => {
       _mounted.current = false;
     };
-  });
+  }); 
   function sortSearchResults(results: SearchResultType[], sortBy:string | 'relavancy'){
     //console.log(`sortSearchResults ~ results:`, results);
     
@@ -76,77 +76,6 @@ const SearchApp = (props: SearchAppPropType) => {
     }
     );
 }
-  // #Start useEffects
-
-  //This effect looks at the sort by values and updates the result with the new sorted results
-
-  // useEffect(()=>{
-  //   if(results && results.length === 0 && _mounted.current === false){
-  //     // If there is no results to sort or the component is not mounted then do nothing
-  //     return;
-  //   }
-  //   const currentResults = results
-  //   console.log('TOP UNSORTED RESULT',results[0])
-  //   //const sorted:SearchResultType[] = 
-  //   //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
-  //   sortSearchResults(currentResults,sortby)
-  //   console.log('After Sort Results')
-  //   //setResults(sorted)
-  // },[sortby,sortdir])
-
-  // Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
-  //useEffect(() => {
-  //  async function fetchCounts() : Promise<any>
-  //   {
-  // [TODO] These are endpoints used by the old app, so we will need create some new endpoints
-  //   this.get("stats/earliest_year", "firstYear");
-  //   this.get("stats/latest_year", "lastYear");
-  //   this.get("stats/eis_count", "EISCount");
-  //const endpoints = ["earliest_year","latest_year","eis_count","ea_count","noi_count","rod_count","scoping_count"];
-  //     const endpoints = ["earliest_year","latest_year","ea_count","noi_count","rod"];
-  //     const counts = {
-  //       "earliest_year": 0,
-  //       "latest_year": 0,
-  //       "eis_count": 0,
-  //       "ea_count": 0,
-  //       "noi_count": 0,
-  //       "rod_count": 0,
-  //       "scoping_count": 0,
-  //     };
-  //   try{
-  //     for (const endpoint of endpoints) {
-  //       const temp = await (await axios.get(`${host}stats/${endpoint}`)).data;
-  //       counts[endpoint] = temp.count;
-  //       console.log(`useEffect ~ counts:`, counts);
-  //       setCount(counts);
-  //     }
-
-  //   }
-  // catch(error){
-  //   console.error(`Non-Fatal Error retrieving counts: ${error}`);
-  // }}
-  //   fetchCounts();
-  // },[titleRaw])
-
-
-   const onNotifyonError = (err) => {
-    if (!titleRaw || titleRaw === "" || err) {
-      console.error("Notifying on error-title raw");
-      return;
-    } else if (err) {
-      console.error("Received Notifaction Error");
-      setError(err);
-    }
-  };
-
-  // function getActiveFilters(input: FilterType): FilterType[] {
-  //   return input input.filter(
-  //     (item) =>
-  //       item !== null &&
-  //       item !== undefined &&
-  //       !(Array.isArray(item) && item.length === 0)
-  //   );
-  // }
   //[TODO] experiment with score relavancy and dump the irrelevant results, ideally from the backend
   function filterResults(results: SearchResultType[]): SearchResultType[] {
     if (!Array.isArray(results)) {
@@ -174,34 +103,6 @@ const SearchApp = (props: SearchAppPropType) => {
       `UPDATING ${key} with the ` + `following value: ${value}`
     );
     setFilterValues({ ...filters, [key]: value });
-  };
-
-  const get = async (url: string) => {
-    console.log(`get ~ url:`, url);
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      },
-    });
-    const results = await res.json();
-    console.log(`get ~ temp:`, results);
-    return results;
-  };
-  const getResultsCount = async (url: string) => {
-    const res = await fetch(`${url}get_count`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      },
-    });
-    const results = await res.json();
-    console.log(`get ~ temp:`, results);
-    return results;
   };
 
   //[TODO] Temp hack untill connected to the backend
@@ -247,19 +148,8 @@ const SearchApp = (props: SearchAppPropType) => {
       // Return a slice of the results array
       setResultsToDisplay(paginatedResults);
   },[pagination])
-//   useEffect(() => {
-//     (async () => {
-//       const start = page * limit
-//       const end = (page * limit) + (limit)
-  
-//       let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=100`;
-//       const response = await axios.get(url);
-//       console.log(`response:`, response);
-//       setResults(response.data);
-// //      await searchTop();
-//     })()
-//   },[pagination])
-const SearchTopPost = async() => {
+
+  const SearchTopPost = async() => {
   let url = urlFromContextPaginationAndFilters(pagination, filters, "search_top");
   console.log('CALLING POST TO SEARCH_TOP', url);
   const response = await axios.post(url,{
