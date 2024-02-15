@@ -61,7 +61,7 @@ const DistanceControl = () => {
               tabIndex={4}
               options={['Exact Phrase', '1','5','10','20']
 }
-              defaultValue={"Exact phrase"}
+              defaultValue={"Exact Phrase"}
              // value={parseInt(distance) || 0}
               onChange={(evt, value, tag) =>
                 onDistanceFilterChange(evt, value, tag)

@@ -18,6 +18,14 @@ type SearchAppPropType = {
   setResults: () => void;
 };
 
+enum messageType{
+  success = "success",
+  error = "error",
+  info = "info",
+  warning = "warning",
+}
+
+
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
 
@@ -31,6 +39,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [count, setCount] = useState({});
   const [searched,setSearched] = useState(false);
   const { page, limit, sortby, sortdir } = pagination;
+  const [message, setMessage] = useState("");
   const {
     isFast41,
     decisions,
@@ -50,7 +59,15 @@ const SearchApp = (props: SearchAppPropType) => {
   const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
- 
+
+  useEffect(() => {
+
+  },[message  ])
+  
+  useEffect(() => {
+
+  },[message])
+  
   const _mounted = React.useRef(false);
   useEffect(() => {
     _mounted.current = true;
@@ -208,11 +225,15 @@ const SearchApp = (props: SearchAppPropType) => {
   const searchNoContext = async () => {
     try{
     setLoading(true);
+    // if(!titleRaw){
+    //   setError("Please enter search term(s)");
+    //   setLoading(false);
+    // }
     console.log("IS LOADING", loading);
     const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
     console.log("🚀 ~ searchNoContext ~ url:", url);
     const response = await axios.post('/api/text/search_no_context',{
-      "title": "copper mine",
+      "title": "copper mine",//titleRaw,
     },{
       method: "POST",
       headers: {
@@ -224,14 +245,19 @@ const SearchApp = (props: SearchAppPropType) => {
     const data = response.data || [];
     console.log(`GOT ${data.length} Results`);
     updatePaginationStateValues("total", data.length);
+    setLoading(false);
+
     //[TODO][CRITICAL][WTF]  Currently the result set returns
     //const data = response.data;
     //const results: SearchResultType[] = filterResults(data);
 //    let results = data.splice(0,100);
-    setSearched(true);
+//    console.log(`searchNoContext ~ data:`, data);
+
+    //setSearched(true);
     //[TODO] Need to rething, we need to have all results, but also a selected subset of results without overwritting the orginal
     setResults(data);
     setResultsToDisplay(data);
+    setSearched(false);
   }
   catch(error){
     console.error(`searchNoContext ~ error:`, error);
@@ -240,32 +266,6 @@ const SearchApp = (props: SearchAppPropType) => {
   finally{
     setLoading(false);
   }
-  };
-//   function paginateResults(results: SearchResultType[], pageNumber: number, pageSize: number): SearchResultType[] {
-//     // Calculate start and end indices for the slice
-//     const start = pageNumber * limit;limit;
-//     const end =  ((pageNumber * pageSize) + limit < results.length) ? (pageNumber * pageSize)+limit : results.length;
-
-//     console.log(`Paginating ${results.length} results... - Start: ${start} - end: ${end}`)
-//     const paginatedResults = results.slice(start, end);
-//     console.log(`First Result ID ${results[0].id} vs Paginated Result ID ${paginatedResults[0].id}`)
-//     console.log(`paginateResults ~ start:${start}, end:${end}`);
-//     // Return a slice of the results array
-//     setResultsToDisplay(paginatedResults);
-// }
-
-  const post = async (url: string, data: any) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-    });
-    const temp = await res.json();
-    console.log(`post ~ temp:`, temp);
-
-    setResults(temp);
   };
   const updatePaginationStateValues = (key: string, value: any) => {
     console.log(
@@ -309,13 +309,14 @@ const SearchApp = (props: SearchAppPropType) => {
 
   return (
     <SearchContext.Provider value={value}>
+       <Box sx={{display:'flex', justifyContent:'center'}}>
+            <Snackbar hidden={error.length ? false : true} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={error.length ? true : false}>
+              <Alert severity={"error"} onClose={() => setMessage("")}>
+                {error}
+              </Alert>
+          </Snackbar>
+      </Box>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
-        <Box sx={{display:'flex', justifyContent:'center'}}>
-          <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={error.length > 0}>
-            <Alert severity="error" onClose={() => {}}>
-              {error}
-            </Alert>
-        </Snackbar></Box>
         <Paper elevation={1}>
           <Grid container>
             <Grid item xs={12} flex={1}>
@@ -335,18 +336,6 @@ const SearchApp = (props: SearchAppPropType) => {
               </Paper>
             </Grid>
             <Grid xs={9} item>
-              <Button
-                variant="contained"
-                // disabled={
-                //   error.length > 0 || filters.titleRaw.length === 0
-                // }
-                onClick={async () => await SearchTopPost()}
-              >
-                Search
-              </Button>                
-              <Button variant="contained" onClick={async () => await searchNoContext()}>
-                Search Not Context 
-              </Button>
               <h2>
                 {results.length ? results.length : 0} Search Results Found
               </h2>

@@ -46,7 +46,7 @@ const SearchContext = React.createContext<SearchContextType>({
   loading: false,
   pagination: {
     page: 0,
-    limit: 100,
+    limit: 25,
     rowsPerPage: 10,
     sortby: "relevance",
     sortdir: "DESC",

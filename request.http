@@ -1,11 +1,13 @@
 @host = "http://localhost:8080/"
-#@host="https://bighorn.sbs.arizona.edu:8443/nepaBackend/"
+@host="https://bighorn.sbs.arizona.edu:8443/nepaBackend/"
 
 ###
 GET {{host}}?title="copper" HTTP/1.1
 
 ###
-GET http://localhost:8080/text/search_no_context HTTP/1.1
+POST http://localhost:8080/text/search_no_context HTTP/1.1
+Content-Type: application/json
+Accept: application/json
 
 {
   "title": "xxxxxx"
@@ -13,6 +15,16 @@ GET http://localhost:8080/text/search_no_context HTTP/1.1
 ###
 GET http://localhost:8080/stats/eis_count HTTP/1.1
 
+###
+POST {{host}}/search_top HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer
+
+
+{
+  "title": "copper"
+}
 
 ###
 POST {{host}}/search_no_context HTTP/1.1

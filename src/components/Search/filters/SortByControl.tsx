@@ -36,7 +36,7 @@ const SortByControl = () => {
               fullWidth
               id="sortby"
               tabIndex={5}
-              defaultValue={"relevance"}
+              defaultValue={"Relevance"}
               options={['Relevance', 'Date', 'Title']}
               value={`${sortby}`}
               onChange={(evt, value, tag) =>

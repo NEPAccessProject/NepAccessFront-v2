@@ -1,12 +1,13 @@
 import { SearchOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
+  Button,
   FormControl,
   FormLabel,
   Grid,
   IconButton,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 //import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
@@ -43,13 +44,13 @@ const SearchHeader = () => {
     updateFilterStateValues,
     searchNoContext,
     searched,
-    setSearched
+    setSearched,
   } = context;
-  const { proximityDisabled, proximityOption, titleRaw, } = filters;
+  const { proximityDisabled, proximityOption, titleRaw } = filters;
   const { page, limit, sortby, sortdir } = pagination;
 
   const onChange = (evt) => {
-    console.log("🚀 ~ onexChange ~ evt:", evt)
+    console.log("🚀 ~ onexChange ~ evt:", evt);
     evt.preventDefault();
     const titleRaw = (evt.target as HTMLInputElement).value;
     // console.log("🚀 ~ onChange ~ titleRaw:", titleRaw)
@@ -58,12 +59,11 @@ const SearchHeader = () => {
     setError("");
     setSearched(true);
   };
-  //[TODO] 
+  //[TODO]
   const onError = (evt: React.SyntheticEvent) => {
     setError(`Please enter a search term(s) to start searching`);
-  }
-  const onIconClick = async(evt: React.SyntheticEvent) => {
-
+  };
+  const onIconClick = async (evt: React.SyntheticEvent) => {
     if (!titleRaw || titleRaw === "") {
       setError("Please enter a search term");
       return;
@@ -76,9 +76,9 @@ const SearchHeader = () => {
   };
 
   const onKeyDown = (evt: React.KeyboardEvent) => {
-    console.log('onKeyDown ~ evt: ', evt.key);
+    console.log("onKeyDown ~ evt: ", evt.key);
     if (evt.key === "Enter") {
-      searchNoContext()
+      searchNoContext();
     }
   };
   const updateLimit = (key: string, val: any) => {
@@ -92,18 +92,14 @@ const SearchHeader = () => {
         </Grid> */}
       <Grid
         container
+        flex={1}
         display={"flex"}
         justifyContent={"flex-start"}
         borderBottom={1}
         borderColor={"#EEE"}
         padding={1}
       >
-
-        <Grid 
-          {...GridItemProps}
-          id={'distance-filter'}
-          xs={12}
-        >
+        <Grid {...GridItemProps} id={"dis tance-filter"} xs={11} flex={1}>
           <TextField
             fullWidth
             //onError={(evt) => onError(evt)}
@@ -112,7 +108,7 @@ const SearchHeader = () => {
             value={titleRaw || ""}
             onKeyDown={(evt) => onKeyDown(evt)}
             onChange={(evt) => {
-              return onChange(evt)
+              return onChange(evt);
             }}
             onError={(evt) => onError(evt)}
             placeholder="Search for NEPA Documents..."
@@ -131,6 +127,15 @@ const SearchHeader = () => {
               ),
             }}
           />
+
+        </Grid>
+        <Grid {...GridItemProps} id={"distance-filter"} xs={1} flex={1} justifyContent={"center"} justifyItems={"center"}  alignSelf={"center"}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={(evt) => onIconClick(evt)}>
+              Search
+            </Button>
         </Grid>
         {/* <Grid xs={12} {...GridItemProps}>
           {error && (
@@ -140,7 +145,7 @@ const SearchHeader = () => {
           )}
         </Grid> */}
       </Grid>
-      {/* <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
+      <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
           <DistanceControl />
         </Grid>
@@ -153,7 +158,7 @@ const SearchHeader = () => {
         <Grid {...GridItemProps} xs={3}>
           <LimitControl />
         </Grid>
-      </Grid> */}
+      </Grid>
     </>
   );
 };
@@ -186,10 +191,11 @@ const DistanceFilter = () => {
             }}
             tabIndex={4}
             defaultValue={{ label: "exact phrase", value: "0" }}
-            options={[{ label: "exact phrase", value: "0" },
-            { label: 10, value: 10 },
-            { label: 25, value: 25 },
-            { label: 50, value: 50 },
+            options={[
+              { label: "exact phrase", value: "0" },
+              { label: 10, value: 10 },
+              { label: 25, value: 25 },
+              { label: 50, value: 50 },
             ]}
             onChange={(evt, value, tag) =>
               updatePaginationStateValues("distance", value)
@@ -210,6 +216,6 @@ const DistanceFilter = () => {
           />
         </FormControl>
       </Grid>
-    </Grid> 
+    </Grid>
   );
 };

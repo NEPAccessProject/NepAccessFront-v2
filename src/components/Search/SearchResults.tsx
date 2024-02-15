@@ -66,6 +66,7 @@ const SearchResults = (props: SearchResultsType) => {
   console.log(`onPaginationChange ~ PAGE:`, evt.target.value);
 //    updatePaginationStateValues("page", page);
       const newPage = evt.target.value;
+      //Use effect should detect the pagination change, so ... a direct call should not be needed?
       updatePaginationStateValues("page", newPage);
 //      setResults(paginatedResults);
   };
@@ -90,6 +91,9 @@ const SearchResults = (props: SearchResultsType) => {
           component={`div`}
         />
       </> 
+      <Box border={2}>
+          {JSON.stringify(resultsToDisplay)}
+      </Box>
       {resultsToDisplay &&  resultsToDisplay.map((result, idx) => {
          
           return (
