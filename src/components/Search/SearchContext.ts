@@ -30,7 +30,7 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  titleRaw: "",
+  titleRaw: "Copper Mine",
   actionsRaw: "",
   endComment: "",
   startComment: "",

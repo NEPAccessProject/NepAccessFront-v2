@@ -91,9 +91,6 @@ const SearchResults = (props: SearchResultsType) => {
           component={`div`}
         />
       </> 
-      <Box border={2}>
-          {JSON.stringify(resultsToDisplay)}
-      </Box>
       {resultsToDisplay &&  resultsToDisplay.map((result, idx) => {
          
           return (

@@ -5,7 +5,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SearchFilters from "../Search/SearchFilters";
-import { SearchResultType } from "../interfaces/interfaces";
+import { FilterType, SearchContextType, SearchResultType,PaginiationType } from "../interfaces/interfaces";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
@@ -14,10 +14,102 @@ import SearchTips from "./SearchTips";
 import response from '../../tests/data/api'; 
 import { title } from "process";
 //console.log(`data:`, data);
+const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
+
 type SearchAppPropType = {
   results: SearchResultType[];
   setResults: () => void;
 };
+export function sortSearchResults(results,sortby:string,sortdir:string="asc"){
+  //console.log(`sortSearchResults ~ results:`, results);
+
+  //[TODO] we need to introduce a sort by param that contols if A > B vs B > A IE ascending and descending so the 
+  results.sort((a:any, b:any) => {
+      //lowercase both sides to avoid case sensitivity issues
+      if (sortby.toLowerCase() === 'title') {
+          if(sortdir === 'asc'){
+              return a.doc.title.localeCompare(b.doc.title);
+          }
+          else{
+              return a.doc.title.localeCompare(b.doc.title);
+          }
+      } else if (sortby.toLowerCase() === 'commentDate') {
+          let dateA = new Date(a.doc.commentDate);  
+          let dateB = new Date(b.doc.commentDate);
+          // For 'score' and 'commentDate', sort in descending order
+          if(sortdir === 'asc'){
+              return dateB.getDate() - dateA.getDate();
+          }
+          else{
+              return dateA.getDate() - dateB.getDate();
+          }
+       }
+       else if (sortby.toLowerCase() ==='relavancy') {
+          //we want those that are MORE relvant then others
+          if(sortdir === 'asc'){
+              return a.score - b.score
+          }
+          else {
+              return b.score - a.score
+          }
+       }
+       if(sortby.toLowerCase() === 'relavancy'){
+           console.log(`SORTED BY SCORE results`, results);
+       }
+       if(sortby.toLowerCase() === 'commentDate'){
+           console.log(`SORTED BY DATE results`, results);
+       }
+       if(sortby.toLowerCase() === 'title'){
+           console.log(`SORTED BY TITLE results`, results);
+       }
+       return results;
+  }
+  );
+}
+
+export function filterResults(results: SearchResultType[]): SearchResultType[] {
+  if (!Array.isArray(results)) {
+    return [];
+  }
+  const scores: number[] = [];
+  results.map((result) => scores.push(result.score));
+  scores.sort((a, b) => b - a);
+  console.log("TOP SCORES", scores[0]);
+  console.log("BOTTOM SCORES", scores[scores.length - 1]);
+  console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
+  const avg = (scores[scores.length - 1] + scores[0]) / 2;
+  const filteredResults = results.filter((result) => result.score > avg);
+  console.log(
+    "🚀 ~ filterResults ~ # of filteredResults:",
+    filteredResults.length
+  );
+
+  return filteredResults;
+}
+
+  //[TODO] Temp hack untill connected to the backend
+  export const urlFromContextPaginationAndFilters = (
+    context: SearchContextType,
+    pagination: PaginiationType,
+    filters: FilterType,
+    searchType : "search_top" | "search_no_context" | "text/search_no_context" | "text/search_top"
+  ) => {
+    const { page, limit, sortby, sortdir,rowsPerPage } = pagination;
+    //Get currently set filters to use in search query
+    //const activeFilters = getActiveFilters(filters);
+    const queryString = `${host}`;
+    // activeFilters.forEach((filter) => {
+    //   queryString.concat(`&${filter[field]}=${filter.value}`s);
+    // });
+    console.log(`GENTERATED QUERY STRING:`, queryString);
+    //TODO temporary hack this should be part of retriving active filters
+    const searchTerm = filters.titleRaw.length ? `&title=${filters.titleRaw}` : "";
+
+    //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
+    const url: string = `${host}${searchType}`;
+    console.log("🚀 ~ urlFromContextPagination ~ url:", url);
+    return url;
+  };
 
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
@@ -25,7 +117,6 @@ const SearchApp = (props: SearchAppPropType) => {
   const [results, setResults] = useState(context.results);
   const [resultsToDisplay, setResultsToDisplay] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
-  //const [titleRaw, setTitleRaw] = useState("");
   const [pagination, setPaginationValues] = useState(context.pagination);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState(context);
@@ -48,7 +139,6 @@ const SearchApp = (props: SearchAppPropType) => {
     actionsRaw,
 } = filters;
   const [error, setError] = useState("");
-  const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
  
@@ -58,25 +148,8 @@ const SearchApp = (props: SearchAppPropType) => {
     return () => {
       _mounted.current = false;
     };
-  });
-  function sortSearchResults(results: SearchResultType[], sortBy:string | 'relavancy'){
-    //console.log(`sortSearchResults ~ results:`, results);
-    
-    const sortedResults = results.sort((a:any, b:any) => {
-        if (sortBy === 'title') {
-            return a.doc.title.localeCompare(b.doc.title);
-        } else if (sortBy === 'commentDate') {
-            let dateA = new Date(a.doc.commentDate);  
-            let dateB = new Date(b.doc.commentDate);
-            // For 'score' and 'commentDate', sort in descending order
-            return dateA.getTime() - dateB.getTime();
-         }
-         console.log(`sortSearchResults ~ sortedResults:`, results[0]);
-         console.log(`sortSearchResults ~ sortedResults:`, sortedResults[0]);
-         setResults(sortedResults);
-    }
-    );
-}
+  }, []);
+
   // #Start useEffects
     useEffect(() => {
       if ((!results ||results.length === 0)|| _mounted.current === false) {
@@ -127,35 +200,6 @@ const SearchApp = (props: SearchAppPropType) => {
   //   fetchCounts();
   // },[titleRaw])
 
-  // function getActiveFilters(input: FilterType): FilterType[] {
-  //   return input input.filter(
-  //     (item) =>
-  //       item !== null &&
-  //       item !== undefined &&
-  //       !(Array.isArray(item) && item.length === 0)
-  //   );
-  // }
-  //[TODO] experiment with score relavancy and dump the irrelevant results, ideally from the backend
-  function filterResults(results: SearchResultType[]): SearchResultType[] {
-    if (!Array.isArray(results)) {
-      return [];
-    }
-    const scores: number[] = [];
-    results.map((result) => scores.push(result.score));
-    scores.sort((a, b) => b - a);
-    console.log("TOP SCORES", scores[0]);
-    console.log("BOTTOM SCORES", scores[scores.length - 1]);
-    console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
-    const avg = (scores[scores.length - 1] + scores[0]) / 2;
-    const filteredResults = results.filter((result) => result.score > avg);
-    console.log(
-      "🚀 ~ filterResults ~ # of filteredResults:",
-      filteredResults.length
-    );
-
-    return filteredResults;
-  }
-
   // #End useEffects
   const updateFilterStateValues = (key: string, value: any) => {
     console.log(
@@ -164,63 +208,13 @@ const SearchApp = (props: SearchAppPropType) => {
     setFilterValues({ ...filters, [key]: value });
   };
 
-  const get = async (url: string) => {
-    console.log(`get ~ url:`, url);
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      },
-    });
-    const results = await res.json();
-    console.log(`get ~ temp:`, results);
-    return results;
-  };
-  const getResultsCount = async (url: string) => {
-    const res = await fetch(`${url}get_count`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
-      },
-    });
-    const results = await res.json();
-    console.log(`get ~ temp:`, results);
-    return results;
-  };
-
-  //[TODO] Temp hack untill connected to the backend
-  const urlFromContextPaginationAndFilters = (
-    pagination: any,
-    filters: any,
-    searchType : "search_top" | "search_no_context" | "text/search_no_context" | "text/search_top"
-  ) => {
-    const { page, limit, sortby, sortdir,rowsPerPage } = pagination;
-    //Get currently set filters to use in search query
-    //const activeFilters = getActiveFilters(filters);
-    const queryString = `${host}`;
-    // activeFilters.forEach((filter) => {
-    //   queryString.concat(`&${filter[field]}=${filter.value}`s);
-    // });
-    console.log(`GENTERATED QUERY STRING:`, queryString);
-    //TODO temporary hack this should be part of retriving active filters
-    const searchTerm = context.filters.titleRaw.length ? `&title=${context.filters.titleRaw}` : "";
-
-    //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
-    const url: string = `${host}${searchType}`;
-    console.log("🚀 ~ urlFromContextPagination ~ url:", url);
-    return url;
-  };
 
   useEffect(()=>{
     console.log('FIRING PAGINATION EFFECT');
       if(_mounted.current !== true){
         return;
       }
-      if(results.length === 0){
+      if(!results || results.length === 0){
         console.info('No results to show - Stopping pagination effect');
         return;
       }
@@ -248,7 +242,7 @@ const SearchApp = (props: SearchAppPropType) => {
 //     })()
 //   },[pagination])o
 const SearchTopPost = async() => {
-  let url = urlFromContextPaginationAndFilters(pagination, filters, "search_top");
+  let url = urlFromContextPaginationAndFilters(context,pagination, filters, "search_top");
   console.log('CALLING POST TO SEARCH_TOP', url);
   const response = await axios.post(url,{
    "title": titleRaw, 
@@ -276,7 +270,7 @@ const SearchTopPost = async() => {
     const start = page * limit
     const end = (page + limit) + (limit)
     setLoading(true);
-    const hostUrl = urlFromContextPaginationAndFilters(pagination, filters,`text/search_top`);
+    const hostUrl = urlFromContextPaginationAndFilters(context,pagination, filters,`text/search_top`);
     //[TODO] prototyping - replace with call from above
 //    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
     let url = `/api/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
@@ -315,7 +309,7 @@ const SearchTopPost = async() => {
         return;
     }
     console.log("SEARCH NO CONTEXT IS LOADING", loading);
-    const url = urlFromContextPaginationAndFilters(pagination, filters,"search_no_context");
+    const url = urlFromContextPaginationAndFilters(context,pagination, filters,"search_no_context");
     const response = await axios.post('/api/text/search_no_context',{
       "title": "copper mine"
     },{
@@ -359,19 +353,6 @@ const SearchTopPost = async() => {
 //     setResultsToDisplay(paginatedResults);
 // }
 
-  const post = async (url: string, data: any) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-    });
-    const temp = await res.json();
-    console.log(`post ~ temp:`, temp);
-
-    setResults(temp);
-  };
   const updatePaginationStateValues = (key: string, value: any) => {
     console.log(
       `updatePaginationStateValues ~ key:string,value:any:`,

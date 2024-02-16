@@ -148,16 +148,16 @@ const SearchHeader = () => {
       </Grid>
       <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
         <Grid {...GridItemProps} xs={3}>
-          <DistanceControl />
+          {/* <DistanceControl /> */}
         </Grid>
         <Grid {...GridItemProps} xs={3}>
           <SortByControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-            <SortDirControl />
+            {/* <SortDirControl /> */}
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-          <LimitControl />
+          {/* <LimitControl /> */}
         </Grid>
       </Grid>
     </>
