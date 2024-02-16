@@ -45,6 +45,7 @@ const SearchHeader = () => {
     searchNoContext,
     searched,
     setSearched,
+    searchTop
   } = context;
   const { proximityDisabled, proximityOption, titleRaw } = filters;
   const { page, limit, sortby, sortdir } = pagination;
@@ -118,7 +119,7 @@ const SearchHeader = () => {
                   <Grid item md={1} xs={1}>
                     <IconButton
                       name="titleRaw"
-                      onClick={(evt) => onIconClick(evt)}
+                      onClick={async() => await searchTop()}
                     >
                       <SearchOutlined />
                     </IconButton>
@@ -133,7 +134,7 @@ const SearchHeader = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={(evt) => onIconClick(evt)}>
+            onClick={async() => await searchNoContext()}>
               Search
             </Button>
         </Grid>

@@ -1,5 +1,4 @@
-import { sortSearchResults } from '../components/Search/SearchApp';
-
+import {sortSearchResults} from '../SearchApp';
 describe('sortSearchResults', () => {
   it('should sort search results by title in ascending order', () => {
     const results = [

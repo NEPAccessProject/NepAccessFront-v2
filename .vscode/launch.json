@@ -6,8 +6,8 @@
     "configurations": [
 
         {
-            "name": "Attach Chrome",
-            "request": "attach",
+            "name": "Launch Chrome",
+            "request": "launch",
             "type": "chrome",
             "url": "http://localhost:4000",
             "webRoot": "${workspaceFolder}",
@@ -15,7 +15,7 @@
             "port": 4000
         },
         {
-            "name": "Launch Endge",
+            "name": "Launch Edge",
             "request": "launch",
             "type": "msedge",
             "url": "http://localhost:4000",

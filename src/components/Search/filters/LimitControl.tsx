@@ -7,6 +7,9 @@ const LimitControl = () => {
   const context = useContext(SearchContext);
   const { pagination, updatePaginationStateValues } = context;
   const { page, limit, sortby, sortdir } = pagination;
+  const onLimitChange = (evt, value, reason) => {
+    updatePaginationStateValues("limit", value);
+  }
   return (
     <Grid container>
       <Grid xs={3} item marginRight={0} paddingRight={0}>
@@ -24,7 +27,7 @@ const LimitControl = () => {
             }
             value={limit}
             onChange={(evt, value, tag) =>
-              updatePaginationStateValues("limit", value)
+              onLimitChange(evt, value, tag) 
             }
             renderInput={(params) => {
               return (

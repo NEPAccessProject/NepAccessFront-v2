@@ -10,8 +10,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "xxxxxx"
+  "title": "tucson"
 }
+
+
 ###
 GET http://localhost:8080/stats/eis_count HTTP/1.1
 
@@ -24,6 +26,17 @@ Authorization: Bearer
 
 {
   "title": "copper"
+}
+
+###
+POST {{host}}/search_top HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer
+
+
+{
+  "title": "copper mine"
 }
 
 ###

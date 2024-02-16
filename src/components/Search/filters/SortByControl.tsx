@@ -5,25 +5,27 @@ import {  FormControl, FormLabel, Autocomplete, TextField,Grid } from "@mui/mate
 
 const SortByControl = () => {
     const ctx = useContext(SearchContext);
-    const { pagination, updatePaginationStateValues,results,sortSearchResults } = ctx;
+    const { pagination, updatePaginationStateValues,results } = ctx;
     const { page, limit, sortby } = pagination;
 
     const onSortByChange = (evt, value, reason) => {
 
 
-      if(value.toLowerCase() === "relevance") {
-        sortSearchResults(results,`${value}`);
-      }
-      else if (value.toLowerCase() === "date") {
-        sortSearchResults(results,`${value}`);
-      }
-      else if (value.toLowerCase() === "title") {
-        sortSearchResults(results,`${value}`);
-      }
+      // if(value.toLowerCase() === "relevance") {
+      //   sortSearchResults(results,`${value}`);
+      // }
+      // else if (value.toLowerCase() === "date") {
+      //   sortSearchResults(results,`${value}`);
+      // }
+      // else if (value.toLowerCase() === "title") {
+      //   sortSearchResults(results,`${value}`);
+      // }
 
-      console.log(`onSortByChange ~ value:`, value,"reason:", reason);
+      // console.log(`onSortByChange ~ value:`, value,"reason:", reason);
+
+      //This should trigger an effect to sort existing results
       updatePaginationStateValues("sortby", value);
-      sortSearchResults(results,`${value}`);
+      //sortSearchResults(results,`${value}`);
     }
     return (
       <Grid container display={"flex"}>
