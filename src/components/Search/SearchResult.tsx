@@ -7,7 +7,6 @@ import { Button, Typography, Divider, Box } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { useContext, useState } from "react";
 import SearchContext from "./SearchContext";
-import { BorderBottom, BorderColor, BorderTop } from "@mui/icons-material";
 import SearchResultCards from "./SearchResultCards";
 import { spacing } from "material-ui/styles";
 const SearchResult = (props: SearchResultPropsType) => {
@@ -34,8 +33,8 @@ const SearchResult = (props: SearchResultPropsType) => {
     display: "flex",
     //    justifyContent: "center",
     padding: 1,
-    BorderBottom: 1,
-    BorderTop: 1,
+    borderBottom: 1,
+    borderTop: 1,
     spacing: 1,
     // BorderColor: "#eee",
     container: true,
@@ -85,17 +84,20 @@ const SearchResult = (props: SearchResultPropsType) => {
           <Grid xs={2} {...GridItemProps}>
             {action}
           </Grid>
-          <Grid xs={3} {...GridItemProps}>
+          <Grid xs={2} {...GridItemProps}>
+            {result.score}
+          </Grid>
+          <Grid xs={2} {...GridItemProps}>
             {`${registerDate ? registerDate : "N/A"}`}
           </Grid>
-          <Grid xs={3} {...GridItemProps}>
+          <Grid xs={2} {...GridItemProps}>
             {`${status ? status : "N/A"}`}
           </Grid>
           <Grid xs={2} {...GridItemProps}>
             <Button variant="contained" color="primary">Download</Button>
           </Grid>
         </Grid>
-        <Box bgcolor={'#3D669C'} xs={12} border={1} borderColor="#ddd" >
+        <Box  style= {{background:'#3D669C',border:'1px solid #ddd'}}>
               { showSnippet ?(
                   <Button color="primary" fullWidth onClick={() => setShowSnippet(!showSnippet)}>
                     <Typography color={"white"}>See Less</Typography>
@@ -109,7 +111,7 @@ const SearchResult = (props: SearchResultPropsType) => {
             }
           <Box>
           {showSnippet &&
-          <Box bgColor="white">
+          <Box style={{backgroundColor: '#fff'}}>
             <Typography color="black" bgcolor="white" padding={1} textAlign={"left"} fontSize={'1rem'} variant="body2">
               urna molestie at. Sollicitudin ac orci phasellus egestas tellus
               rutrum tellus. Quam quisque id diam vel quam elementum pulvinar.

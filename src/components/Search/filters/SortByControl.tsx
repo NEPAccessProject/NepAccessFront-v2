@@ -1,14 +1,17 @@
 import React, { useContext, useState } from "react";
 import SearchContext from "../SearchContext";
 import {  FormControl, FormLabel, Autocomplete, TextField,Grid } from "@mui/material";
+import Select from 'react-select'
 //import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 
 const SortByControl = () => {
     const ctx = useContext(SearchContext);
-    const { pagination, updatePaginationStateValues,results } = ctx;
+    const { pagination, updatePaginationStateValues,results,loading,error } = ctx;
     const { page, limit, sortby } = pagination;
 
-    const onSortByChange = (evt, value, reason) => {
+    const onSortByChange = (value, action) => {
+    console.log(`onSortByChange ~ action:`, action);
+    console.log(`onSortByChange ~ value:`, value.value);
 
 
       // if(value.toLowerCase() === "relevance") {
@@ -24,7 +27,7 @@ const SortByControl = () => {
       // console.log(`onSortByChange ~ value:`, value,"reason:", reason);
 
       //This should trigger an effect to sort existing results
-      updatePaginationStateValues("sortby", value);
+      updatePaginationStateValues("sortby", value.value);
       //sortSearchResults(results,`${value}`);
     }
     return (
@@ -33,7 +36,27 @@ const SortByControl = () => {
           <FormLabel htmlFor="searchAgency">Sort By:</FormLabel>
         </Grid>
         <Grid item xs={9}>
-          <FormControl fullWidth>
+        <>  <Select
+            className="basic-single"
+            classNamePrefix="select"
+            defaultValue={{
+              label: 'Relevance',
+              value: 'relavancy',
+            }}
+            onChange={(newValue, actionMeta) => onSortByChange(newValue, actionMeta)}
+            isDisabled={loading ||!results.length}
+            isLoading={loading}
+            name="sort-dir-select-control"
+            options={[
+                { value: 'relavancy', label: 'Relevance' },
+                { value: 'title', label: 'Title' },
+                {value: 'date', label: 'Date' },
+            ]}
+    />
+      
+      </>
+
+          {/* <FormControl fullWidth>
             <Autocomplete
               fullWidth
               id="sortby"
@@ -58,7 +81,7 @@ const SortByControl = () => {
                 );
               }}
             />
-          </FormControl>
+          </FormControl> */}
         </Grid>
       </Grid>
     );

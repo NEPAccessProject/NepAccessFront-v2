@@ -81,7 +81,7 @@ function SearchResultOptions(props) {
       // justifyContent={isDesktop ? 'center' : 'flex-start'}
       >
 
-          <Grid item xs={12} border={1} md={6} id="result-options-grid-top-container">
+          <Grid item xs={12} md={6} id="result-options-grid-top-container">
             <Grid item xs={12}
               borderRight={1} style={gridItemStyle} id="show-checkbox-grid-item" className={classes.container}
             >
