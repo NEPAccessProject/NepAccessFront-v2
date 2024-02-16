@@ -154,7 +154,7 @@ const SearchHeader = () => {
           <SortByControl />
         </Grid>
         <Grid {...GridItemProps} xs={3}>
-            {/* <SortDirControl /> */}
+            <SortDirControl /> 
         </Grid>
         <Grid {...GridItemProps} xs={3}>
           {/* <LimitControl /> */}

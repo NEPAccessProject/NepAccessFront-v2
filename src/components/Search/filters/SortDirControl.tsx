@@ -14,6 +14,7 @@ const SortDirControl = () => {
     const onSortDirChange = (evt: React.SyntheticEvent,value: string,reason) => {
         let target = evt.target as HTMLInputElement;
         const val = (evt.target as HTMLInputElement).value;
+        console.log(`onSortDirChange ~ val:`, val);
 
   //      let filteredValues:FilterOptionType[]  = [];
         
@@ -30,9 +31,9 @@ const SortDirControl = () => {
               fullWidth
               id="sortdir"
               tabIndex={5}
-              options={options}
+              options={['ASC','DESC']}
               defaultValue={'ASC'}
-              value={`${sortdir}`}
+              value={`${sortdir}`.toUpperCase()}
               onChange={(evt, value, tag) =>
                 onSortDirChange(evt,value ? value: '',tag)
               }
