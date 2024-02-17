@@ -9,6 +9,7 @@ import { useContext, useState } from "react";
 import SearchContext from "./SearchContext";
 import SearchResultCards from "./SearchResultCards";
 import { spacing } from "material-ui/styles";
+import { BorderColor } from "@mui/icons-material";
 const SearchResult = (props: SearchResultPropsType) => {
   const result: SearchResultType = props.result;
   const doc: DocumentType = result.doc;
@@ -33,6 +34,7 @@ const SearchResult = (props: SearchResultPropsType) => {
     display: "flex",
     //    justifyContent: "center",
     padding: 1,
+    BorderColor: "#eee",
     borderBottom: 1,
     borderTop: 1,
     spacing: 1,
