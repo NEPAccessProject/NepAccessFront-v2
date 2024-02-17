@@ -6,6 +6,7 @@ import {
   Grid,
   Paper,
   Snackbar,
+  Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 //import Grid from "@mui/material/Unstable_Grid2";
@@ -37,9 +38,9 @@ export function sortSearchResults(
   results,
   sortby: string,
   sortdir: string = "asc"
-) {
+) : SearchResultType[] {
   //console.log(`sortSearchResults ~ results:`, results);
-
+  // const temp = results;
   //[TODO] we need to introduce a sort by param that contols if A > B vs B > A IE ascending and descending so the
   results.sort((a: any, b: any) => {
     //lowercase both sides to avoid case sensitivity issues
@@ -75,8 +76,8 @@ export function sortSearchResults(
     if (sortby.toLowerCase() === "title") {
       console.log(`SORTED BY TITLE results`, results);
     }
-    return results;
   });
+  return results;
 }
 
 export function filterResults(results: SearchResultType[]): SearchResultType[] {
@@ -141,6 +142,9 @@ const SearchApp = (props: SearchAppPropType) => {
   const [options, setOptions] = useState(context);
   const [count, setCount] = useState({});
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
+
   const { page, limit, sortby, sortdir } = pagination;
   const {
     isFast41,
@@ -157,7 +161,6 @@ const SearchApp = (props: SearchAppPropType) => {
     actions,
     actionsRaw,
   } = filters;
-  const [error, setError] = useState("");
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
 
@@ -196,20 +199,54 @@ const SearchApp = (props: SearchAppPropType) => {
     );
   }, [limit]);
 
+  // useEffect(() => {
+  //   if (!results || results.length === 0 || _mounted.current === false) {
+  //     // If there is no results to sort or the component is not mounted then do nothing
+  //     console.info(`Halting Sort Effect, no results yet to sort`);
+  //     return;
+  //   }
+  //   console.log(`Firing Sort and Sort by Effect - limit ${limit}`);
+  //   //const sorted:SearchResultType[] =
+  //   //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
+  //   console.log("After Sort Results");
+  //   const sorted = sortSearchResults(results, sortby);
+  //   console.log(`useEffect ~ sorted:`, sorted);
+  //   setResults(sorted);
+  //   //setResults(sorted)
+  // }, [sortby, sortdir]);
+
+
   useEffect(() => {
-    if (!results || results.length === 0 || _mounted.current === false) {
-      // If there is no results to sort or the component is not mounted then do nothing
-      console.info(`Halting Sort Effect, no results yet to sort`);
+    console.log("FIRING PAGINATION EFFECT");
+    if (_mounted.current !== true) {
       return;
     }
-    //const currentResults = results
-    console.log("TOP UNSORTED RESULT", results[0]);
-    //const sorted:SearchResultType[] =
-    //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
-    console.log("After Sort Results");
-    sortSearchResults(results, sortby);
-    //setResults(sorted)
-  }, [sortby, sortdir]);
+    if (!results || results.length === 0) {
+      console.info("No results to show - Stopping pagination effect");
+      return;
+    }
+    const { limit, rowsPerPage, page } = pagination;
+    console.log(`useEffect ~ pagination:`, pagination);
+    const start = page * rowsPerPage || 0;
+    const end = page * rowsPerPage + rowsPerPage;
+
+    console.log(
+      `PAGINATE RESULTS # ${results.length} results... - Start: ${start} - end: ${end}`
+    );
+    const filteredResults = results.slice(start, end);
+    //Sort all results
+    const sorted = sortSearchResults(filteredResults, sortby, sortdir).splice(0,rowsPerPage)
+
+    // Reduce the number of results based on rowPerPage
+
+    //const resultsToDisplay: SearchResultType[] = filterResults(sorted).splice(0, rowsPerPage);
+    console.log(`paginateResults ~ start:${start}, end:${end}`);
+    //[TODO] Revisit - Do we want the existing records to disapper even if there is 
+    if(sorted.length >0 && hasSearched) {
+     setResultsToDisplay(sorted);
+    }
+  }, [pagination]);
+  //#End useEffects
 
   // Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
   //useEffect(() => {
@@ -251,29 +288,6 @@ const SearchApp = (props: SearchAppPropType) => {
     setFilterValues({ ...filters, [key]: value });
   };
 
-  useEffect(() => {
-    console.log("FIRING PAGINATION EFFECT");
-    if (_mounted.current !== true) {
-      return;
-    }
-    if (!results || results.length === 0) {
-      console.info("No results to show - Stopping pagination effect");
-      return;
-    }
-    const { limit, rowsPerPage, page } = pagination;
-    console.log(`useEffect ~ pagination:`, pagination);
-    const start = page * rowsPerPage || 0;
-    const end = page * rowsPerPage + rowsPerPage;
-
-    console.log(
-      `PAGINATE RESULTS # ${results.length} results... - Start: ${start} - end: ${end}`
-    );
-    const paginatedResults = results.slice(start, end) || results;
-    console.log(`paginateResults ~ start:${start}, end:${end}`);
-    // Return a slice of the results array
-    setResultsToDisplay(paginatedResults);
-  }, [pagination]);
-
   const SearchTopPost = async () => {
     let url = urlFromContextPaginationAndFilters(
       context,
@@ -281,6 +295,8 @@ const SearchApp = (props: SearchAppPropType) => {
       filters,
       "search_top"
     );
+    setHasSearched(true);
+
     console.log("CALLING POST TO SEARCH_TOP", url);
     const response = await axios.post(
       url,
@@ -309,6 +325,8 @@ const SearchApp = (props: SearchAppPropType) => {
         setError("Please enter term(s) to search for.");
         return;
       }
+      setHasSearched(true);
+
       const start = page * limit;
       const end = page + limit + limit;
       setLoading(true);
@@ -353,6 +371,8 @@ const SearchApp = (props: SearchAppPropType) => {
   const searchNoContext = async () => {
     try {
       setLoading(true);
+      setHasSearched(true);
+
       if (!filters.titleRaw) {
         setError("Please enter a search term");
         return;
@@ -462,9 +482,7 @@ const SearchApp = (props: SearchAppPropType) => {
               </Paper>
             </Grid>
             <Grid xs={9} item>
-              <h2>
-                {results.length ? results.length : 0} Search Results Found
-              </h2>
+             
               <>
                 {loading && (
                   <>
@@ -484,8 +502,14 @@ const SearchApp = (props: SearchAppPropType) => {
                 )}
                 <>
                   {resultsToDisplay.length > 0 && (
+                    <>
+                     <Typography variant="h2">
+                     {results.length ? results.length : 0} Search Results Found
+                   </Typography>
                     <SearchResults results={resultsToDisplay} />
-                  )}
+                  
+                  </>)
+}
                 </>
                 {resultsToDisplay.length === 0 && (
                   <>
