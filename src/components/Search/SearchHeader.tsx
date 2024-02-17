@@ -133,6 +133,7 @@ const SearchHeader = () => {
         <Grid {...GridItemProps} id={"distance-filter"} xs={1} flex={1} justifyContent={"center"} justifyItems={"center"}  alignSelf={"center"}>
           <Button
             variant="contained"
+            disabled={loading ? true : false}
             color="primary"
             onClick={async() => await searchNoContext()}>
               Search
