@@ -81,7 +81,7 @@ const SearchResults = (props: SearchResultsType) => {
           onChange={(evt)=>onPaginationChange(evt)}
           //count={results.length} [TODO] Need to get count from the server
           count={results.length}
-          rowsPerPage={10}//{limit}
+          rowsPerPage={rowsPerPage}//{limit}
           page={page}
           onPageChange={(evt, page) => handleChangePage(evt, page)}
           onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
