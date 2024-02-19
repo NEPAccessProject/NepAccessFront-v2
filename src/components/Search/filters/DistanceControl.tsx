@@ -9,7 +9,7 @@ import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
 import Select from "react-select";
 //import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import { FilterOptionType } from "@/components/interfaces/interfaces";
+import { FilterOptionType } from "@/components/interfaces/types";
 const DistanceControl = () => {
   const context = useContext(SearchContext);
   const results = context.results;
@@ -58,7 +58,7 @@ const DistanceControl = () => {
                   label: 'Exact Phrase',
                   value: 'Exact Phrase',
                 }}
-                isLoading={()=>loading}
+                isLoading={loading}
                 isClearable={true}
                 name="sort-order-select"
                 onChange={(newValue, actionMeta) => onDistanceFilterChange(newValue, actionMeta)}                options={[

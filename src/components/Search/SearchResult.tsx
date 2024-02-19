@@ -2,7 +2,7 @@ import {
   DocumentType,
   SearchResultPropsType,
   SearchResultType,
-} from "@/components/interfaces/interfaces";
+} from "@/components/interfaces/types";
 import { Button, Typography, Divider, Box } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { useContext, useState } from "react";
@@ -18,15 +18,10 @@ const SearchResult = (props: SearchResultPropsType) => {
   const { filters } = context;
   const {
     actions,
-    actionsRaw,
     agencies,
-    agenciesRaw,
     cooperatingAgency,
-    cooperatingAgencyRaw,
     county,
-    countyRaw,
     decisions,
-    decisionsRaw,
   } = filters;
 
   const GridContainerProps = {

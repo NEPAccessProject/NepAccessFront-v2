@@ -19,7 +19,7 @@ import {
   SearchContextType,
   SearchResultType,
   PaginiationType,
-} from "../interfaces/interfaces";
+} from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
@@ -123,8 +123,8 @@ export const urlFromContextPaginationAndFilters = (
   // });
   console.log(`GENTERATED QUERY STRING:`, queryString);
   //TODO temporary hack this should be part of retriving active filters
-  const searchTerm = filters.titleRaw.length
-    ? `&title=${filters.titleRaw}`
+  const searchTerm = filters.title.length
+    ? `&title=${filters.title}`
     : "";
 
   //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
@@ -152,17 +152,11 @@ const SearchApp = (props: SearchAppPropType) => {
   const {
     isFast41,
     decisions,
-    decisionsRaw,
     states,
     agencies,
-    agenciesRaw,
     cooperatingAgency,
-    cooperatingAgencyRaw,
-    stateRaw,
-    countyRaw,
     county,
     actions,
-    actionsRaw,
   } = filters;
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
@@ -369,7 +363,7 @@ const SearchApp = (props: SearchAppPropType) => {
   };
   const searchTop = async () => {
     try {
-      if (!filters.titleRaw) {
+      if (!filters.title) {
         setError("Please enter term(s) to search for.");
         return;
       }
@@ -420,7 +414,7 @@ const SearchApp = (props: SearchAppPropType) => {
       setLoading(true);
       setHasSearched(true);
 
-      if (!filters.titleRaw) {
+      if (!filters.title) {
         setError("Please enter a search term");
         return;
       }
@@ -470,7 +464,7 @@ const SearchApp = (props: SearchAppPropType) => {
     });
     //    console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
-  const titleRaw = context.filters.titleRaw;
+  const titleRaw = context.filters.title;
   const onSearchClick = async () => {
     console.log("🚀 ~ ON SEARCH CLICK ~ titleRaw:", titleRaw);
     setSearched(true);
@@ -578,7 +572,7 @@ const SearchApp = (props: SearchAppPropType) => {
             <h6>Has Title ? {titleRaw.length > 0 ? "Yes" : "No"}</h6>
             <h6>Has # of Results {results.length > 0 ? "Yes" : "No"} </h6>
             <h6>loading ? {loading ? "Yes" : "No"} </h6>
-            <h5> Title from context.filter {context.filters.titleRaw}</h5>
+            <h5> Title from context.filter {context.filters.title}</h5>
             <h5> Deconstruced title: {titleRaw}</h5>
           </Grid>
         </Paper>

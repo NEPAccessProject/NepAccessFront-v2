@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
 import {Box, Autocomplete, TextField} from "@mui/material";
 import {agencies} from '../data/dropdownValues';
-import { FilterOptionType } from "@/components/interfaces/interfaces";
+import { FilterOptionType } from "@/components/interfaces/types";
 //import _ from "underscore";
 import _debounce from "lodash/debounce";
 
@@ -14,7 +14,7 @@ export default function CooperatingAgenciesFilter(props) {
       updatePaginationStateValues,
       updateFilterStateValues,
     } = context;
-    const { cooperatingAgencyRaw, cooperatingAgency, agencies,agenciesRaw } = filters;
+    const { cooperatingAgency, agencies } = filters;
     
     const onCooperatingAgencyChange = (evt:React.SyntheticEvent, selected, reason) => {
     console.log(`onCooperatingAgencyChange ~ reason:`, reason);

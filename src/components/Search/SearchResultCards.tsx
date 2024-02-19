@@ -3,7 +3,7 @@ import { Grid, Paper } from '@mui/material';
 import { makeStyles } from "@mui/styles";
 import React from "react";
 import theme from "../../themes/theme";
-import { SearchResultType } from "../interfaces/interfaces";
+import { SearchResultType } from "../interfaces/types";
 import SearchContext from './SearchContext';
 
 
@@ -27,7 +27,7 @@ const SearchResultCards = (props) => {
     const {doc} = result;
     const {
         finalNoaDate,
-        registerDate,states,processId,action,agency,commentDate,commentsFilename,cooperatingAgency,county,decisionRaw,decisions,department,documentType,draftNoa,finalNoa,firstRodDate} = doc;
+        registerDate,states,processId,action,agency,commentDate,commentsFilename,cooperatingAgency,county,decision,department,documentType,draftNoa,finalNoa,firstRodDate} = doc;
 
 
     const useStyles = makeStyles(() => ({
@@ -138,7 +138,7 @@ const SearchResultCards = (props) => {
                     elevation: 1,
                   }}
                 >
-                  Decision <b>{decisions ? decisions : 'N/A'}</b>
+                  Decision <b>{decision ? decision : 'N/A'}</b>
                 </Grid>
                 {/* {(commentDate)
                       ? ( */}

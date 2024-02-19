@@ -89,16 +89,11 @@ export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
 export type FilterType = {
 	
 	actions: string[];
-	actionsRaw: string;
 	agencies: FilterOptionType[];
-	agenciesRaw: string;
 	cooperatingAgency: [];
-	cooperatingAgencyRaw: string;
 	county: [];
-	countyRaw: string;
 	distance: string;
 	decisions:string[];
-	decisionsRaw: string
 	endComment: Date | string;
 	endPublish: string | Date;
 	filtersHidden: boolean;
@@ -109,9 +104,8 @@ export type FilterType = {
 	proximityOption: string
 	startComment: string | Date;
 	startPublish: string | Date;
-	stateRaw: string;
 	states: FilterOptionType[];
-	titleRaw: string;
+	title: string;
 	typeAll: boolean;
 	typeDraft: boolean;
 	typeEA: boolean;
@@ -124,16 +118,12 @@ export type FilterType = {
   };
   
   const filters: FilterType = {
-	actionsRaw: "",
 	actions: [],
 	agencies: [],
-	agenciesRaw: "",
 	cooperatingAgency: [],
-	cooperatingAgencyRaw: "",
 	county: [],
 	distance: "",
 	decisions: [],
-	decisionsRaw: "",
 	endComment: "",
 	endPublish: "",
 	filtersHidden: false,
@@ -143,9 +133,8 @@ export type FilterType = {
 	proximityDisabled: false,
 	proximityOption: "",
 	startPublish: "",
-	stateRaw: "",
 	states: [],
-	titleRaw: "",
+	title: "",
 	typeAll: false,
 	typeDraft: false,
 	typeEA: false,
@@ -154,7 +143,6 @@ export type FilterType = {
 	typeOther: false,
 	typeROD: false,
 	typeScoping: false,
-    countyRaw: "",
     startComment: "",
   };  
 //   export type SearchContextType = {

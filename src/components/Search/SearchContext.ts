@@ -1,6 +1,6 @@
 
 import React from "react";
-import { FilterType, SearchContextType, SearchResultType } from '../interfaces/interfaces';
+import { FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
 const filters: FilterType = {
@@ -30,7 +30,7 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  titleRaw: "Copper Mine",
+  title: "Copper Mine",
   actionsRaw: "",
   endComment: "",
   startComment: "",

@@ -9,7 +9,7 @@ import {
   FormLabel,
 } from "@mui/material";
 import { actionOptions, decisionOptions } from "../data/dropdownValues";
-import { FilterOptionType,InputEvent } from "@/components/interfaces/interfaces";
+import { FilterOptionType,InputEvent } from "@/components/interfaces/types";
 export default function DecisionFilter() {
   const context = useContext(SearchContext);
   const {
@@ -18,7 +18,7 @@ export default function DecisionFilter() {
     updatePaginationStateValues,
     updateFilterStateValues,
   } = context;
-  const { decisions, decisionsRaw } = filters;
+  const { decisions } = filters;
   const onDecisionChange = (evt:React.SyntheticEvent, selected, reason) => {
     
     let target = evt.target as HTMLInputElement;

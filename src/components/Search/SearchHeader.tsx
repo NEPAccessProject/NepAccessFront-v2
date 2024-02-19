@@ -47,7 +47,7 @@ const SearchHeader = () => {
     setSearched,
     searchTop
   } = context;
-  const { proximityDisabled, proximityOption, titleRaw } = filters;
+  const { proximityDisabled, proximityOption, title: titleRaw } = filters;
   const { page, limit, sortby, sortdir } = pagination;
 
   const onChange = (evt) => {

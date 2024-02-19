@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
 import {Box, Autocomplete, TextField,FormControl,FormLabel} from "@mui/material";
 import {agencies, agencyOptions} from '../data/dropdownValues';
-import { FilterOptionType } from "@/components/interfaces/interfaces";
+import { FilterOptionType } from "@/components/interfaces/types";
 import Select from 'react-select';
 //import _ from "lodash";
 import _debounce from "lodash/debounce";
@@ -11,7 +11,7 @@ import _debounce from "lodash/debounce";
 export default function AgencyFilter(props) {
     const context = useContext(SearchContext);
     const { updateFilterStateValues, filters,loading,error } = context;
-    const { agenciesRaw, agencies, cooperatingAgency, cooperatingAgencyRaw } = filters;
+    const { agencies, cooperatingAgency } = filters;
 
     const onAgencyChange = (value,meta) => {
         console.log(`onAgencyChange ~ value,meta:`, value,meta);
