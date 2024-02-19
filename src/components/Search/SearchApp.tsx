@@ -30,6 +30,8 @@ import { title } from "process";
 //console.log(`data:`, data);
 const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
 
+
+
 type SearchAppPropType = {
   results: SearchResultType[];
   setResults: () => void;
@@ -137,6 +139,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [results, setResults] = useState(context.results);
   const [resultsToDisplay, setResultsToDisplay] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
+  const [activeFilters,setActiveFilters] = useState([]);
   const [pagination, setPaginationValues] = useState(context.pagination);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState(context);
@@ -174,6 +177,7 @@ const SearchApp = (props: SearchAppPropType) => {
 
   // #Start useEffects
 
+  //# of results to display effect
   useEffect(() => {
     //handle changes to the # of results displayed per page
     if (_mounted.current === false || results.length === 0) {
@@ -214,6 +218,50 @@ const SearchApp = (props: SearchAppPropType) => {
   //   setResults(sorted);
   //   //setResults(sorted)
   // }, [sortby, sortdir]);
+
+  const getActiveFilters = (filters) : {}  => {
+    const activeFilter = {};
+      Object.keys(filters).forEach((key) => {
+        const val = filters[key];
+        if (typeof(val) !== "object" && val) {
+            console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
+            activeFilter[key] = val;
+        }
+        else if(typeof(val) === "object" && val.length > 0) {
+            console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
+            activeFilter[key] = val;
+        }
+      });
+      
+      return activeFilters
+  }
+  //Effect to filter results one a filter is selected
+  // useEffect(() => {
+  //   if(_mounted.current === false)  return;
+  //   const activeFilter = {
+
+  //   };
+  //   Object.keys(filters).forEach((key) => {
+  //     const val = filters[key];
+  //     if (typeof(val) !== "object" && val) {
+  //         console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
+  //         activeFilter[key] = val;
+  //     }
+  //     else if(typeof(val) === "object" && val.length > 0) {
+  //         console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
+  //         activeFilter[key] = val;
+  //     }
+  // });
+
+  //   setActiveFilters(activeFilters);
+
+  //   let newResults = [];
+  //   results.map((result) => {
+  //   });
+
+  //   console.log('SETTING ACTIVE FILTERS',activeFilters);
+  // },[filters])
+
 
 
   useEffect(() => {
@@ -340,12 +388,11 @@ const SearchApp = (props: SearchAppPropType) => {
       //    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
       let url = `/api/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
       console.log(`PAGINATION EFFECT ~ url:`, url);
-
+        const activeFilters = getActiveFilters(filters);
+        console.log(`searchTop ~ activeFilters:`, activeFilters);
       const response = await axios.post(
         url,
-        {
-          title: titleRaw,
-        },
+        activeFilters,
         {
           method: "POST",
           headers: {
@@ -384,11 +431,11 @@ const SearchApp = (props: SearchAppPropType) => {
         filters,
         "search_no_context"
       );
+      const activeFilters = getActiveFilters(filters);
       const response = await axios.post(
-        "/api/text/search_no_context",
-        {
-          title: "copper mine",
-        },
+        //"/api/text/search_no_context",
+        "http://localhost:8080/text/search_no_context",
+        activeFilters,
         {
           method: "POST",
           headers: {

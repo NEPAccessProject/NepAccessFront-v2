@@ -181,7 +181,7 @@ const SearchFilters = (props) => {
           </Grid>
         </Grid>
 
-        <Grid {...gridItemProps} xs={12}>
+        {/* <Grid {...gridItemProps} xs={12}>
           <Grid xs={12}><Typography variant="filterLabel">Cooperating Agencies:</Typography></Grid>
           <Grid xs={12}><CooperatingAgenciesFilter /></Grid>
         </Grid>
@@ -202,7 +202,7 @@ const SearchFilters = (props) => {
         <Grid {...gridItemProps} xs={12}>
           <Grid xs={12}><Typography variant="filterLabel">Decision(s):</Typography></Grid>
           <Grid xs={12}><DecisionFilter /></Grid>
-        </Grid> 
+        </Grid>  */}
       </Grid>
       <Divider />
       <Box>

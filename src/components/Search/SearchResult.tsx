@@ -30,15 +30,12 @@ const SearchResult = (props: SearchResultPropsType) => {
   } = filters;
 
   const GridContainerProps = {
-    //  borderLeft: "1px solid #eee",
     display: "flex",
-    //    justifyContent: "center",
     padding: 1,
     BorderColor: "#eee",
     borderBottom: 1,
     borderTop: 1,
     spacing: 1,
-    // BorderColor: "#eee",
     container: true,
     flex: 1,
   };
