@@ -16,13 +16,6 @@ const SearchResult = (props: SearchResultPropsType) => {
   const context = useContext(SearchContext);
   const [showSnippet, setShowSnippet] = useState(false);
   const { filters } = context;
-  const {
-    actions,
-    agencies,
-    cooperatingAgency,
-    county,
-    decisions,
-  } = filters;
 
   const GridContainerProps = {
     display: "flex",
@@ -78,7 +71,10 @@ const SearchResult = (props: SearchResultPropsType) => {
           <Grid xs={2} {...GridItemProps}>
             {action}
           </Grid>
-          <Grid xs={2} {...GridItemProps}>
+          <Grid xs={1} {...GridItemProps}>
+            {agency}
+          </Grid>
+          <Grid xs={1} {...GridItemProps}>
             {result.score}
           </Grid>
           <Grid xs={2} {...GridItemProps}>

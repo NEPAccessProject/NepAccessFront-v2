@@ -10,23 +10,32 @@ import _debounce from "lodash/debounce";
 
 export default function AgencyFilter(props) {
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters,loading,error } = context;
-    const { agencies, cooperatingAgency } = filters;
+    const { updateFilterStateValues, filters,loading,error,results } = context;
+    const { agency: agencies, cooperatingAgency } = filters;
 
     const onAgencyChange = (value,meta) => {
-        console.log(`onAgencyChange ~ value,meta:`, value,meta);
-        let filteredAgencies:FilterOptionType[] = [];
+      console.log('onAgencyChange META',meta)
+        console.log(`onAgencyChange VALUE: `,value);
+        let filteredAgencies:string[] = [];
 
         if(meta.action === "select-option"){
-          agencies.push(value);
+          console.log('PUSHING VALUE LABEL',value[0]);
+          filteredAgencies.push(value[0].label);
+
+            const res = results.filter((v) =>{ 
+              v.doc.agency === value.label
+            })
+            console.log('TEST FILTERED BY AGENCY',res);
         }
         else if(meta.action === "remove-value"){
-            agencies.filter((v) => v.value !== value.value);
+            filteredAgencies = agencies.filter((v) => v !== value.label);
         }
         else if (meta.action === "clear"){
           filteredAgencies = [];
         }
-        updateFilterStateValues("agencies", agencies);
+        console.log(`onAgencyChange ~ filteredAgencies:`, filteredAgencies);
+
+        updateFilterStateValues("agencies", filteredAgencies);
         //updateFilterStateValues("agencyRaw", evt);
         // [TODO] will need to filter the availble options based on the selected
         // filterResultsBy(this.state);

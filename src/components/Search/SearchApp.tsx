@@ -36,6 +36,11 @@ type SearchAppPropType = {
   results: SearchResultType[];
   setResults: () => void;
 };
+
+//[TODO][Critical] values for looks such as agencies, stqtes etc should be stored in lookup tables
+// For now that is out of scopes, should refator after MVP thoughx
+
+
 export function sortSearchResults(
   results,
   sortby: string,
@@ -151,12 +156,12 @@ const SearchApp = (props: SearchAppPropType) => {
   const { page, limit, sortby, sortdir } = pagination;
   const {
     isFast41,
-    decisions,
+    decision,
     states,
-    agencies,
+    agency: agencies,
     cooperatingAgency,
     county,
-    actions,
+    action: actions,
   } = filters;
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
@@ -326,6 +331,7 @@ const SearchApp = (props: SearchAppPropType) => {
 
   // #End useEffects
   const updateFilterStateValues = (key: string, value: any) => {
+    console.log('UPDATE FILTER STATE VALUES - KEY',key, ' VALUE ',value);
     console.log(`UPDATING ${key} with the ` + `following value: ${value}`);
     setFilterValues({ ...filters, [key]: value });
   };
@@ -409,6 +415,34 @@ const SearchApp = (props: SearchAppPropType) => {
       setSearched(true);
     }
   };
+
+
+  const fieldToArray = (field) => {
+    if (field) {
+      if (Array.isArray(field)) {
+        return field;
+      }
+      return [field];
+    }
+    return [];
+  };
+  
+  const transformFieldToArray = (field) => {
+      if(typeof field === "string" && field.includes(";")){
+          return field.split(';')
+      }
+      else if(typeof field === "string"){
+          return [field]
+      }
+      else if(Array.isArray(field)){
+          return field
+      }
+      else{
+          return []
+      }
+
+  };
+
   const searchNoContext = async () => {
     try {
       setLoading(true);
@@ -429,7 +463,9 @@ const SearchApp = (props: SearchAppPropType) => {
       const response = await axios.post(
         //"/api/text/search_no_context",
         "http://localhost:8080/text/search_no_context",
-        activeFilters,
+        {...activeFilters,
+            title: "XXX"
+        },
         {
           method: "POST",
           headers: {
@@ -441,6 +477,17 @@ const SearchApp = (props: SearchAppPropType) => {
       );
       const data = response.data || [];
       console.log(`SEARCH NO CONTEXT GOT ${data.length} Results`);
+      // const results = data.forEach((result) => {
+      //     Object.keys(result.doc).map((key, idx) => {
+      //       results.doc[key] = fieldToArray
+      //       //The Database is not proberly normalized ATM, so multiple values are seperated by ;
+      //       //These should be treated as an array downstream so convert it here
+      //       if(typeof result.doc[key] === 'string' && result.doc[key].includes(";")) {
+      //           result.doc[key] = result.doc[key].split(";");
+      //       }
+      //     })
+      // })
+      console.log('RESULTS ARE', results);
       updatePaginationStateValues("total", data.length);
       setSearched(true);
       setResults(data);

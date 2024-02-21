@@ -1,190 +1,170 @@
-const { type } = require("os");
+const filters = {
+    title: 'Copper Mine',
+    agency: 
+       'Advisory Council on Historic Preserve (ACHP)',
+}
 
-//import {FilterType} from './interfaces/interfaces'
 const results = [
     {
-        id: 1,
-        score: 3,
+        id:1,
         doc: {
-            title: 'ZZZZZZ',
-            commentDate: '2025-01-01',
+            agency: 'Advisory Council on Historic Preserve (ACHP),Forest Service',
+            title: 'Copper Flat Copper Mine',
+            cooperatingAgency: 'Agency 1',
         }
-
     },
     {
-        id: 3,
-        score: 1,
+        id:2,
         doc: {
-            title: 'BBBBB',
-            commentDate: '2021-01-01',
+            agency: 'Advisory Council on Historic Preserve (ACHP),Forest Service',
+            title: 'Copper Mine',
+            cooperatingAgency: 'Agency 2',
         }
-
-    },
-    {
-        id: 2,
-        score: 2,
-        doc: {
-            title: 'ZZZZ 3',
-            commentDate: '1999-01-01',
-        }
-
     }
 ]
 
 
+const matchesArray = (field, val) => {
+    console.log(`matchesArray ~ field, val:`, field, val);
+    return function (a) {
+        let returnValue = false;
+        val.forEach(item =>{
+            if (a[field] === item) {
+                returnValue = true;
+            }
+        });
+        return returnValue;
+    };
+}
+const arrayMatchesArray = (field, val) => {
+    return function (a) {
+        // console.log(a);
+        let returnValue = false;
+        val.forEach(item =>{
+            if(a[field]){
+                let _vals = a[field].split(/[;,]+/); // e.g. AK;AL or AK,AL
+                for(let i = 0; i < _vals.length; i++) {
+                    if (_vals[i].trim() === item.trim()) {
+                        returnValue = true; // if we hit ANY of them, then true
+                        i = _vals.length; // done
+                    }
+                }
+            }
+        });
+        return returnValue;
+    };
+}
+const doFilter = (searcherState, searchResults, preFilterCount, legacyStyle) => {
 
-const filter = {
-    actions:[],
-    agencies: [{
-        label: "Agency 1",
-        value: "Agency 1",
-    },{
-        label: "Agency 2",
-        value: "Agency 2",
-    }],
-    agenciesRaw: "",
-    cooperatingAgency: [{
-        label: "Coop Agency 1",
-        value: "Coop Agency 1",
-    }],
-    county: [],
-    countyRaw:"",
-    distance: "",
-    decisions: [],
-    decisionsRaw: "",
-    isFast41: true,
-    proximityDisabled: true,
-    proximityOption: "",
-    states: [],
-    stateRaw: "",
-    needsComments: false,
-    needsDocument: true,
-    typeAll: true,
-    typeDraft: false,
-    typeEA: false,
-    typeFinal: false,
-    typeNOI: false,
-    typeOther: false,
-    typeROD: false,
-    typeScoping: false,
-    startPublish: "",
-    endPublish: "",
-    titleRaw: "Copper Mine",
-    actionsRaw: "",
-    endComment: "",
-    startComment: "",
-    cooperatingAgencyRaw: "",
-    filtersHidden: false,
+    let filtered = {isFiltered: false, textToUse: "", filteredResults: []};
+    
+    let isFiltered = false;
+
+    // Deep clone results
+    let filteredResults = JSON.parse(JSON.stringify(searchResults));
+    
+    if(searcherState.agency && searcherState.agency.length > 0){
+        isFiltered = true;
+        filteredResults = filteredResults.filter(matchesArray("agency", searcherState.agency));
+    }
+    if(searcherState.cooperatingAgency && searcherState.cooperatingAgency.length > 0){
+        isFiltered = true;
+        if(legacyStyle) {
+            filteredResults = filteredResults.filter(arrayMatchesArrayNotSpacedOld("cooperatingAgency", searcherState.cooperatingAgency));
+        } else {
+            filteredResults = filteredResults.filter(arrayMatchesArrayNotSpaced("cooperatingAgency", searcherState.cooperatingAgency));
+        }
+    }
+    if(searcherState.state && searcherState.state.length > 0){
+        isFiltered = true;
+        filteredResults = filteredResults.filter(arrayMatchesArray("state", searcherState.state));
+    }
+    if(searcherState.county && searcherState.county.length > 0){
+        isFiltered = true;
+        filteredResults = filteredResults.filter(arrayMatchesArray("county", searcherState.county));
+    }
+    if(searcherState.decision && searcherState.decision.length > 0){
+        isFiltered = true;
+        filteredResults = filteredResults.filter(arrayMatchesArray("decision", searcherState.decision));
+    }
+    if(searcherState.action && searcherState.action.length > 0){
+        isFiltered = true;
+        filteredResults = filteredResults.filter(arrayMatchesArray("action", searcherState.action));
+    }
+    if(searcherState.startPublish){
+        isFiltered = true;
+        let formattedDate = Globals.formatDate(searcherState.startPublish);
+        if(legacyStyle) {
+            filteredResults = filteredResults.filter(matchesStartDateOld(formattedDate));
+        } else {
+            filteredResults = filteredResults.filter(matchesStartDate(formattedDate));
+        }
+    }
+    if(searcherState.endPublish){
+        isFiltered = true;
+        let formattedDate = Globals.formatDate(searcherState.endPublish);
+        if(legacyStyle) {
+            filteredResults = filteredResults.filter(matchesEndDateOld(formattedDate));
+        } else {
+            filteredResults = filteredResults.filter(matchesEndDate(formattedDate));
+        }
+    }
+    if(searcherState.typeFinal || searcherState.typeDraft || searcherState.typeEA 
+        || searcherState.typeNOI || searcherState.typeROD || searcherState.typeScoping){
+        isFiltered = true;
+        if(legacyStyle) {
+            filteredResults = filteredResults.filter(matchesTypeOld(
+                searcherState.typeFinal, 
+                searcherState.typeDraft,
+                searcherState.typeEA,
+                searcherState.typeNOI,
+                searcherState.typeROD,
+                searcherState.typeScoping));
+        } else {
+            filteredResults = filteredResults.filter(matchesType(
+                searcherState.typeFinal, 
+                searcherState.typeDraft,
+                searcherState.typeEA,
+                searcherState.typeNOI,
+                searcherState.typeROD,
+                searcherState.typeScoping));
+        }
+    }
+    if(searcherState.needsDocument) {
+        isFiltered = true;
+        if(legacyStyle) {
+            filteredResults = filteredResults.filter(hasDocumentOld)
+        } else {
+            filteredResults = filteredResults.filter(hasDocument)
+        }
+    }
+    
+    let textToUse = filteredResults.length + " Results"; // unfiltered: "Results"
+    if(filteredResults.length === 1) {
+        textToUse = filteredResults.length + " Result";
+    }
+    if(isFiltered) { // filtered: "Matches"
+        textToUse = filteredResults.length + " Matches (narrowed down from " + preFilterCount + " Results)";
+        if(filteredResults.length === 1) {
+            textToUse = filteredResults.length + " Match (narrowed down from " + preFilterCount + " Results)";
+            if(preFilterCount === 1) {
+                textToUse = filteredResults.length + " Match (narrowed down from " + preFilterCount + " Result)";
+            }
+        }
+    }
+
+    filtered.textToUse = textToUse;
+    filtered.filteredResults = filteredResults;
+    filtered.isFiltered = isFiltered;
+
+    return filtered;
 }
 
-const activeFilters = {
+const searcherState = {
+    title: 'Copper Mine',
+    agency: 
+       'Advisory Council on Historic Preserve (ACHP)',
+}
 
-
-};
-Object.keys(filter).forEach((key) => {
-    const val = filter[key];
-//    console.log(`The type of value for ${key} is ${typeof val}`,key[val]);
-    if (typeof(val) !== "object") {
-        activeFilters[key] = val;
-    }
-    else if(typeof(val) === "object" && val.length > 0) {
-        activeFilters[key] = val;
-    }
-});
-
-Object.keys(activeFilters).forEach((key) => {
-    console.log('ACTIVE FILTERS',key,activeFilters[key]);
-})
-
-
-// Test SortBy Title
-//    let sortBy = "title" | "score" | "commentDate"
-//     let sortBy = "title"
-//     let tmpSorted = results.sort((a, b) => {
-//         if (sortBy === 'title') {
-//             return a.doc.title.localeCompare(b.doc.title);
-//         } else { 
-//             For 'score' and 'commentDate', sort in descending order
-//             return b[sortBy] - a[sortBy];
-//         }
-//         console.log(`SORTED BY ${sortBy}`, tmpSorted[0] )
-//     });
-
-
-// TEST SORT BY SCORE
-//    let sortBy = "title" | "score" | "commentDate"
-//  sortBy = "score"
-// let tempScored = results.sort((a, b) => {
-//     if (sortBy === 'title') {
-//         return a.doc.title.localeCompare(b.doc.title);
-//     } else { 
-//         For 'score' and 'commentDate', sort in descending order
-//         return b[sortBy] - a[sortBy];
-//     }
-//     console.log(`SORTED BY ${sortBy}`, tempScored[0] )
-// });
-
-
-
-// function sortSearchResults(results,sortBy,sortDir="asc"){
-//     //console.log(`sortSearchResults ~ results:`, results);
-//     console.log('STARTING TO SORTBY',sortBy);
-//     //[TODO] we need to introduce a sort by param that contols if A > B vs B > A IE ascending and descending so the 
-//     results.sort((a, b) => {
-//         //lowercase both sides to avoid case sensitivity issues
-//         if (sortBy.toLowerCase() === 'title') {
-//             if(sortDir === 'asc'){
-//                 return a.doc.title.localeCompare(b.doc.title);
-//             }
-//             else{
-//                 return a.doc.title.localeCompare(b.doc.title);
-//             }
-//         } else if (sortBy.toLowerCase() === 'commentDate') {
-//             let dateA = new Date(a.doc.commentDate);  
-//             let dateB = new Date(b.doc.commentDate);
-//             // For 'score' and 'commentDate', sort in descending order
-//             if(sortDir === 'asc'){
-//                 return dateB.getDate() - dateA.getDate();
-//             }
-//             else{
-//                 return dateA.getDate() - dateB.getDate();
-//             }
-//          }
-//          else if (sortBy.toLowerCase() ==='relavancy') {
-//             //we want those that are MORE relvant then others
-//             if(sortDir === 'asc'){
-//                 return a.score - b.score
-//             }
-//             else {
-//                 return b.score - a.score
-//             }
-//          }
-//          if(sortBy.toLowerCase() === 'relavancy'){
-//              console.log(`SORTED BY SCORE results`, results);
-//          }
-//          if(sortBy.toLowerCase() === 'commentDate'){
-//              console.log(`SORTED BY DATE results`, results);
-//          }
-//          if(sortBy.toLowerCase() === 'title'){
-//              console.log(`SORTED BY TITLE results`, results);
-//          }
-//          return results;
-//     }
-//     );
-// }
-// {{
-//     results
-// }}
-// // const relevant = sortSearchResults(results,"relavancy")
-// // {{
-// //     relevant
-// // }}
-// // console.log('SORT BY RELAVANCY',relevant)
-// const byTitle = sortSearchResults(results,"title","desc")
-
-// console.log('SORT BY TITLE',byTitle)
-//const byDate = sortSearchResults(results,"commentDate","desc")
-// {{
-//       byDate
-// }}
-// console.log('SORT BY DATE',byDate)
+const filtered = doFilter(searcherState, results, results.length, false);
+console.log('FILTERED Results', filtered.length,'Orginal Results', results.length);

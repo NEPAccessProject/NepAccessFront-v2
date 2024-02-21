@@ -1,4 +1,4 @@
-import { FilterOptionType } from "@/components/interfaces/interfaces";
+import { FilterOptionType } from "@/components/interfaces/types";
 import {
   Autocomplete,
   FormLabel,
@@ -13,7 +13,7 @@ const ActionsFilter = () => {
 
     const context = useContext(SearchContext);
     const { updateFilterStateValues, filters } = context;
-    const { actions, actionsRaw } = filters;
+    const { action: actions } = filters;
     const onActionChange = (evt:React.SyntheticEvent, selected, reason) => {
       
       let target = evt.target as HTMLInputElement;

@@ -14,7 +14,7 @@ export default function CooperatingAgenciesFilter(props) {
       updatePaginationStateValues,
       updateFilterStateValues,
     } = context;
-    const { cooperatingAgency, agencies } = filters;
+    const { cooperatingAgency, agency: agencies } = filters;
     
     const onCooperatingAgencyChange = (evt:React.SyntheticEvent, selected, reason) => {
     console.log(`onCooperatingAgencyChange ~ reason:`, reason);

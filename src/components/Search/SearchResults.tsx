@@ -3,9 +3,10 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { makeStyles } from "@mui/styles";
 import React, { useRef } from "react";
 import theme from "../../themes/theme";
-import { SearchResultsType,SearchResultType } from "../interfaces/interfaces";
+import { SearchResultsType,SearchResultType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchResult from "./SearchResult";
+import SearchResultCards from "./SearchResultCards";
 const GridItemProps = {
   padding: 0.5,
   item: true,
@@ -95,6 +96,7 @@ const SearchResults = (props: SearchResultsType) => {
          
           return (
             <Grid {...GridItemProps} key={`${result.id+'_'+idx}`}>
+              <Box><SearchResultCards result={result}/></Box>
               <Box>{result.doc &&<SearchResult result={result} />}</Box> 
             </Grid>
           )

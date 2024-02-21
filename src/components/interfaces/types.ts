@@ -2,32 +2,32 @@
 
 //[TOO] maybe 
 export type DocumentType = {
-	action: string;
-	agency: string;
-	commentDate: Date;
-	commentsFilename: string;
-	cooperatingAgency: string;
-	county: string ;
-	decision: string ;
-	department: string;
-	documentType: string;
-	draftNoa: string;
-	filename: string; 
-	finalNoa: string; //Date | string ;
-	finalNoaDate: string ;
-	firstRodDate:  string;
-	folder: string;
-	id: number;
-	link: string;
-	noiDate: string; //Date | string;
-	notes: string ;
-	processId: number ;
-	registerDate: string ;
-	size: number;
-	states: string;
-	status: string;
-	subtype: string;
-	summaryText: string;
+	action?: string;
+	agency?: string;
+	commentDate?: Date | string;
+	commentsFilename?: string;
+	cooperatingAgency?: string;
+	county?: string ;
+	decision?: string ;
+	department?: string | null;
+	documentType?: string;
+	draftNoa?: string | null;
+	filename?: string; 
+	//finalNoa: string; //Date | string ;
+//	finalNoaDate: string ;
+	firstRodDate?:  string | null;
+	folder?: string | null;
+	id: number | null;
+	link?: string | null;
+	noiDate?: Date | string | null;
+	notes?: string | null;
+	processId: number;
+	registerDate?: Date| string | null;
+	size?: number | null;
+	state?: string | null;
+	status?: string | null;
+	subtype?: string | null;
+	summaryText?: string | null;
 	title: string;
 }
 
@@ -42,7 +42,6 @@ export type DocumentType = {
   }
 
 export type SearchResultType = {
-  id: number;
   ids: number[];
   doc: DocumentType;
   highlights: string[];
@@ -50,62 +49,29 @@ export type SearchResultType = {
   score: number;
 }
 
-export type SearchResultsType = {
-	results: SearchResultType[];
-  }
 
-// PROPS INTERFACES
-export type SearchResultPropsType = {
-  result: SearchResultType
-}
-
-export type SearchHeaderPropsType = {
-  //[TODO] placeholder implement when needed
-}
-
-export type SearchAppPropsType ={
-  //results: ISearchResult[];
-}
-
-export interface SearchFiltersPropType {
-	filtersHidden: boolean;
-}
-
-
-export type SearchTipsPropType = {
-	// Define the type for the props here
-  }
-
-export type SearchFilterResultsType = {
-		key: string;
-		value: any;
-}
-
-
-
-export type InputEvent = React.ChangeEvent<HTMLInputElement>;
-export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
 
 export type FilterType = {
-	
-	actions: string[];
-	agencies: FilterOptionType[];
+	action: string[];
+	agency: string[];
 	cooperatingAgency: [];
 	county: [];
 	distance: string;
-	decisions:string[];
+	decision:string[];
 	endComment: Date | string;
-	endPublish: string | Date;
+	endPublish: Date | string;
 	filtersHidden: boolean;
 	isFast41: boolean;
 	needsComments: boolean;
 	needsDocument: boolean;
 	proximityDisabled: boolean;
 	proximityOption: string
-	startComment: string | Date;
-	startPublish: string | Date;
+	commentDate: Date | string;
+	startPublish: Date | string;
 	states: FilterOptionType[];
+	status: string[];
 	title: string;
+	documentType: FilterOptionType[];
 	typeAll: boolean;
 	typeDraft: boolean;
 	typeEA: boolean;
@@ -115,72 +81,7 @@ export type FilterType = {
 	typeROD: boolean;
 	typeScoping: boolean;
   
-  };
-  
-  const filters: FilterType = {
-	actions: [],
-	agencies: [],
-	cooperatingAgency: [],
-	county: [],
-	distance: "",
-	decisions: [],
-	endComment: "",
-	endPublish: "",
-	filtersHidden: false,
-	isFast41: false,
-	needsComments: false,
-	needsDocument: true,
-	proximityDisabled: false,
-	proximityOption: "",
-	startPublish: "",
-	states: [],
-	title: "",
-	typeAll: false,
-	typeDraft: false,
-	typeEA: false,
-	typeFinal: false,
-	typeNOI: false,
-	typeOther: false,
-	typeROD: false,
-	typeScoping: false,
-    startComment: "",
-  };  
-//   export type SearchContextType = {
-// 	filters: FilterType;
-// 	filtersHidden: boolean;
-// 	fragmentSizeValue: number;
-// 	hideOrganization: boolean;
-// 	iconClassName: string;
-// 	isAvailableFilesDialogOpen: boolean;
-// 	isDirty: boolean;
-// 	loading:boolean
-// 	isQuickStartDialogOpen: boolean;
-// 	isSearchTipsDialogOpen: boolean;
-// 	markup: boolean;
-// 	message: string;
-// 	optionsChecked: boolean;
-// 	pagination: PaginiationType;
-// 	proximityDisabled: boolean;
-// 	proximityOption: string;
-// 	results: SearchResultType[];
-// 	searchOption: string;
-// 	showContext: boolean;
-// 	showPDFDialog: boolean;
-// 	showQuickTipsDialog: boolean;
-// 	showSearchTipsDialog: boolean;
-// 	tooltipOpen: boolean;
-// 	setError: (message: string) => void;
-// 	error: string;
-// 	updatePaginationStateValues : (key:string, value:any) => void;
-// 	updateFilterStateValues : (key:string, value:any) => void;
-// 	setTitleRaw: (titleRaw:string) => void;
-// 	searchTop: () => {},
-// 	searchNoContext: () => {},
-// 	showLoading: () => {},
-// 	getData: () => {},
-//   };
-
-
+};
 export type SearchContextType = {
 	error: string;
 	filters: FilterType;
@@ -217,8 +118,42 @@ export type SearchContextType = {
 	setResults: (results:SearchResultType[]) => void;
 	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
   };
-
   export type FilterOptionType = {
 	label: string;
 	value: any;
   }
+
+
+export type SearchResultsType = {
+	results: SearchResultType[];
+  }
+
+// PROPS INTERFACES
+export type SearchResultPropsType = {
+  result: SearchResultType
+}
+
+export type SearchHeaderPropsType = {
+  //[TODO] placeholder implement when needed
+}
+
+export type SearchAppPropsType ={
+  //results: ISearchResult[];
+}
+
+export interface SearchFiltersPropType {
+	filtersHidden: boolean;
+}
+
+
+export type SearchTipsPropType = {
+	// Define the type for the props here
+  }
+
+export type SearchFilterResultsType = {
+		key: string;
+		value: any;
+}
+
+export type InputEvent = React.ChangeEvent<HTMLInputElement>;
+export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;

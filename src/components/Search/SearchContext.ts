@@ -4,20 +4,16 @@ import { FilterType, SearchContextType, SearchResultType } from '../interfaces/t
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
 const filters: FilterType = {
-  actions:[],
-  agencies: [],
-  agenciesRaw: "",
+  action:[],
+  agency: [],
   cooperatingAgency: [],
   county: [],
-  countyRaw:"",
   distance: "",
-  decisions: [],
-  decisionsRaw: "",
+  decision: [],
   isFast41: false,
   proximityDisabled: true,
   proximityOption: "",
   states: [],
-  stateRaw: "",
   needsComments: false,
   needsDocument: true,
   typeAll: false,
@@ -30,11 +26,9 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  title: "Copper Mine",
-  actionsRaw: "",
+  title: "",
   endComment: "",
-  startComment: "",
-  cooperatingAgencyRaw: "",
+  commentDate: "",
   filtersHidden: false,
 };
 
