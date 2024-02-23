@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "allowJs": true //[TODO] should be set to off after TSC porting
+    "allowJs": false //[TODO] should be set to off after TSC porting
   },
   "include": ["vite.config.ts"]
 }

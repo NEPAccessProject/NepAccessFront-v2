@@ -1,6 +1,6 @@
 import { Divider, Grid, Typography } from '@mui/material';
 import React, { ReactElement } from 'react';
-import {SearchTipsPropType} from '../interfaces/interfaces';
+import {SearchTipsPropType} from '../interfaces/types';
 
 export default function SearchTips(props: SearchTipsPropType): ReactElement {
   //console.log('searchTips Props',props);

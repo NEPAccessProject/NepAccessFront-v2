@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Box,
   Button,
@@ -21,6 +22,7 @@ import StatesFilter from "./filters/StateFilter";
 
 import CountyFilter from "./filters/CountyFilter";
 import { Padding } from "@mui/icons-material";
+import { has } from "lodash";
 
 //console.log(actions.length, agencies.length, decisions.length, locations.length, counties.length);
 // const actions = Array.from(new Set(actionOptions));
@@ -49,16 +51,20 @@ const SearchFilters = (props) => {
     filters,
     updatePaginationStateValues,
     updateFilterStateValues,
+    hasActiveFilters,
+    searchNoContext,
+    searchTop,
+    loading,
+    setSearchTitlesOnly,
+    searchTitlesOnly,
   } = context;
+  
   const { page, sortby, sortdir, limit } = pagination;
   const {
-    actions,
-    agencies,
-    agenciesRaw,
+    action: actions,
+    agency: agencies,
     cooperatingAgency,
-    cooperatingAgencyRaw,
     county,
-    countyRaw,
     isFast41,
   } = filters;
 
@@ -110,20 +116,20 @@ const SearchFilters = (props) => {
       return text.length > length ? text.slice(0, length) + "..." : text;
     }
   };
-
-  const formControlProps = {
-    p: 1,
-    mb: 1,
-    mt: 1,
-  };
   const formLabelProps = {
-    margin:1,
+    //margin:1,
+    marginTop: 0.5,
+    marginBottom: 0.5,
+    fontWeight:'bold',
     border:'1px solid black',
+    fontSize: 28,
   }
   const gridItemProps = {
-    spacing: 1,
-    marginTop: 1,
-    marginBottom: 1,
+    padding:0,
+    margin:0,
+    // spacing: 0.5,
+    // marginTop: 0.5,
+    // marginBottom: 0.5,
 //    flex: 1,
  //   xs:12,
     // borderLeft: "none",
@@ -134,32 +140,34 @@ const SearchFilters = (props) => {
     // justifyItems: "center",
     // alignContent: "center",
     // alignItems: "center",
-    "&:hover": {
-      //           backgroundColor: //theme.palette.grey[200],
-      boxShadow: "0px 4px 8px rgba(0.5, 0.5, 0.5, 0.15)",
-      cursor: "pointer",
-      "& .addIcon": {
-        color: "purple",
-      },
-    },
   };
   return (
     <>
       <Box alignItems={"center"}>
         <FormLabel {...formLabelProps}>
-          <Typography variant="filterLabel">
+          <Typography>
             {" "}
             Search Only Within titles
+            <Checkbox
+              id="search-only-titles-checkbox"
+              name="searchOnlyTitles"
+              onChange={(e) => setSearchTitlesOnly(!searchTitlesOnly)}
+          />
           </Typography>
         </FormLabel>
       </Box>
       <Box>
-        <FormLabel {...formLabelProps} htmlFor="is_fast41">Fast 41 Documents Only</FormLabel>
+        <FormLabel htmlFor="is_fast41">
+          Fast 41 Documents Only
+        </FormLabel>
         <Checkbox
           id="is_fast41"
           name="is_fast41"
           onChange={(e) => updatePaginationStateValues("is_fast41", !isFast41)}
         />
+      </Box>
+      <Box>
+          <SearchFilterButton />
       </Box>
       <Box>
         <Button
@@ -171,16 +179,11 @@ const SearchFilters = (props) => {
           Clear Filters
         </Button>
       </Box>
-      <Grid >
-        <Grid xs={12} marginTop={1}>
-          <Grid xs={12}>
-            <Typography variant="filterLabel">Lead Agencies:</Typography>
-          </Grid>
-          <Grid xs={12}>
-            <AgencyFilter />
-          </Grid>
+      <Grid container>
+        <Grid xs={12} {...gridItemProps} >
+          <Grid xs={12}><Typography variant="filterLabel">Lead Agencies:</Typography></Grid>
+          <Grid xs={12}><AgencyFilter /></Grid>
         </Grid>
-
         <Grid {...gridItemProps} xs={12}>
           <Grid xs={12}><Typography variant="filterLabel">Cooperating Agencies:</Typography></Grid>
           <Grid xs={12}><CooperatingAgenciesFilter /></Grid>
@@ -360,5 +363,21 @@ export default SearchFilters;
 
 // };
 
+export function SearchFilterButton(){
+  const context = useContext(SearchContext);
+  const {  searchNoContext, loading, hasActiveFilters,searchTop } = context;
+  return(
+    <>
+    <Grid xs={12} marginBottom={1}>
+          <Button 
+            style={{ margin: 0 }} 
+            onClick={async() => await searchTop()}  
+            disabled={loading} variant="contained" fullWidth color="primary">
+              Search
+          </Button>
+        </Grid>
+    </>
+  )
+}
 
 

@@ -1,15 +1,14 @@
-import { SearchOutlined } from "@mui/icons-material";
+import { CheckBox, Group, SearchOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Button,
   FormControl,
   FormLabel,
-  Grid,
   IconButton,
   TextField,
   Typography,
 } from "@mui/material";
-//import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
 import SearchContext from "./SearchContext";
 import DistanceControl from "./filters/DistanceControl";
@@ -22,17 +21,24 @@ const GridItemProps = {
   alignItems: "center",
   justifyContent: "center",
   paddingRight: 2,
-  item: true,
   // elevation: 1,
   // borderRadius: 1,
   // justifyContent: 'flex-start',
   // alignItems: 'center',
-  // border: '1px solid black',
+  // flexWrap: 'wrap',
+};
+const GridContainerProps = {
+  padding: 1,
+  container: true,
+  // elevation: 1,
+  // borderRadius: 1,
+  // justifyContent: 'flex-start',
+  // alignItems: 'center',
   // flexWrap: 'wrap',
 };
 
 const SearchHeader = () => {
-  //const {titleRaw, onInput, onKeyUp, onKeyDown, onEnter, onSearch} = context;
+  //const {title, onInput, onKeyUp, onKeyDown, onEnter, onSearch} = context;
   const context = useContext(SearchContext);
   const {
     filters,
@@ -40,21 +46,24 @@ const SearchHeader = () => {
     loading,
     error,
     setError,
+    showSnippets,
     updatePaginationStateValues,
     updateFilterStateValues,
     searchNoContext,
     searched,
     setSearched,
+    searchTop,
+    setShowSnippets,
   } = context;
-  const { proximityDisabled, proximityOption, titleRaw } = filters;
+  const { proximityDisabled, proximityOption, title: title } = filters;
   const { page, limit, sortby, sortdir } = pagination;
 
-  const onChange = (evt) => {
+  const onChange = (evt: React.SyntheticEvent) => {
     console.log("🚀 ~ onexChange ~ evt:", evt);
     evt.preventDefault();
-    const titleRaw = (evt.target as HTMLInputElement).value;
-    // console.log("🚀 ~ onChange ~ titleRaw:", titleRaw)
-    updateFilterStateValues("titleRaw", titleRaw);
+    const title = (evt.target as HTMLInputElement).value;
+    // console.log("🚀 ~ onChange ~ title:", title)
+    updateFilterStateValues("title", title);
     //clear existing error if any since the user has typed
     setError("");
     setSearched(true);
@@ -64,14 +73,14 @@ const SearchHeader = () => {
     setError(`Please enter a search term(s) to start searching`);
   };
   const onIconClick = async (evt: React.SyntheticEvent) => {
-    if (!titleRaw || titleRaw === "") {
+    if (!title || title === "") {
       setError("Please enter a search term");
       return;
     }
     evt.preventDefault();
     // const raw = (evt.target as HTMLInputElement).value;
     // console.log(`onIconClick ~ raw:`, raw);
-    // updatePaginationStateValues("titleRaw", raw);
+    // updatePaginationStateValues("title", raw);
     const done = await searchNoContext();
   };
 
@@ -85,78 +94,102 @@ const SearchHeader = () => {
     console.log(`updateLimit ~ key:string,val:any:`, key, val);
     updatePaginationStateValues(key, val);
   };
+
+  const onShowSnippetsChange = (evt: React.SyntheticEvent) => {
+    console.log(`onShowSnippetsChange ~ evt:`, evt.target);
+    const showSnippets = (evt.target as HTMLInputElement).value;
+    console.log(`onShowSnippetsChange ~ showSnippets:`, showSnippets);
+    setShowSnippets(showSnippets ? true : false);
+  };
+
   return (
     <>
       {/* <Grid xs={12}>
           <AppBar />
         </Grid> */}
-      <Grid
-        container
-        flex={1}
-        display={"flex"}
-        justifyContent={"flex-start"}
-        borderBottom={1}
-        borderColor={"#EEE"}
-        padding={1}
-      >
-        <Grid {...GridItemProps} id={"dis tance-filter"} xs={11} flex={1}>
-          <TextField
-            fullWidth
-            //onError={(evt) => onError(evt)}
-            error={!searched && error ? true : false} //[TODO] need to see if can be only true affer uses so it doesnt' default to true, only validate on enter
-            disabled={loading ? true : false}
-            value={titleRaw || ""}
-            onKeyDown={(evt) => onKeyDown(evt)}
-            onChange={(evt) => {
-              return onChange(evt);
-            }}
-            onError={(evt) => onError(evt)}
-            placeholder="Search for NEPA Documents..."
-            InputProps={{
-              endAdornment: (
-                <>
-                  <Grid item md={1} xs={1}>
-                    <IconButton
-                      name="titleRaw"
-                      onClick={(evt) => onIconClick(evt)}
-                    >
-                      <SearchOutlined />
-                    </IconButton>
-                  </Grid>
-                </>
-              ),
-            }}
-          />
-
-        </Grid>
-        <Grid {...GridItemProps} id={"distance-filter"} xs={1} flex={1} justifyContent={"center"} justifyItems={"center"}  alignSelf={"center"}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={(evt) => onIconClick(evt)}>
+      <Grid xs={12} container>
+        <Grid xs={12} {...GridContainerProps}>
+          <Grid
+            xs={10}
+            {...GridItemProps}
+            id={"dis tance-filter"}
+            flex={1}
+          >
+            <TextField
+              fullWidth
+              //onError={(evt) => onError(evt)}
+              error={!searched && error ? true : false}
+              //[TODO] need to see if can be only true affer uses so it doesnt' default to true, only validate on enter
+              disabled={loading ? true : false}
+              value={title || ""}
+              onKeyDown={(evt) => onKeyDown(evt)}
+              onChange={(evt) => {
+                return onChange(evt);
+              }}
+              onError={(evt) => onError(evt)}
+              placeholder="Search for NEPA Documents..."
+              InputProps={{
+                endAdornment: (
+                  <>
+                    <Grid md={1} xs={1}>
+                      <IconButton
+                        name="title"
+                        onClick={async () => await searchTop()}
+                      >
+                        <SearchOutlined />
+                      </IconButton>
+                    </Grid>
+                  </>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid {...GridItemProps} alignSelf={'center'} >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={(evt) => searchTop()}
+            >
               Search
             </Button>
+          </Grid>
         </Grid>
-        {/* <Grid xs={12} {...GridItemProps}>
-          {error && (
-            <Alert variant="filled" icon={<CheckIcon fontSize="inherit" />} severity="error">
-              Error! Please enter a search term(s) to continue searching
-            </Alert>
-          )}
-        </Grid> */}
-      </Grid>
-      <Grid container display={"flex"} justifyContent={"flex-start"} style={{}}>
-        <Grid {...GridItemProps} xs={3}>
-          <DistanceControl />
-        </Grid>
-        <Grid {...GridItemProps} xs={3}>
-          <SortByControl />
-        </Grid>
-        <Grid {...GridItemProps} xs={3}>
-            <SortDirControl />
-        </Grid>
-        <Grid {...GridItemProps} xs={3}>
-          <LimitControl />
+        <Grid
+          {...GridContainerProps}
+          xs={12}
+          justifyContent={"flex-start"}
+        >
+          <Grid {...GridItemProps} xs={3}>
+            <DistanceControl />
+          </Grid>
+
+          <Grid {...GridItemProps} xs={3}>
+            <SortByControl />
+          </Grid>
+          <Grid {...GridItemProps} xs={3}>
+            <LimitControl />
+          </Grid>
+          <Grid {...GridItemProps} xs={3}>
+            {/* [TODO] Abstract this to it's own control component */}
+            <Grid
+              container
+              display={"flex"}
+              flex={1}
+              justifyContent={"flex-end"}
+            >
+              <Grid xs={9} flex={1} {...GridItemProps}>
+                <FormLabel htmlFor="searchAgency">Show Snippets:</FormLabel>
+              </Grid>
+              <Grid
+                xs={3}
+                flex={1}
+                {...GridItemProps}
+                justifyContent={"flex-start"}
+              >
+                <CheckBox onChange={(evt) => onShowSnippetsChange(evt)} />
+              </Grid>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </>
@@ -177,11 +210,11 @@ const DistanceFilter = () => {
   const { page, limit, sortby, sortdir } = pagination;
   return (
     <Grid container style={{ display: "flex" }}>
-      <Grid item xs={3} style={gridStyle} paddingLeft={1}>
+      <Grid xs={3} style={gridStyle} paddingLeft={1}>
         <FormLabel htmlFor="searchAgency">Search Within...</FormLabel>
       </Grid>
 
-      <Grid item xs={9} style={gridStyle}>
+      <Grid xs={9} style={gridStyle}>
         <FormControl fullWidth>
           <Autocomplete
             fullWidth

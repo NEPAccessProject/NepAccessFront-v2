@@ -2,6 +2,8 @@ import react from '@vitejs/plugin-react-swc';
 import * as path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 /// <reference types="vite/client" />
+/// <reference types="vitest" />
+
 const env = loadEnv(path.resolve(__dirname, '.env'), process.env.NODE_ENV);
 console.log("🚀 ~ env:", env)
 export default defineConfig({

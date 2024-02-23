@@ -3,9 +3,10 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { makeStyles } from "@mui/styles";
 import React, { useRef } from "react";
 import theme from "../../themes/theme";
-import { SearchResultsType,SearchResultType } from "../interfaces/interfaces";
+import { SearchResultsType,SearchResultType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchResult from "./SearchResult";
+import SearchResultCards from "./SearchResultCards";
 const GridItemProps = {
   padding: 0.5,
   item: true,
@@ -81,7 +82,7 @@ const SearchResults = (props: SearchResultsType) => {
           onChange={(evt)=>onPaginationChange(evt)}
           //count={results.length} [TODO] Need to get count from the server
           count={results.length}
-          rowsPerPage={10}//{limit}
+          rowsPerPage={rowsPerPage}//{limit}
           page={page}
           onPageChange={(evt, page) => handleChangePage(evt, page)}
           onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
@@ -91,14 +92,14 @@ const SearchResults = (props: SearchResultsType) => {
           component={`div`}
         />
       </> 
-      <Box border={2}>
-          {JSON.stringify(resultsToDisplay)}
-      </Box>
       {resultsToDisplay &&  resultsToDisplay.map((result, idx) => {
          
           return (
-            <Grid {...GridItemProps} key={`${result.id+'_'+idx}`}>
-              <Box>{result.doc &&<SearchResult result={result} />}</Box> 
+            
+            <Grid {...GridItemProps} key={`${result.doc.id+'_'+result.doc.processId+'_'+result.doc.documentType}`}>
+              <>
+                <Box>{result.doc &&<SearchResult result={result} />}</Box> 
+              </>
             </Grid>
           )
       })}

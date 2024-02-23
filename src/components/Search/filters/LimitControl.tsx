@@ -1,47 +1,54 @@
-
-import { Autocomplete, FormControl, FormLabel, Grid, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  FormControl,
+  FormLabel,
+  Grid,
+  TextField,
+} from "@mui/material";
 import { useContext } from "react";
 import SearchContext from "../SearchContext";
-
+import Select from "react-select";
 const LimitControl = () => {
   const context = useContext(SearchContext);
-  const { pagination, updatePaginationStateValues } = context;
-  const { page, limit, sortby, sortdir } = pagination;
+  const { pagination, updatePaginationStateValues, loading, error, results } =
+    context;
+  const { page, limit, sortby, sortdir,rowsPerPage } = pagination;
+  const onLimitChange = (value, action) => {
+    console.log(`onLimitChange ~ value,action:`, value, action);
+    updatePaginationStateValues("rowsPerPage", value);
+  };
+  const options = [
+    { label: "1", value: 1 },
+    { label: "5", value: 5 },
+    { label: "10", value: 10 },
+    { label: "25", value: 25 },
+    { label: "50", value: 50 },
+  ]
   return (
     <Grid container>
-      <Grid xs={3} item marginRight={0} paddingRight={0}>
-        <FormLabel htmlFor="searchAgency"># of Results:</FormLabel>
-      </Grid>
-      <Grid xs={9} item>
-        <FormControl fullWidth>
-          <Autocomplete
-            fullWidth
-            id="limit"
-            tabIndex={4}
-            isOptionEqualToValue={(option, value) => option === value}
-            options={
-              [1,10,25,50]
+      <Grid container>
+        <Grid
+          item
+          xs={4}
+          display={"flex"}
+          style={{ justifyContent: "center", alignItems: "center" }}
+        >
+          <FormLabel htmlFor="searchAgency">Results per page:</FormLabel>
+        </Grid>
+        <Grid item xs={8}>
+          <Select
+            className="basic-single"
+            classNamePrefix="select"
+            isDisabled={loading}
+            defaultValue={options[1]}
+            onChange={(newValue, actionMeta) =>
+              onLimitChange(newValue, actionMeta)
             }
-            value={limit}
-            onChange={(evt, value, tag) =>
-              updatePaginationStateValues("limit", value)
-            }
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  placeholder="Set A limit"
-                  variant="outlined"
-                  sx={{
-                    wordWrap: "break-word",
-                    overflow: "hidden",
-                    p: 0,
-                  }}
-                />
-              );
-            }}
+            isLoading={loading}
+            name="color"
+            options={options}
           />
-        </FormControl>
+        </Grid>
       </Grid>
     </Grid>
   );

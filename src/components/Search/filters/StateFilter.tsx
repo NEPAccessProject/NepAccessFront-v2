@@ -1,75 +1,115 @@
 import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {Box, Autocomplete, TextField,FormControlLabel,FormControl,FormLabel} from "@mui/material";
-import {decisionOptions as decisions,counties,locations} from '../data/dropdownValues';
-import _debounce from "lodash/debounce";
+import {
+  Box,
+  Autocomplete,
+  TextField,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
+import {
+  locations as options,
+  counties,
+  locations,
+} from "../data/dropdownValues";
+import FilterSelect from "./FilterSelect";
+export default function StateFilter() {
+  const context = useContext(SearchContext);
+  const {
+    getFilterValues,
+    getFilteredValues,
+    updateFilterStateValues,
+    updatePaginationStateValues,
+    filters,
+    searchTitlesOnly,
+    loading,
+    error,
+  } = context;
+  const states = filters.states;
 
-export default function StateFilter(){
-    const context = useContext(SearchContext);
-    const {  updateFilterStateValues,updatePaginationStateValues, filters } = context;
-    const { states, stateRaw, countyRaw, county } = filters;
+  const onChange = (value, meta) => {
+    const filtered = getFilteredValues(options, value, meta);
+    console.log(`onChange ~ filtered:`, filtered);
+    updateFilterStateValues("county", counties);
 
-      const { cooperatingAgencyRaw, cooperatingAgency } = filters;
-  
-    const onLocationChange = (evt, item, reason) => {
-      console.log(`onLocationChange ~ evt,item,reason:`, evt, item, reason);
-      var stateValues = [];
-      for (var i = 0; i < evt.length; i++) {
-        //stateValues.push(evt[i].value);
-      }
-      updateFilterStateValues("stateRaw", evt);
-      updateFilterStateValues("county", narrowCountyOptions(stateValues));
-  
-      //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));
+    //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));
+  };
+
+  return (
+    <>
+      {/* [TODO] we will need to pass a function to handle the narrowing of counties or other post select action behavior */}
+      <FilterSelect options={options} filterValue={states} key="states" placeholder="Type or Select States"/>
+    </>
+  )
+
+  // return (
+  //   <Box>
+  //     <Select
+  //       className="basic-single"
+  //       isSearchable={true}
+  //       isMulti={true}
+  //       classNamePrefix="select"
+  //       isDisabled={searchTitlesOnly}
+  //       isClearable={true}
+  //       value={getFilterValues(options, states)}
+  //       placeholder="Type or Select Lead Agencies"
+  //       onChange={(newValue, actionMeta) => onChange(newValue, actionMeta)}
+  //       isLoading={loading}
+  //       name="agency"
+  //       options={options}
+  //     />
+  //   </Box>
+  // );
+
+  // return (
+  //   <>
+  //     {/* <FormLabel htmlFor="state">State(s) and Location(s):</FormLabel> */}
+  //     <Autocomplete
+  //       id="state"
+  //       options={locations}
+  //       loading={loading}
+  //       disabled={searchTitlesOnly}
+  //       isOptionEqualToValue={(option, value) => option.value === value.value}
+  //       onChange={(evt, value, reason) => onLocationChange(evt, value, reason)}
+  //       renderInput={(params) => {
+  //         return (
+  //           <TextField
+  //             {...params}
+  //             placeholder="Type or Select a State"
+  //             variant="outlined"
+  //             sx={{
+  //               width: "100%",
+  //               p: 0,
+  //             }}
+  //           />
+  //         );
+  //       }}
+  //     />
+  //   </>
+  // );
+}
+
+// We have to share this between the state filter and the county filter, so we export it here, akward but works
+export const narrowCountyOptions = (stateValues) => {
+  /** Filter logic for county array of specific label/value format given array of state abbreviations  */
+  function countyFilter(_stateValues) {
+    return function (a) {
+      let returnValue = false;
+      _stateValues.forEach((item) => {
+        if (a.label.split(":")[0] === item) {
+          // a.label.split(':')[0] gets 'AZ' from expected 'AZ: Arizona'
+          returnValue = true;
+        }
+      });
+      return returnValue;
     };
-    
-    
-    return (
-      <>
-        {/* <FormLabel htmlFor="state">State(s) and Location(s):</FormLabel> */}
-        <Autocomplete
-          id="state"
-          options={locations}
-          isOptionEqualToValue={(option, value) => stateRaw === value.value}
-          onChange={(evt, value, reason) => onLocationChange(evt, value, reason)}
-          renderInput={(params) => {
-            return (
-              <TextField
-                {...params}
-                placeholder="Type or Select a State"
-                variant="outlined"
-                sx={{
-                  width: "100%",
-                  p: 0,
-                }}
-              />
-            );
-          }}
-        />
-      </>
-    );
-  };
+  }
 
-  // We have to share this between the state filter and the county filter, so we export it here, akward but works
-  export const narrowCountyOptions = (stateValues) => {
-    /** Filter logic for county array of specific label/value format given array of state abbreviations  */
-    function countyFilter(_stateValues) {
-      return function (a) {
-        let returnValue = false;
-        _stateValues.forEach((item) => {
-          if (a.label.split(":")[0] === item) {
-            // a.label.split(':')[0] gets 'AZ' from expected 'AZ: Arizona'
-            returnValue = true;
-          }
-        });
-        return returnValue;
-      };
-    }
-  
-    let filteredCounties = counties;
-    if (stateValues && stateValues.length > 0) {
-      filteredCounties = filteredCounties.filter(countyFilter(stateValues));
-    }
-  
-    return filteredCounties;
-  };
+  let filteredCounties = counties;
+  if (stateValues && stateValues.length > 0) {
+    filteredCounties = filteredCounties.filter(countyFilter(stateValues));
+  }
+
+  return filteredCounties;
+};

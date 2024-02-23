@@ -1,65 +1,62 @@
-import { FilterOptionType } from "@/components/interfaces/interfaces";
+import { FilterOptionType } from "@/components/interfaces/types";
 import {
   Autocomplete,
   FormLabel,
-  TextField
+  TextField,
+  Box,
 } from "@mui/material";
 import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
-import { actionOptions } from "../data/dropdownValues";
-
+import { actionOptions as options } from "../data/dropdownValues";
+import Select from 'react-select'
+import FilterSelect from "./FilterSelect";
 
 const ActionsFilter = () => {
 
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters } = context;
-    const { actions, actionsRaw } = filters;
-    const onActionChange = (evt:React.SyntheticEvent, selected, reason) => {
-      
-      let target = evt.target as HTMLInputElement;
-      let raw = (evt.target as HTMLInputElement).value;
-      let filteredActions: FilterOptionType[] = [];
-
-      if(reason === "selectOption") {
-        filteredActions.push(selected);
-      } else if (reason === "removeOption") {
-        const filtered = filteredActions.filter((v) => v.value !== selected.value);
-        filteredActions = filtered;
-      } else if (reason === "clear") {
-        filteredActions = [];
-      }
-      updateFilterStateValues("decisions", filteredActions);
+    const { updateFilterStateValues, filters,searchTitlesOnly,loading,getFilterValues,getFilteredValues } = context;
+    const { action } = filters;
+    const onChange = (value,meta) => {
+      const filtered = getFilteredValues(options,value,meta);
+      updateFilterStateValues("decisions", filtered);
 //      updateFilterStateValues("decisionsRaw", evt);
     }
 
-  return (
-    <>
-      {/* <FormLabel htmlFor="searchAction">Action Type:</FormLabel> */}
-      <Autocomplete
-        id="searchAction"
-        tabIndex={10}
-        className={"classes.autocomplete"}
-        options={actionOptions}
-        isOptionEqualToValue={(option, value) =>{
-            return option.value === value.value
-        }}
-        onChange={(evt, value, reason) => onActionChange(evt, value, reason)}
-        renderInput={(params) => {
+    return (<>
+      <>
+        <FilterSelect options={options} filterValue={action} key="action" placeholder="Type of Select a Action Type(s)" />
+      </>
+    </>)
+  // return (
+  //   <>
+  //     {/* <FormLabel htmlFor="searchAction">Action Type:</FormLabel> */}
+  //     <Autocomplete
+  //       id="searchAction"
+  //       tabIndex={10}
+  //       className={"classes.autocomplete"}
+  //       options={actionOptions}
+  //       loading={loading}
+  //       disabled={searchTitlesOnly}
+  //       isOptionEqualToValue={(option, value) =>{
+  //           return option.value === value.value
+  //       }}
+  //       onChange={(evt, value, reason) => onActionChange(evt, value, reason)}
+  //       renderInput={(params) => {
           
-          return (
-            <TextField
-              {...params}
-              placeholder="Type or Select a Action Type(s)"
-              variant="outlined"
-              sx={{
-                width: "100%",
-                p: 0,
-              }}
-            />
-          );
-        }}
-      />
-    </>
-  );
+  //         return (
+  //           <TextField
+  //             {...params}
+  //             placeholder="Type or Select a Action Type(s)"
+  //             variant="outlined"
+  //             sx={{
+  //               width: "100%",
+  //               p: 0,
+  //             }}
+  //           />
+  //         );
+  //       }}
+  //     />
+  //   </>
+  // );
 }
 export default ActionsFilter;
