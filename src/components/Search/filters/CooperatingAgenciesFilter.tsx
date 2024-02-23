@@ -1,96 +1,56 @@
 import React, { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {Box, Autocomplete, TextField} from "@mui/material";
-import {agencies} from '../data/dropdownValues';
+import { Box, Autocomplete, TextField } from "@mui/material";
+import { agencyOptions as options } from "../data/dropdownValues";
 import { FilterOptionType } from "@/components/interfaces/types";
+import FilterSelect from "./FilterSelect";
 //import _ from "underscore";
 import _debounce from "lodash/debounce";
+import Select from "react-select";
 
 export default function CooperatingAgenciesFilter(props) {
-    const context = useContext(SearchContext);
-    const {
-      pagination,
-      filters,
-      updatePaginationStateValues,
-      updateFilterStateValues,
-    } = context;
-    const { cooperatingAgency, agency: agencies } = filters;
-    
-    const onCooperatingAgencyChange = (evt:React.SyntheticEvent, selected, reason) => {
-    console.log(`onCooperatingAgencyChange ~ reason:`, reason);
-    console.log(`onCooperatingAgencyChange ~ selected:`, selected);
-    console.log(`onCooperatingAgencyChange ~ evt:`, evt);
-    let target = evt.target as HTMLInputElement;
-    let raw = (evt.target as HTMLInputElement).value;
-    console.log(`onCooperatingAgencyChange ~ target:`, raw);
-    
+  const context = useContext(SearchContext);
+  const {
+    pagination,
+    filters,
+    updatePaginationStateValues,
+    updateFilterStateValues,
+    loading,
+    searchTitlesOnly,
+    getFilterValues,
+    getFilteredValues,
+  } = context;
 
-    let filteredAgencies:FilterOptionType[] = []; 
-        if (reason === "selectOption") {
-          selected.map((agency:any) => {  
-            filteredAgencies.push(agency);
-          });
-        }
-        else if (reason === "removeOption") {
-          const temp =  agencies.filter((v) => v.value !== selected.value);
-          console.log(`onCooperatingAgencyChange ~ temp:`, temp);
-          filteredAgencies = temp;
-``        }
-        else if (reason === "clear") {
-          filteredAgencies = [];
-        }
-        updateFilterStateValues("cooperatingAgency", filteredAgencies);
-      }
-        //updateFilterStateValues("cooperatingAgencyRaw", cooperatingAgencyRaw);
-        // [TODO] will need to filter the availble options based on the selected
-        // filterResultsBy(this.state);
-    // const onCooperatingAgencyChange = (evt, selected, reason) => {
+  const filterValue:FilterOptionType[] = filters.cooperatingAgency;
   
-    //   let filteredAgencies:FilterOptionType[] = [];
-    //   if (reason === "selectOption") {
-    //     selected.map(selected => {
-    //       filteredAgencies.push(selected);
-    //     });
-    //   }
-    //   else if (reason === "removeOption") {
-    //     filteredAgencies = cooperatingAgency.filter((v) => selected.value !== v);
-    //   }
-    //   updateFilterStateValues("cooperatingAgency", filteredAgencies);
-    //   updateFilterStateValues("cooperatingAgencyRaw", evt);
-    //   //[TODO] Implement This 
-    //   //filterResultsBy(this.state);
-    // };
+  const onChange = (value, meta) => {
+    let filteredAgencies = getFilteredValues(options, value, meta);
+    updateFilterStateValues("cooperatingAgency", filteredAgencies);
+  };
 
-    return (
-      <>
-        <Box>
-          <Autocomplete
-            id="cooperatingAgency"
-            // {...filterProps}
-            tabIndex={12}
-            multiple
-            loading={context.loading}
-            options={agencies}
-            isOptionEqualToValue={(option, value) => option.value === value.value}
-            onChange={(evt, value, tag) =>
-              onCooperatingAgencyChange(evt, value, tag)
-            }
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  placeholder="Type or Select Cooperating Agencies"
-                  variant="outlined"
-                  sx={{
-                    wordWrap: "break-word",
-                    overflow: "hidden",
-                    p: 0,
-                  }}
-                />
-              );
-            }}
-          />
-        </Box>
-      </>
-    );
-  }
+  return (
+    <>
+      <FilterSelect options={options} filterValue={filterValue} key="cooperatingAgency" placeholder="Type or Select an Cooperating Agencies)" />
+    </>
+  )
+  // return (
+  //   <>
+  //     <Box>
+  //       <Select
+  //         id="cooperatingAgency"
+  //         // {...filterProps}
+  //         tabIndex={12}
+  //         isSearchable={true}
+  //         isMulti={true}
+  //         isDisabled={searchTitlesOnly}
+  //         isLoading={loading}
+  //         options={options}
+  //         isClearable={true}
+  //         onChange={(newValue,meta)=>onChange(newValue,meta)}
+  //         placeholder="Type or Select an Cooperating Agencies)"
+  //         value={getFilterValues(options,filterValue)}
+  //         />
+  //     </Box>
+  //   </>
+  // );
+}

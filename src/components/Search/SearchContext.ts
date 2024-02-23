@@ -1,6 +1,7 @@
 
 import React from "react";
-import { FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
+import { FilterType, SearchContextType, SearchResultType,FilterOptionType } from '../interfaces/types';
+
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
 const filters: FilterType = {
@@ -14,10 +15,13 @@ const filters: FilterType = {
   proximityDisabled: true,
   proximityOption: "",
   states: [],
-  needsComments: false,
-  needsDocument: true,
+  status: [],
+  title: "Copper Mine",
+  documentType: [],
   typeAll: false,
   typeDraft: false,
+  needsComments: false,
+  needsDocument: true,
   typeEA: false,
   typeFinal: false,
   typeNOI: false,
@@ -26,7 +30,6 @@ const filters: FilterType = {
   typeScoping: false,
   startPublish: "",
   endPublish: "",
-  title: "",
   endComment: "",
   commentDate: "",
   filtersHidden: false,
@@ -48,33 +51,29 @@ const SearchContext = React.createContext<SearchContextType>({
   },
   fragmentSizeValue: 0,
   hideOrganization: false,
-  iconClassName: "",
   isAvailableFilesDialogOpen: false,
-  isDirty: false,
-  isQuickStartDialogOpen: false,
-  isSearchTipsDialogOpen: false,
-  markup: false,
-  message: "",
-  optionsChecked: false,
-  searchOption: "",
-  showContext: false,
   showPDFDialog: false,
-  showQuickTipsDialog: false,
-  showSearchTipsDialog: false,
-  tooltipOpen: false,
+  showSnippets: false,
+  hasActiveFilters: false,
+  setHasActiveFilters: () => false,
+  setShowSnippets: (showSnippets:boolean) => {},
+  updateFilterStateValues : (key:string, value:any) => {},
+  updatePaginationStateValues : (key:string, value:any) => {},
+  setError: (error:string) => {},
   setLoading: () => {},
-	setError: (message: string) => {},
   setSearched: (boolean) => {},
   searched: false,
 	error: "",
-	updatePaginationStateValues : (key:string, value:any) => {},
-	updateFilterStateValues : (key:string, value:any) => {},
 	searchTop: () => {},
 	searchNoContext: () => {},
   setResultsToDisplay: (results:SearchResultType[]) => {},
   setResults: (results:SearchResultType[]) => {},
   resultsToDisplay: [],
   paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => {},
+  searchTitlesOnly: false,
+  setSearchTitlesOnly: (searchTitlesOnly: boolean) => {},
+  getFilterValues: (options:FilterOptionType[], key:string) => [],
+  getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => []
 });
 
 export default SearchContext;

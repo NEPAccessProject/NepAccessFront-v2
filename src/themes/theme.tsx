@@ -67,12 +67,6 @@ declare module "@mui/material/Typography" {
 		typography: {
 			fontFamily: ['open-sans','sans-serif'].join(','),
 			fontSize: 12,
-			filterLabel: {
-				fontSize: '0.8rem',
-				marginTop:2,
-				marginBottom:2,
-				display: 'block',
-			},
 			// resultsTitle: {
 			//   fontSize: "1.6rem",
 			//   fontColor: "#80a9ff",
@@ -123,6 +117,14 @@ declare module "@mui/material/Typography" {
 			subtitle2: {
 				fontSize: '0.7rem',
 			},
+			filterLabel: {
+				fontSize: '0.8rem',
+				color: grey.A700,
+				fontWeight: 'bolder',
+				display: 'block',
+				paddingTop: 6,
+				paddingBottom: 3,
+			}
 		},
 
 		shape: {

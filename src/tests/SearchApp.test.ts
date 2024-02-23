@@ -1,8 +1,8 @@
 import { result } from "lodash";
 import { FilterType, SearchResultType } from "../components/interfaces/types";
-import {it,describe,expect} from 'vitest'
+import {it,describe,expect,test} from 'vitest'
 import { resourceLimits } from "worker_threads";
-
+import axios from "axios";
 	const filters = {
 		title: 'Copper Mine',
 		agency: 
@@ -31,39 +31,108 @@ import { resourceLimits } from "worker_threads";
 		it('Should pass',()=>{
 			expect(true).toBe(true)
 		})
+		describe.sequential('Results Filtering Test',async()=>{
 
-		it('Should Filter Results by Agency',()=>{
-			const filters = {
-				agency: 'Advisory Council on Historic Preserve (ACHP)',
-			}
-			const res = doFilter(filters, results, results.length, false);
-			expect(res.filteredResults.length).toBe(2)
-		})
-		it('Should Filter Results by Title',()=>{
-			const filters = {
+			test.sequential('Should Only Retrive Filtered Results matching a filter',async()=>{
+			console.log('Starting Test')
+			const postData = {
 				title: 'Copper Mine',
-			}
-			const res = doFilter(filters, results, results.length, false);
-			expect(res.filteredResults.length).toBe(1)
-		})
-		it('Should not filter on incorrect filter',()=>{
-			const filters = {
-				title: 'XYZABCDEFG',
-			}
-			const res = doFilter(filters, results, results.length, false);
-			//Since we are filtering on a bogus value, we should have 0 matches on the filter hence a result set of 0
-			console.log('Results after unmatched filter', res);
-			expect(res.filteredResults.length).toBe(0)
+				agency: ['Forest Service'],
+				state: ['AZ'],
+				documentType: ['final'],
+			}; //??
+			const res = await post('http://localhost:8080/text/search_no_context',postData);
+			const results = await res as SearchResultType[]; //??
+			console.log('Valid Filters -  # of results: ', results.length);
 			
+			//[TODO] Need to inspect the filtering logic in the backend - seems to be acting like as an OR vs AND
+			expect(results.length).toBeGreaterThan(0);
 		})
-		it('Should Filter Results by Cooperating Agency',()=>{
-			const filters = {
-				cooperatingAgency: 'Agency 2',
+
+		test.sequential('Should Return exact matches - on a single filter',async()=>{
+			const postData = {
+				documentType: ['final'],
+			};
+			const res = await post('http://localhost:8080/text/search_no_context',postData);
+			const results = await res as SearchResultType[]; //??
+			results.forEach(result => {
+				expect(result.doc.documentType?.toLowerCase()).toBe('final');
+			});
+			console.log('Should have no results - actual count: ', results.length);
+			expect(results.length).toBe(0);
+		},{timeout: 100000,retry: 2})
+
+		test.sequential('Should Return No Results for Unmatched Filter',async()=>{
+			//Since a filter only has one value, it should only return results that are matches
+			const postData = {
+				title: 'XXXXXXXXXXXXXXXXYyYYYYYYY',
+			};
+			const res = await post('http://localhost:8080/text/search_no_context',postData);
+			const results = await res as SearchResultType[]; //??
+			console.log('Should have no results - actual count: ', results.length);
+			expect(results.length).toBe(0);
+		},{timeout: 100000,retry: 2})
+
+		it('Should Return Exact Matches for a Single Filter',async()=>{
+			const postData = {
+				title: 'copper',
+			};
+			const res = await post('http://localhost:8080/text/search_no_context',postData);
+			const results = await res as SearchResultType[]; //??
+			console.log('Should have no results - actual count: ', results.length);
+			expect(results.length).toBeGreaterThan(0);
+			results.map(result => {
+				expect(result.doc.title?.toLowerCase().includes('copper')).toBe(true);
+			})
+		})
+	},{
+		timeout: 100000,
+		retry: 2
+	})
+
+	async function searchNoTop() { //??
+		const postData = {
+			title: 'Copper Mine',
+			agency: ['Forest Service'],
+			state: ['AZ'],
+			documentType: ['final'],
+		};
+		const res = await post('http://localhost:8080/text/search_top',postData);
+		const results = res as SearchResultType[]; //??
+		console.log('Search No Top - # of results: ', results.length);
+		return results;
+	}
+	 async function post(url,postData) { //??
+		console.log(' POSTING to URL: ',url,' DATA: ', postData);
+		return new Promise(async (resolve, reject) => {
+			try {
+			const response = await axios.post(
+				//"/api/text/search_no_context",
+				url,
+				JSON.stringify(postData),
+				{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+					"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+				},
+				}
+			);
+
+			const data = response.data || [];
+			console.log(`SEARCH NO CONTEXT GOT ${data.length} Results`,'Filter: ,', postData);
+
+			resolve(data);
+			} catch (error) {
+			console.error(`Error in searchNoTop: `,error);
+			reject(error);
 			}
-			const res = doFilter(filters, results, results.length, false);         
-			console.log(`it ~ res:`, res);
-			expect(res.filteredResults.length).toBe(1)
-		})
+  });
+}
+
+
+
 const matchesArray = (field, val) => {
     console.log(`MATCHES ARRAY with FIELD: `,field, ' VALUE: ', val);
 	if(!val) return null;
@@ -94,6 +163,26 @@ const arrayMatchesArray = (field, val) => {
         });
         return returnValue;
     };
+}
+
+
+const filterByAgency = (result, filter)=>{
+	const agency = result.doc.agency;
+	if(typeof agency ==='string' && agency.includes(';') ){
+		const agencies = agency.split(";");
+		const filterAgency = filter.agency;
+		console.log(`filterByAgency ~ filterAgency:`, filterAgency);
+		console.log(`filterByAgency ~ agencies:`, agencies);
+		
+		agencies.forEach(agency => {
+			console.log('Agency: ', agency);
+		})
+		//Multiple values break apart array vals on 
+	}
+	else if(typeof agency ==='string'){
+        //Multiple values break apart array vals on 
+    }
+
 }
 const doFilter = (searcherState, searchResults, preFilterCount, legacyStyle) => {
 

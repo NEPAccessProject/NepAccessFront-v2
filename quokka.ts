@@ -259,6 +259,5 @@ const filterResult = (result, activeFilters) => {
 
 // const filteredResults = filterResults(results, activeFilters);
 // console.log('FILTERED RESULTS', filteredResults);
-
-
+//
 //

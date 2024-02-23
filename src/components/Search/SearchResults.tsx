@@ -95,9 +95,11 @@ const SearchResults = (props: SearchResultsType) => {
       {resultsToDisplay &&  resultsToDisplay.map((result, idx) => {
          
           return (
-            <Grid {...GridItemProps} key={`${result.id+'_'+idx}`}>
-              <Box><SearchResultCards result={result}/></Box>
-              <Box>{result.doc &&<SearchResult result={result} />}</Box> 
+            
+            <Grid {...GridItemProps} key={`${result.doc.id+'_'+result.doc.processId+'_'+result.doc.documentType}`}>
+              <>
+                <Box>{result.doc &&<SearchResult result={result} />}</Box> 
+              </>
             </Grid>
           )
       })}

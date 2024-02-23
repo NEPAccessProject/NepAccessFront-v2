@@ -13,8 +13,8 @@ export type DocumentType = {
 	documentType?: string;
 	draftNoa?: string | null;
 	filename?: string; 
-	//finalNoa: string; //Date | string ;
-//	finalNoaDate: string ;
+	finalNoa?: string; //Date | string ;
+	finalNoaDate?: string;
 	firstRodDate?:  string | null;
 	folder?: string | null;
 	id: number | null;
@@ -52,63 +52,55 @@ export type SearchResultType = {
 
 
 export type FilterType = {
-	action: string[];
-	agency: string[];
-	cooperatingAgency: [];
-	county: [];
-	distance: string;
-	decision:string[];
-	endComment: Date | string;
-	endPublish: Date | string;
-	filtersHidden: boolean;
-	isFast41: boolean;
-	needsComments: boolean;
-	needsDocument: boolean;
-	proximityDisabled: boolean;
-	proximityOption: string
-	commentDate: Date | string;
-	startPublish: Date | string;
+	action?: FilterOptionType[];
+	agency: FilterOptionType[];
+	cooperatingAgency: FilterOptionType[];
+	county: FilterOptionType[];
+	distance?: string;
+	decision:FilterOptionType[];
+	endComment?: Date | string;
+	endPublish?: Date | string;
+	filtersHidden?: boolean;
+	isFast41?: boolean;
+	needsComments?: boolean;
+	needsDocument?: boolean;
+	proximityDisabled?: boolean;
+	proximityOption?: string
+	commentDate?: Date | string;
+	startPublish?: Date | string;
 	states: FilterOptionType[];
-	status: string[];
+	status?: string[];
 	title: string;
 	documentType: FilterOptionType[];
-	typeAll: boolean;
-	typeDraft: boolean;
-	typeEA: boolean;
-	typeFinal: boolean;
-	typeNOI: boolean;
-	typeOther: boolean;
-	typeROD: boolean;
-	typeScoping: boolean;
+	typeAll?: boolean;
+	typeDraft?: boolean;
+	typeEA?: boolean;
+	typeFinal?: boolean;
+	typeNOI?: boolean;
+	typeOther?: boolean;
+	typeROD?: boolean;
+	typeScoping?: boolean;
   
 };
 export type SearchContextType = {
 	error: string;
 	filters: FilterType;
-	fragmentSizeValue: number;
-	hideOrganization: boolean;
-	iconClassName: string;
+	fragmentSizeValue?: number;
+	hideOrganization?: boolean;
 	isAvailableFilesDialogOpen: boolean;
-	isDirty: false;
-	isQuickStartDialogOpen: false;
-	isSearchTipsDialogOpen: false;
 	loading: boolean;
-	markup: boolean;
-	message: string;
-	optionsChecked: boolean;
 	pagination: PaginiationType;
 	results: SearchResultType[];
 	resultsToDisplay: SearchResultType[];
 	setResultsToDisplay: (results:SearchResultType[]) => void;
 	searchNoContext: () => void;
-	searchOption: string;
 	searched: boolean;
 	searchTop: () => void;
-	showContext: boolean;
+	showSnippets: boolean;
+	setHasActiveFilters: () => boolean;
+	hasActiveFilters: boolean;
+	setShowSnippets: (showSnippets:boolean) => void;
 	showPDFDialog: boolean;
-	showQuickTipsDialog: boolean;
-	showSearchTipsDialog: boolean;
-	tooltipOpen: boolean;
 	updateFilterStateValues : (key:string, value:any) => void;
 	updatePaginationStateValues : (key:string, value:any) => void;
 	setError: (error:string) => void;
@@ -117,12 +109,26 @@ export type SearchContextType = {
 	setSearched: (searched:boolean) => void;
 	setResults: (results:SearchResultType[]) => void;
 	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
+	setSearchTitlesOnly: (searchTitlesOnly:boolean) => void;
+	searchTitlesOnly: boolean;
+	getFilterValues: (options:FilterOptionType[], key:string) => FilterOptionType[],
+	getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => FilterOptionType[]
   };
   export type FilterOptionType = {
 	label: string;
 	value: any;
   }
-
+  enum LOG_LEVEL {
+	DEBUG = "debug",
+	INFO = "info",
+	WARN = "warn",
+	ERROR = "error"
+  }
+  export type NotifcationMessageType = {
+	message: string;
+	type: LOG_LEVEL;
+  }
+  
 
 export type SearchResultsType = {
 	results: SearchResultType[];

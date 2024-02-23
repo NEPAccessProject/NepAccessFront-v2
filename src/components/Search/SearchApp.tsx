@@ -3,34 +3,30 @@ import {
   Box,
   Button,
   Container,
-  Grid,
   Paper,
   Snackbar,
   Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-//import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Unstable_Grid2";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import SearchFilters from "../Search/SearchFilters";
 import {
   FilterType,
   SearchContextType,
   SearchResultType,
   PaginiationType,
+  FilterOptionType,
 } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
 import SearchTips from "./SearchTips";
+import { agencyOptions } from "./data/dropdownValues";
 //import data from "../../tests/data/api.json";
-import response from "../../tests/data/api";
-import { title } from "process";
 //console.log(`data:`, data);
 const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
-
-
 
 type SearchAppPropType = {
   results: SearchResultType[];
@@ -39,15 +35,13 @@ type SearchAppPropType = {
 
 //[TODO][Critical] values for looks such as agencies, stqtes etc should be stored in lookup tables
 // For now that is out of scopes, should refator after MVP thoughx
-
-
 export function sortSearchResults(
   results,
   sortby: string,
   sortdir: string = "asc"
 ) : SearchResultType[] {
   //console.log(`sortSearchResults ~ results:`, results);
-  // const temp = results;
+
   //[TODO] we need to introduce a sort by param that contols if A > B vs B > A IE ascending and descending so the
   results.sort((a: any, b: any) => {
     //lowercase both sides to avoid case sensitivity issues
@@ -58,14 +52,14 @@ export function sortSearchResults(
         return a.doc.title.localeCompare(b.doc.title);
       }
     } else if (sortby.toLowerCase() === "commentDate") {
-      let dateA = new Date(a.doc.commentDate);
-      let dateB = new Date(b.doc.commentDate);
-      // For 'score' and 'commentDate', sort in descending order
-      if (sortdir === "asc") {
-        return dateA.getDate() - dateB.getDate();
-      } else {
-        return dateB.getDate() - dateA.getDate();
-      }
+        let dateA = new Date(a.doc.commentDate);
+        let dateB = new Date(b.doc.commentDate);
+        // For 'score' and 'commentDate', sort in descending order
+        if (sortdir === "asc") {
+          return dateA.getDate() - dateB.getDate();
+        } else {
+          return dateB.getDate() - dateA.getDate();
+        }
     } else if (sortby.toLowerCase() === "relavancy") {
       //we want those that are MORE relvant then others
       if (sortdir === "asc") {
@@ -87,6 +81,7 @@ export function sortSearchResults(
   return results;
 }
 
+
 export function filterResults(results: SearchResultType[]): SearchResultType[] {
   if (!Array.isArray(results)) {
     return [];
@@ -106,9 +101,8 @@ export function filterResults(results: SearchResultType[]): SearchResultType[] {
 
   return filteredResults;
 }
-
 //[TODO] Temp hack untill connected to the backend
-export const urlFromContextPaginationAndFilters = (
+export const  urlFromContextPaginationAndFilters = (
   context: SearchContextType,
   pagination: PaginiationType,
   filters: FilterType,
@@ -137,7 +131,6 @@ export const urlFromContextPaginationAndFilters = (
   console.log("🚀 ~ urlFromContextPagination ~ url:", url);
   return url;
 };
-
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
 
@@ -146,12 +139,13 @@ const SearchApp = (props: SearchAppPropType) => {
   const [filters, setFilterValues] = useState(context.filters);
   const [activeFilters,setActiveFilters] = useState([]);
   const [pagination, setPaginationValues] = useState(context.pagination);
-  const [loading, setLoading] = useState(false);
+const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState(context);
   const [count, setCount] = useState({});
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [showSnippets, setShowSnippets] = useState(false);
 
   const { page, limit, sortby, sortdir } = pagination;
   const {
@@ -162,10 +156,12 @@ const SearchApp = (props: SearchAppPropType) => {
     cooperatingAgency,
     county,
     action: actions,
+    title,
   } = filters;
   //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
   //const host = import.meta.env.VITE_API_HOST
 
+  //#region Effects
   const _mounted = React.useRef(false);
   useEffect(() => {
     _mounted.current = true;
@@ -173,95 +169,6 @@ const SearchApp = (props: SearchAppPropType) => {
       _mounted.current = false;
     };
   }, []);
-
-  // #Start useEffects
-
-  //# of results to display effect
-  useEffect(() => {
-    //handle changes to the # of results displayed per page
-    if (_mounted.current === false || results.length === 0) {
-      console.log(
-        "��� ~Use Effect for Limit called before being mounted or having no results"
-      );
-      return;
-    }
-    console.log(`useEffect ~ # of results for the limit of ${limit}:`, results);
-    setPaginationValues({
-      ...pagination,
-      limit: limit,
-    });
-    console.log("New Value for Limit", limit);
-    const limitedResults = results.slice(
-      0,
-      limit > results.length ? limit : results.length
-    );
-    setResultsToDisplay(limitedResults);
-    console.log(
-      `useEffect ~ # of limitedResults for the limit of ${limit}:`,
-      limitedResults
-    );
-  }, [limit]);
-
-  // useEffect(() => {
-  //   if (!results || results.length === 0 || _mounted.current === false) {
-  //     // If there is no results to sort or the component is not mounted then do nothing
-  //     console.info(`Halting Sort Effect, no results yet to sort`);
-  //     return;
-  //   }
-  //   console.log(`Firing Sort and Sort by Effect - limit ${limit}`);
-  //   //const sorted:SearchResultType[] =
-  //   //[TODO] This is a temporary hack to get the sort to work, we need to refactor the sortSearchResults to handle the sort by and sort dir
-  //   console.log("After Sort Results");
-  //   const sorted = sortSearchResults(results, sortby);
-  //   console.log(`useEffect ~ sorted:`, sorted);
-  //   setResults(sorted);
-  //   //setResults(sorted)
-  // }, [sortby, sortdir]);
-
-  const getActiveFilters = (filters) : {}  => {
-    const activeFilter = {};
-      Object.keys(filters).forEach((key) => {
-        const val = filters[key];
-        if (typeof(val) !== "object" && val) {
-            console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
-            activeFilter[key] = val;
-        }
-        else if(typeof(val) === "object" && val.length > 0) {
-            console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
-            activeFilter[key] = val;
-        }
-      });
-      
-      return activeFilters
-  }
-  //Effect to filter results one a filter is selected
-  // useEffect(() => {
-  //   if(_mounted.current === false)  return;
-  //   const activeFilter = {
-
-  //   };
-  //   Object.keys(filters).forEach((key) => {
-  //     const val = filters[key];
-  //     if (typeof(val) !== "object" && val) {
-  //         console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
-  //         activeFilter[key] = val;
-  //     }
-  //     else if(typeof(val) === "object" && val.length > 0) {
-  //         console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
-  //         activeFilter[key] = val;
-  //     }
-  // });
-
-  //   setActiveFilters(activeFilters);
-
-  //   let newResults = [];
-  //   results.map((result) => {
-  //   });
-
-  //   console.log('SETTING ACTIVE FILTERS',activeFilters);
-  // },[filters])
-
-
 
   useEffect(() => {
     console.log("FIRING PAGINATION EFFECT");
@@ -291,132 +198,107 @@ const SearchApp = (props: SearchAppPropType) => {
     //[TODO] Revisit - Do we want the existing records to disapper even if there is 
     if(sorted.length >0 && hasSearched) {
      setResultsToDisplay(sorted);
-    }
+    } 
   }, [pagination]);
-  //#End useEffects
 
-  // Gets the total counts for each document type and the total POTENTIAL results to use in paginatio
-  //useEffect(() => {
-  //  async function fetchCounts() : Promise<any>
-  //   {
-  // [TODO] These are endpoints used by the old app, so we will need create some new endpoints
-  //   this.get("stats/earliest_year", "firstYear");
-  //   this.get("stats/latest_year", "lastYear");
-  //   this.get("stats/eis_count", "EISCount");
-  //const endpoints = ["earliest_year","latest_year","eis_count","ea_count","noi_count","rod_count","scoping_count"];
-  //     const endpoints = ["earliest_year","latest_year","ea_count","noi_count","rod"];
-  //     const counts = {
-  //       "earliest_year": 0,
-  //       "latest_year": 0,
-  //       "eis_count": 0,
-  //       "ea_count": 0,
-  //       "noi_count": 0,
-  //       "rod_count": 0,
-  //       "scoping_count": 0,
-  //     };
-  //   try{
-  //     for (const endpoint of endpoints) {
-  //       const temp = await (await axios.get(`${host}stats/${endpoint}`)).data;
-  //       counts[endpoint] = temp.count;
-  //       console.log(`useEffect ~ counts:`, counts);
-  //       setCount(counts);
-  //     }
+  //# of results to display effect
+  useEffect(() => {
+    //handle changes to the # of results displayed per page
+    if (_mounted.current === false || results.length === 0) {
+      console.log(
+        "��� ~Use Effect for Limit called before being mounted or having no results"
+      );
+      return;
+    }
+    console.log(`useEffect ~ # of results for the limit of ${limit}:`, results);
+    setPaginationValues({
+      ...pagination,
+      limit: limit,
+    });
+    console.log("New Value for Limit", limit);
+    const limitedResults = results.slice(
+      0,
+      limit > results.length ? limit : results.length
+    );
+    setResultsToDisplay(limitedResults);
+    console.log(
+      `useEffect ~ # of limitedResults for the limit of ${limit}:`,
+      limitedResults
+    );
+  }, [limit]);
 
-  //   }
-  // catch(error){
-  //   console.error(`Non-Fatal Error retrieving counts: ${error}`);
-  // }}
-  //   fetchCounts();
-  // },[titleRaw])
+  //#endregion
+  const getActiveFilters = (filters) : FilterOptionType[]  => {
+    const activeFilter = {};
+      Object.keys(filters).forEach((key) => {
+        const val = filters[key];
+        if (typeof(val) !== "object" && val) {
+            console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
+            activeFilter[key] = val;
+        }
+        else if(typeof(val) === "object" && val.length > 0) {
+            console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
+            activeFilter[key] = val;
+        }
+      });
+      
+      return activeFilters
+  }
 
-  // #End useEffects
+  const getFilteredValues = (options,value,meta) => {
+    if(!value) return [];
+    let filtered: FilterOptionType[] = [];
+    if(meta.action === "select-option"){
+      console.log('PUSHING VALUE LABEL - VALUE',value);
+      filtered = {
+        ...value[0],
+      },
+      console.log('Update Filter State',filtered);
+    }
+    else if(meta.action === "remove-value"){
+        filtered = options.filter((v) => v !== value.label) as FilterOptionType[];
+    }
+    else if (meta.action === "clear"){
+      filtered = [];
+    }      
+    return filtered;
+  }
+
+const getFilterValue = (options,value) : FilterOptionType[] => {
+  console.log(`getFilterValue ~ value:`, value);
+  //  console.log(`getValue ~ options,value:`, options,value);
+    const filtered = options.filter((v:FilterOptionType) => options.includes(v.value));
+    console.log(`getFilterValue ~ filtered:`, filtered);
+  
+    return filtered;
+  }
+  const getFilterValues = (options:FilterOptionType[],value:FilterOptionType) => {
+    console.log('FILTER VALUE KEYS',Object.keys(value));
+    console.log(`getFilterValues ~ value:`, value);
+    if(!value || !value.label) {
+      console.warn(`The value specified is empty this is most likely an upstream issue - VALUE`,value)
+      return [];
+    }
+    console.log(`getFilterValues ~ value:`, value);
+    const vals: FilterOptionType[] = getFilterValue(options,value);
+    const items = options.filter((v:FilterOptionType) => options.includes(v)) || []
+
+    const filtered = {
+      ...value,
+      ...items
+    }
+    console.log('getFilterValues',filtered);
+    return filtered;
+  }
+
   const updateFilterStateValues = (key: string, value: any) => {
-    console.log('UPDATE FILTER STATE VALUES - KEY',key, ' VALUE ',value);
-    console.log(`UPDATING ${key} with the ` + `following value: ${value}`);
+    console.log(`UPDATING ${key} with the ` + `following value:`,value);
     setFilterValues({ ...filters, [key]: value });
   };
 
-  const SearchTopPost = async () => {
-    let url = urlFromContextPaginationAndFilters(
-      context,
-      pagination,
-      filters,
-      "search_top"
-    );
-    setHasSearched(true);
-
-    console.log("CALLING POST TO SEARCH_TOP", url);
-    const response = await axios.post(
-      url,
-      {
-        title: titleRaw,
-      },
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-        },
-      }
-    );
-    const results = response.data || [];
-    console.log(`SearchTopPost ~ results:`, results);
-    setResults(results);
-    setResultsToDisplay(results);
-    setLoading(false);
-    setSearched(true);
+  const hasActiveFilters = (): boolean => {
+    return Object.keys(filters).length > 0;
   };
-  const searchTop = async () => {
-    try {
-      if (!filters.title) {
-        setError("Please enter term(s) to search for.");
-        return;
-      }
-      setHasSearched(true);
-
-      const start = page * limit;
-      const end = page + limit + limit;
-      setLoading(true);
-      const hostUrl = urlFromContextPaginationAndFilters(
-        context,
-        pagination,
-        filters,
-        `text/search_top`
-      );
-      //[TODO] prototyping - replace with call from above
-      //    let url = `http://localhost:8080/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
-      let url = `/api/search_top?_start=${start}&_end=${end}&_limit=${limit}`;
-      console.log(`PAGINATION EFFECT ~ url:`, url);
-        const activeFilters = getActiveFilters(filters);
-        console.log(`searchTop ~ activeFilters:`, activeFilters);
-      const response = await axios.post(
-        url,
-        activeFilters,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-          },
-        }
-      );
-
-      const results = response.data;
-      setResults(results);
-      setResultsToDisplay(results);
-      console.log(`FILTER EFFECT GOT ${results.length}:`);
-    } catch (error) {
-      const msg = `Error Searching for Results! ${error}`;
-      setError(msg);
-    } finally {
-      setLoading(false);
-      setSearched(true);
-    }
-  };
-
-
   const fieldToArray = (field) => {
     if (field) {
       if (Array.isArray(field)) {
@@ -440,33 +322,182 @@ const SearchApp = (props: SearchAppPropType) => {
       else{
           return []
       }
-
   };
 
+  //#region Search Functions
+
+  const searchTop = async () => {
+    try {
+      console.log('CONTEXT FILTERS', filters)
+      if (!filters.title) {
+        setError("Please enter term(s) to search for.");
+        return;
+      }
+      const activeFilters = getActiveFilters(context.filters);
+      const agencies:FilterOptionType[] = [];
+      filters && filters?.agency.map((agency) => {
+          agencies.push(agency);
+      })
+      const filter = {
+        ...activeFilters,
+        title: title,
+        agency: [filters.agency],
+      }
+      setHasSearched(true);
+        const res = await post('http://localhost:8080/text/search_top',filter);
+        console.log(`searchTop ~ res:`, res);
+        const results = await res as SearchResultType[];
+        console.log(`searchTop ~ results:`, results);
+
+      setResults(results);
+      setResultsToDisplay(results);
+      console.log(`FILTER EFFECT GOT ${results.length}:`);
+    } catch (error) {
+      const msg = `Error Searching for Results! ${error}`;
+       console.error(msg);
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+	async function searchNoTop() { //??
+    const activeFilters = getActiveFilters(context.filters);
+    if(!title){
+      setError("Please enter term(s) to search for.");
+      return;
+    }
+    const filter = {
+      ...activeFilters,
+      title: title
+    }
+    console.log('SEARCH NO TOP - ACTIVE FILTERS', filter)
+    setHasSearched(true);
+    setLoading(true);
+    try {
+      const res = await post('http://localhost:8080/text/search_no_top',filter);
+      const results = await res as SearchResultType[]; //??
+      console.log('Search No Top - # of results: ', results.length);
+      setResultsToDisplay(results);
+      setResults(results);
+      setLoading(false);
+      return results;
+    } 
+    catch (error) {
+        console.error(`Error in searchNoTop: `,error);
+        setError(`Unable to complete search! An unexpected error occurred: ${error}`);
+    }
+    finally {
+      setLoading(false);
+    }
+	}
+
+  const search= async()=>{
+    setLoading(true);
+    setHasSearched(true);
+    if(!title){
+      setError("Please enter term(s) to search for.");
+      return;
+    }
+    const filter = {
+      title: title
+    }
+    try {
+      const res = await post('http://localhost:8080/text/search',filter);
+      const results = await res as SearchResultType[];
+      setResultsToDisplay(results);
+      setResults(results);
+      setLoading(false);
+    } catch (error) {
+      console.error(`search ~ error:`, error);
+      setError(`Error Searching for Results! ${error}`);
+    }
+    finally {
+      setLoading(false);
+    }
+  }
   const searchNoContext = async () => {
     try {
       setLoading(true);
       setHasSearched(true);
 
-      if (!filters.title) {
+      if (!title) {
         setError("Please enter a search term");
         return;
       }
-      console.log("SEARCH NO CONTEXT IS LOADING", loading);
-      const url = urlFromContextPaginationAndFilters(
-        context,
-        pagination,
-        filters,
-        "search_no_context"
-      );
-      const activeFilters = getActiveFilters(filters);
-      const response = await axios.post(
-        //"/api/text/search_no_context",
-        "http://localhost:8080/text/search_no_context",
-        {...activeFilters,
-            title: "XXX"
-        },
-        {
+
+      const af = getActiveFilters(context.filters) || {};
+      console.log('AF',af);
+        const activeFilters: FilterOptionType[] = {
+          ...af
+        }
+        const filterKeys = Object.keys(filters);
+        filterKeys.forEach((key:string) => {
+          const val:FilterOptionType = filters[key];
+          if (val &&typeof(val) === "string") {
+            console.log(`filterKeys.forEach ~ val:`, val);
+            activeFilters.push(val);
+          }
+        })
+        console.log('AF',af);
+        console.log(`searchNoContext ~ activeFilters:`, activeFilters);
+        const filter = {
+          title: title,
+          ...activeFilters,
+          DocumentType: ['Draft']
+          
+        }
+        const res = await post('http://localhost:8080/text/search_no_context',filter);
+        const results = await res as SearchResultType[];
+        console.log(`SEARCH NO CONTEXT GOT ${results.length} Results`);
+        setResultsToDisplay(results);
+        setResults(results);
+        setLoading(false);
+      }
+    catch (error) {
+      console.error(`searchNoContext ~ error:`, error);
+      setError(`Error Searching for Results! ${error}`);
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+  //#endregion
+
+  // #region HTTP Methods 
+  async function get(url) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await axios(url,{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+          },
+        });
+        const data = response.data || [];
+        resolve(data);
+      } catch (error) {
+        console.error(`Error in get: `,error);
+        reject(error);
+      }
+      finally {
+        setLoading(false);
+      }
+      
+    });
+    
+  }
+  //#Regions
+	 async function post(url,postData) { //??
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await axios.post(
+          //"/api/text/search_no_context",
+          url,
+          postData,
+          {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -474,31 +505,15 @@ const SearchApp = (props: SearchAppPropType) => {
             "Access-Control-Allow-Origin": "*", // Required for CORS support to work
           },
         }
-      );
-      const data = response.data || [];
-      console.log(`SEARCH NO CONTEXT GOT ${data.length} Results`);
-      // const results = data.forEach((result) => {
-      //     Object.keys(result.doc).map((key, idx) => {
-      //       results.doc[key] = fieldToArray
-      //       //The Database is not proberly normalized ATM, so multiple values are seperated by ;
-      //       //These should be treated as an array downstream so convert it here
-      //       if(typeof result.doc[key] === 'string' && result.doc[key].includes(";")) {
-      //           result.doc[key] = result.doc[key].split(";");
-      //       }
-      //     })
-      // })
-      console.log('RESULTS ARE', results);
-      updatePaginationStateValues("total", data.length);
-      setSearched(true);
-      setResults(data);
-      setResultsToDisplay(data);
-    } catch (error) {
-      console.error(`searchNoContext ~ error:`, error);
-      setError("Error Searching for Results!");
-    } finally {
-      setLoading(false);
-    }
-  };
+        );
+      }
+      catch (error) {
+        console.error(`Error in post: `,error);
+        reject(error);
+      }
+    });
+  }
+  // #endregion
   const updatePaginationStateValues = (key: string, value: any) => {
     console.log(
       `updatePaginationStateValues ~ key:string,value:any:`,
@@ -511,13 +526,7 @@ const SearchApp = (props: SearchAppPropType) => {
     });
     //    console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
-  const titleRaw = context.filters.title;
-  const onSearchClick = async () => {
-    console.log("🚀 ~ ON SEARCH CLICK ~ titleRaw:", titleRaw);
-    setSearched(true);
-    await SearchTopPost();
-  };
-  console.log("🚀 ~ SearchApp ~ titleRaw:", titleRaw);
+
   const value = {
     ...context,
     results,
@@ -528,6 +537,7 @@ const SearchApp = (props: SearchAppPropType) => {
     updateFilterStateValues,
     updatePaginationStateValues,
     searchTop,
+    title,
     error,
     setError,
     searchNoContext,
@@ -535,6 +545,10 @@ const SearchApp = (props: SearchAppPropType) => {
     setSearched,
     setResultsToDisplay,
     resultsToDisplay,
+    setShowSnippets,
+    showSnippets,
+    hasActiveFilters: hasActiveFilters(),
+    getFilterValues,
   };
 
   return (
@@ -553,7 +567,7 @@ const SearchApp = (props: SearchAppPropType) => {
         </Box>
         <Paper elevation={1}>
           <Grid container>
-            <Grid item xs={12} flex={1}>
+            <Grid xs={12} flex={1}>
               <SearchHeader />
             </Grid>
           </Grid>
@@ -564,19 +578,31 @@ const SearchApp = (props: SearchAppPropType) => {
             marginTop={0}
             spacing={2}
           >
-            <Grid xs={3} item>
+            <Grid xs={3}>
               <Paper style={{ padding: 5, flexGrow: 1 }}>
                 <SearchFilters />
               </Paper>
             </Grid>
-            <Grid xs={9} item>
+            <Grid xs={9}>
              
               <>
+                <Grid container>
+                  <Grid xs={4}>
+                    <Button variant="contained" onClick={async()=> await searchTop()}>
+                      Search Top
+                    </Button>
+                  </Grid>
+                  <Grid xs={4}>
+                    <Button variant="contained" onClick={async ()=> await searchNoContext()}>
+                      Search No Context
+                    </Button>
+                  </Grid>
+                </Grid>
+                {JSON.stringify(filters)}
                 {loading && (
                   <>
                     <Grid container display={"flex"}>
                       <Grid
-                        item
                         xs={12}
                         display={"flex"}
                         alignItems={"center"}
@@ -616,11 +642,11 @@ const SearchApp = (props: SearchAppPropType) => {
           >
             <h6>Has Searched ? {searched ? "Yes" : "No"}</h6>
             <h6>Has Error ? {error.length > 0 ? "Yes" : "No"}</h6>
-            <h6>Has Title ? {titleRaw.length > 0 ? "Yes" : "No"}</h6>
+            <h6>Has Title ? {title.length > 0 ? "Yes" : "No"}</h6>
             <h6>Has # of Results {results.length > 0 ? "Yes" : "No"} </h6>
             <h6>loading ? {loading ? "Yes" : "No"} </h6>
             <h5> Title from context.filter {context.filters.title}</h5>
-            <h5> Deconstruced title: {titleRaw}</h5>
+            <h5> Deconstruced title: {title}</h5>
           </Grid>
         </Paper>
       </Container>

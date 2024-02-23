@@ -40,7 +40,7 @@ const LimitControl = () => {
             className="basic-single"
             classNamePrefix="select"
             isDisabled={loading}
-            defaultValue={options[0]}
+            defaultValue={options[1]}
             onChange={(newValue, actionMeta) =>
               onLimitChange(newValue, actionMeta)
             }

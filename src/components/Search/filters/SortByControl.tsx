@@ -13,6 +13,12 @@ const SortByControl = () => {
     console.log(`onSortByChange ~ action:`, action);
     console.log(`onSortByChange ~ value:`, value.value);
 
+    //seperate to sort by and sort direction based on ("_")
+    const sortBy = value.value.split("_")[0];
+    const sortDir = value.value.split("_")[1];
+    console.log(`onSortByChange ~ sortBy:`, sortBy);
+    console.log(`onSortByChange ~ sortDir:`, sortDir);
+
 
       // if(value.toLowerCase() === "relevance") {
       //   sortSearchResults(results,`${value}`);
@@ -27,7 +33,8 @@ const SortByControl = () => {
       // console.log(`onSortByChange ~ value:`, value,"reason:", reason);
 
       //This should trigger an effect to sort existing results
-      updatePaginationStateValues("sortby", value.value);
+      updatePaginationStateValues("sortby", sortBy);
+      updatePaginationStateValues("sortdir", sortDir);
       //sortSearchResults(results,`${value}`);
     }
     return (
@@ -48,9 +55,15 @@ const SortByControl = () => {
             isLoading={loading}
             name="sort-dir-select-control"
             options={[
-                { value: 'relavancy', label: 'Relevance' },
-                { value: 'title', label: 'Title' },
-                {value: 'date', label: 'Date' },
+                { value: 'relavancy-desc', label: 'Most Relevant ' },
+                { value: 'relavancy-asc', label: 'Least Relevant ' },
+                { value: 'title-desc', label: 'Title: A-Z  ' },
+                { value: 'title-asc', label: 'Title: Z-A  ' },
+                { value: 'agency-desc', label: 'Agency Name: A-Z ' },
+                { value: 'agency-asc', label: 'Agency Name: Z-A ' },
+                { value: 'commentDate-desc', label: 'Date: Newest to Oldest ' },
+                { value: 'commentDate-asc', label: 'Date: Oldest to Newest ' },
+                
             ]}
     />
       
