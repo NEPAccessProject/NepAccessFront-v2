@@ -9,7 +9,6 @@ import SearchResult from "./SearchResult";
 import SearchResultCards from "./SearchResultCards";
 const GridItemProps = {
   padding: 0.5,
-  item: true,
   elevation: 1,
   border: 0,
   borderRadius: 1,
@@ -92,15 +91,17 @@ const SearchResults = (props: SearchResultsType) => {
           component={`div`}
         />
       </> 
-      {resultsToDisplay &&  resultsToDisplay.map((result, idx) => {
+      {resultsToDisplay &&  resultsToDisplay.map((result:SearchResultType, idx:number) => {
          
           return (
-            
-            <Grid {...GridItemProps} key={`${result.doc.id+'_'+result.doc.processId+'_'+result.doc.documentType}`}>
-              <>
-                <Box>{result.doc &&<SearchResult result={result} />}</Box> 
-              </>
-            </Grid>
+            <Box key={result.doc.processId + "_" + result.doc.id}> 
+              
+              <Grid {...GridItemProps} key={`${result.doc.id+'_'+result.doc.processId+'_'+result.doc.documentType}`}>
+                <>
+                  <Box> <SearchResult result={result} /></Box> 
+                </>
+              </Grid>
+            </Box>
           )
       })}
     </Paper>

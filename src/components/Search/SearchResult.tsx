@@ -77,8 +77,7 @@ const SearchResult = (props: SearchResultPropsType) => {
   return (
     <>
       {/* <SearchResultCards result={result}/> */}
-      Item
-      {/* {doc && (
+      {doc && (
         <>
           <ProcessCards result={result} />
           <Typography textAlign="center" variant="h4">
@@ -148,7 +147,7 @@ const SearchResult = (props: SearchResultPropsType) => {
             </Box>
           </Box>
         </>
-      )} */}
+      )}
     </>
   );
 };
@@ -206,7 +205,9 @@ const ProcessCards = (props) => {
   const classes = useStyles();
   return (
     <>
-      <Grid container flex={1} display={"flex"} spacing={0.5} margin={1}>
+    {/* <Typography>{doc.title}</Typography> */}
+      {/* <Grid container flex={1} display={"flex"} spacing={0.5} margin={1}>
+        {result.doc.title}
         {Object.keys(doc).map((key) => (
           <span key={key}>
             {doc[key] && doc[key].length && (
@@ -227,7 +228,7 @@ const ProcessCards = (props) => {
             )}
           </span>
         ))}
-      </Grid>
+      </Grid> */}
     </>
   );
 };

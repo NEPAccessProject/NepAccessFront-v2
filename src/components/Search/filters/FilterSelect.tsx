@@ -1,50 +1,75 @@
-import React,{useContext} from 'react'
-import SearchContext from '../SearchContext';
-import {Box} from '@mui/material';
-import Select from 'react-select';
 import { FilterOptionType } from '@/components/interfaces/types';
+import { Box } from '@mui/material';
+import { useContext } from 'react';
+import Select from 'react-select';
+import SearchContext from '../SearchContext';
 
 type FilterSelectProps = {
     options: FilterOptionType[];
     filterValue: FilterOptionType[];
-    key:string,
+    keyLabel:string,
     placeholder:string,
     //[TODO] Create a standard interface for post filtering callback function
     callback?: (filtered:FilterOptionType[],key:string,value:FilterOptionType,meta) => void
 }
 export default function FilterSelect(props:FilterSelectProps) {
-    const {options,filterValue,key,placeholder,callback} = props;
-    const context = useContext(SearchContext);
-    const {loading,searchTitlesOnly,getFilterValues,getFilteredValues,updateFilterStateValues} = context;
-    
-    const onChange = (key,value, meta) => {
-        const filtered = getFilteredValues(options, value, meta);
-        console.log(`onChange ~ filtered:`, filtered);
+    const {options,filterValue,keyLabel,placeholder,callback} = props;
+    const {setError,filters,loading,error,updateFilterStateValues,searchTitlesOnly} = useContext(SearchContext);
+    const {title} = filters;
+    if(!keyLabel){
+            const msg = `Missing key, please provide a key for the filter select. Key: ${keyLabel} - ${props.keyLabel}`
+        setError(msg);
+
+    }    
+    const onChange = (value, meta,key:string) => {
+      console.log(`onChange ~ value, meta,key:`, value, meta,key);
+      if(!key){
+        console.error('Filter Update Called with a missing KEY: ', keyLabel);
+        
+      }
+      if(meta.action ==='select-option'){
+        updateFilterStateValues(key, value);
+      }
+      else if(meta.action ==='remove-value'){
+        //remove selected item only
+        let filtered = options.filter((v) => v !== value)
         updateFilterStateValues(key, filtered);
-        if(callback){
-            callback(filtered,key,value,meta)
-        }
+      }
+      else if(meta.action ==='clear'){
+        //remove filter
+        updateFilterStateValues(key,[] );
+      }
+        // const filtered = getFilteredValues(options, value, meta);
+        // if(!value || !meta){
+        //   console.warn('Filter Update Called with a missing KEY: ', key,' OR VALUE: ' ,value, meta);
+        //   return;
+        // } 
+        // console.log(`onChange ~ filtered:`, filtered);
+        // updateFilterStateValues(key, value.label);
+        // if(callback){
+        //     console.info('Callback received in FilterSelect',callback);
+        //     //callback(filtered,value.label)
+        // }
         //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));
-      };
+    };
     return (
         <div>
-<Box>
-      <Select
-        className="basic-single"
-        isSearchable={true}
-        isMulti={true}
-        classNamePrefix="select"
-        isDisabled={searchTitlesOnly}
-        isClearable={true}
-        value={getFilterValues(options, filterValue)}
-        placeholder={placeholder}
-        onChange={(newValue, actionMeta) => onChange(key,newValue, actionMeta)}
-        isLoading={loading}
-        name={key}
-        options={options}
-      />
-    </Box>
-            
+          <Box>
+            <Select
+              className="basic-single"
+              isSearchable={true}
+              isMulti={true}
+              classNamePrefix="select"
+              isDisabled={searchTitlesOnly || !title}
+              isClearable={true}
+              value={options.filter((v) => filterValue.includes(v))}
+              placeholder={placeholder}
+              onChange={(newValue, actionMeta) => onChange(newValue, actionMeta,'agency')}
+              isLoading={loading}
+              name={keyLabel}
+              options={options}
+            />
+          </Box>
         </div>
     )
 }

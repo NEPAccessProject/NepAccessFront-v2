@@ -1,12 +1,11 @@
-import { CheckBox, Group, SearchOutlined } from "@mui/icons-material";
+import { CheckBox, SearchOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Button,
   FormControl,
   FormLabel,
   IconButton,
-  TextField,
-  Typography,
+  TextField
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
@@ -14,13 +13,13 @@ import SearchContext from "./SearchContext";
 import DistanceControl from "./filters/DistanceControl";
 import LimitControl from "./filters/LimitControl";
 import SortByControl from "./filters/SortByControl";
-import SortDirControl from "./filters/SortDirControl";
 
 const GridItemProps = {
   padding: 1,
   alignItems: "center",
   justifyContent: "center",
   paddingRight: 2,
+  borderLeft: '1px solid #ccc'
   // elevation: 1,
   // borderRadius: 1,
   // justifyContent: 'flex-start',
@@ -62,7 +61,9 @@ const SearchHeader = () => {
     console.log("🚀 ~ onexChange ~ evt:", evt);
     evt.preventDefault();
     const title = (evt.target as HTMLInputElement).value;
+    console.log("🚀 ~ onChange ~ title:", title)
     // console.log("🚀 ~ onChange ~ title:", title)
+    
     updateFilterStateValues("title", title);
     //clear existing error if any since the user has typed
     setError("");
@@ -114,6 +115,7 @@ const SearchHeader = () => {
             {...GridItemProps}
             id={"dis tance-filter"}
             flex={1}
+            border={0}
           >
             <TextField
               fullWidth
@@ -148,7 +150,7 @@ const SearchHeader = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={(evt) => searchTop()}
+              onClick={(evt) => searchNoContext()}
             >
               Search
             </Button>
@@ -159,7 +161,7 @@ const SearchHeader = () => {
           xs={12}
           justifyContent={"flex-start"}
         >
-          <Grid {...GridItemProps} xs={3}>
+          <Grid  {...GridItemProps} borderLeft={0} xs={4}>
             <DistanceControl />
           </Grid>
 
@@ -169,7 +171,7 @@ const SearchHeader = () => {
           <Grid {...GridItemProps} xs={3}>
             <LimitControl />
           </Grid>
-          <Grid {...GridItemProps} xs={3}>
+          <Grid {...GridItemProps} xs={2}>
             {/* [TODO] Abstract this to it's own control component */}
             <Grid
               container
@@ -177,16 +179,17 @@ const SearchHeader = () => {
               flex={1}
               justifyContent={"flex-end"}
             >
-              <Grid xs={9} flex={1} {...GridItemProps}>
+              <Grid xs={9} flex={1}>
                 <FormLabel htmlFor="searchAgency">Show Snippets:</FormLabel>
               </Grid>
               <Grid
-                xs={3}
+                xs={2}
                 flex={1}
-                {...GridItemProps}
                 justifyContent={"flex-start"}
               >
-                <CheckBox onChange={(evt) => onShowSnippetsChange(evt)} />
+                <CheckBox 
+//                  checked={showSnippets}  
+                  onChange={(evt) => onShowSnippetsChange(evt)} />
               </Grid>
             </Grid>
           </Grid>

@@ -30,7 +30,7 @@ export default function CooperatingAgenciesFilter(props) {
 
   return (
     <>
-      <FilterSelect options={options} filterValue={filterValue} key="cooperatingAgency" placeholder="Type or Select an Cooperating Agencies)" />
+      <FilterSelect options={options} filterValue={filterValue} keyLabel="cooperatingAgency" placeholder="Type or Select an Cooperating Agencies)" />
     </>
   )
   // return (

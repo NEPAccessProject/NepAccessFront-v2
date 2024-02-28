@@ -29,7 +29,12 @@ export type DocumentType = {
 	subtype?: string | null;
 	summaryText?: string | null;
 	title: string;
+	isFast41?: boolean;
 }
+
+export type HighlightType = {
+    [key: string]: string[];
+  };
 
   
   export type PaginiationType = {
@@ -45,33 +50,42 @@ export type SearchResultType = {
   ids: number[];
   doc: DocumentType;
   highlights: string[];
-  filenames: string[];
+  filenames: string[];//string[];
   score: number;
 }
 
+export type HighlightIdsType = {
+	luceneId:number;
+	filename:string[];
+  }
 
+  export type HighlightsPostDataType = {
+	unhighlighted: HighlightIdsType[];
+	terms: string[];
+	markup: boolean;
+	fragmentSizeValue: number;
+
+  }
 
 export type FilterType = {
 	action?: FilterOptionType[];
 	agency: FilterOptionType[];
-	cooperatingAgency: FilterOptionType[];
-	county: FilterOptionType[];
+	cooperatingAgency?: FilterOptionType[];
+	county?: FilterOptionType[];
 	distance?: string;
-	decision:FilterOptionType[];
+	decision?:FilterOptionType[];
 	endComment?: Date | string;
 	endPublish?: Date | string;
 	filtersHidden?: boolean;
 	isFast41?: boolean;
-	needsComments?: boolean;
-	needsDocument?: boolean;
 	proximityDisabled?: boolean;
 	proximityOption?: string
 	commentDate?: Date | string;
 	startPublish?: Date | string;
-	states: FilterOptionType[];
+	states?: FilterOptionType[];
 	status?: string[];
 	title: string;
-	documentType: FilterOptionType[];
+	documentType?: FilterOptionType[];
 	typeAll?: boolean;
 	typeDraft?: boolean;
 	typeEA?: boolean;
@@ -111,6 +125,7 @@ export type SearchContextType = {
 	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
 	setSearchTitlesOnly: (searchTitlesOnly:boolean) => void;
 	searchTitlesOnly: boolean;
+	getActiveFilters: (filters:FilterType) => FilterOptionType[],
 	getFilterValues: (options:FilterOptionType[], key:string) => FilterOptionType[],
 	getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => FilterOptionType[]
   };
@@ -129,6 +144,10 @@ export type SearchContextType = {
 	type: LOG_LEVEL;
   }
   
+  export type SearchAppPropType = {
+	results: SearchResultType[];
+	setResults: () => void;
+  };
 
 export type SearchResultsType = {
 	results: SearchResultType[];
@@ -160,6 +179,7 @@ export type SearchFilterResultsType = {
 		key: string;
 		value: any;
 }
+
 
 export type InputEvent = React.ChangeEvent<HTMLInputElement>;
 export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;

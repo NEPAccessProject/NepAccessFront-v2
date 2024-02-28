@@ -20,6 +20,10 @@ const DistanceControl = () => {
   const { distance } = filters;
   
   const onDistanceFilterChange = (value, action) => {
+    if(!value || !action) {
+      console.warn("Error in onDistanceFilterChange, no value or action provided");
+      return
+    }
     console.log(`onDistanceFilterChange ~ action:`, action);
     console.log(`onDistanceFilterChange ~ value:`, value);
     // let target = evt.target as HTMLInputElement;

@@ -15,16 +15,16 @@ const ActionsFilter = () => {
 
     const context = useContext(SearchContext);
     const { updateFilterStateValues, filters,searchTitlesOnly,loading,getFilterValues,getFilteredValues } = context;
-    const { action } = filters;
+    const action = filters.action || [];
     const onChange = (value,meta) => {
       const filtered = getFilteredValues(options,value,meta);
-      updateFilterStateValues("decisions", filtered);
+      updateFilterStateValues("action", filtered);
 //      updateFilterStateValues("decisionsRaw", evt);
     }
 
     return (<>
       <>
-        <FilterSelect options={options} filterValue={action} key="action" placeholder="Type of Select a Action Type(s)" />
+        <FilterSelect options={options} filterValue={action} keyLabel="action" placeholder="Type of Select a Action Type(s)" />
       </>
     </>)
   // return (

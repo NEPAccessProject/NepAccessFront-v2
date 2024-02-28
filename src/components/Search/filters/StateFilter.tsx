@@ -1,17 +1,8 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import SearchContext from "../SearchContext";
 import {
-  Box,
-  Autocomplete,
-  TextField,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
-import {
-  locations as options,
   counties,
-  locations,
+  locations as options
 } from "../data/dropdownValues";
 import FilterSelect from "./FilterSelect";
 export default function StateFilter() {
@@ -36,10 +27,17 @@ export default function StateFilter() {
     //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));
   };
 
+  const narrowCountyOptions = (filtered,value)=> {
+    console.log('narrowCountyOptions',filtered, ' value ',value)
+  };
+
   return (
     <>
       {/* [TODO] we will need to pass a function to handle the narrowing of counties or other post select action behavior */}
-      <FilterSelect options={options} filterValue={states} key="states" placeholder="Type or Select States"/>
+      <FilterSelect options={options} filterValue={states || []} keyLabel="states" placeholder="Type or Select States"
+      
+        callback={narrowCountyOptions}
+      />
     </>
   )
 

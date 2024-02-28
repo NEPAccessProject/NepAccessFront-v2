@@ -7,16 +7,20 @@ import Select from 'react-select';
 import FilterSelect from "./FilterSelect";
 
 export default function AgencyFilter(props) {
-    const context = useContext(SearchContext);
+    const context = useContext(SearchContext);  
     const { updateFilterStateValues, filters,loading,error,results,searchTitlesOnly,getFilterValues } = context;
     const { agency } = filters;
 //    const { agency, cooperatingAgency } = filters;
-
+      let key = "agency";
       
       
       return (<>
         <Box>
-          <FilterSelect options={options} filterValue={agency} key="agency" placeholder="Type of Select a Lead Agency(s)" />
+          <FilterSelect 
+            options={options} 
+            filterValue={agency} 
+            keyLabel={'agency'} 
+            placeholder="Type of Select a Lead Agency(s)" />
         </Box>
       </>)
     // return (

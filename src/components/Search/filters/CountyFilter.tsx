@@ -1,14 +1,7 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {
-  Box,
-  Autocomplete,
-  TextField,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
-import { counties } from "../data/dropdownValues";
+import { counties as options } from "../data/dropdownValues";
+import FilterSelect from "./FilterSelect";
 const CountyFilter = () => {
   const context = useContext(SearchContext);
   const { updateFilterStateValues, filters,loading,searchTitlesOnly } = context;
@@ -27,8 +20,9 @@ const CountyFilter = () => {
   };
   return (
     <>
+    <FilterSelect options={options} filterValue={county} keyLabel="county" placeholder="Type or Select a Counties / Regions" />
       {/* <FormLabel htmlFor="county">County/counties:</FormLabel> */}
-      <Autocomplete
+      {/* <Autocomplete
         id="county"
         tabIndex={5}
         options={counties}
@@ -44,7 +38,7 @@ const CountyFilter = () => {
           return (
             <TextField
               placeholder="Type or Select a Counties"
-              {...params}
+              {...params}`
               variant="outlined"
               sx={{
                 width: "100%",
@@ -53,7 +47,7 @@ const CountyFilter = () => {
             />
           );
         }}
-      />
+      /> */}
     </>
   );
 };

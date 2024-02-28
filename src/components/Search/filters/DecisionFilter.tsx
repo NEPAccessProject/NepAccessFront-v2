@@ -31,14 +31,14 @@ export default function DecisionFilter() {
   const onChange = (value,meta) => {
     const filtered = getFilteredValues(options,value,meta);
     console.log(`onDecisionChange ~ filteredDecisions:`, filtered);
-    updateFilterStateValues("decisions", filtered);
+    updateFilterStateValues("decision", filtered);
     //updateFilterStateValues("decisionsRaw", evt);
   };
 
 
   return (
     <>
-      <FilterSelect options={options} filterValue={decision} key="decision" placeholder="Type of Select a Decision(s)" />
+      <FilterSelect options={options} filterValue={decision} keyLabel="decision" placeholder="Type of Select a Decision(s)" />
     </>
 
   )

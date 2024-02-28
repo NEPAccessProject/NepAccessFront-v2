@@ -5,147 +5,53 @@ import {
   Container,
   Paper,
   Snackbar,
-  Typography,
+  Typography
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Unstable_Grid2";
-import axios from "axios";
+import axios,{AxiosResponse} from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import SearchFilters from "../Search/SearchFilters";
 import {
-  FilterType,
-  SearchContextType,
-  SearchResultType,
-  PaginiationType,
   FilterOptionType,
+  SearchResultType,
+  SearchAppPropType,
+  HighlightType,
+  FilterType,
 } from "../interfaces/types";
+import {
+    get,
+    post,
+    sortSearchResults,
+    getActiveFilters,
+    getFilterValue,
+    getFilterValues,
+    filterResults,
+    hasActiveFilters,
+    getHighlightsFromResults,
+    urlFromContextPaginationAndFilters,
+  } from './searchUtils';
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
-import SearchTips from "./SearchTips";
-import { agencyOptions } from "./data/dropdownValues";
-//import data from "../../tests/data/api.json";
-//console.log(`data:`, data);
-const host = "http://localhost:8080/"; //[TODO] need to move this ENV so dev and prod can have different hosts
+import { number } from "prop-types";
 
-type SearchAppPropType = {
-  results: SearchResultType[];
-  setResults: () => void;
-};
-
-//[TODO][Critical] values for looks such as agencies, stqtes etc should be stored in lookup tables
-// For now that is out of scopes, should refator after MVP thoughx
-export function sortSearchResults(
-  results,
-  sortby: string,
-  sortdir: string = "asc"
-) : SearchResultType[] {
-  //console.log(`sortSearchResults ~ results:`, results);
-
-  //[TODO] we need to introduce a sort by param that contols if A > B vs B > A IE ascending and descending so the
-  results.sort((a: any, b: any) => {
-    //lowercase both sides to avoid case sensitivity issues
-    if (sortby.toLowerCase() === "title") {
-      if (sortdir === "asc") {
-        return a.doc.title.localeCompare(b.doc.title);
-      } else {
-        return a.doc.title.localeCompare(b.doc.title);
-      }
-    } else if (sortby.toLowerCase() === "commentDate") {
-        let dateA = new Date(a.doc.commentDate);
-        let dateB = new Date(b.doc.commentDate);
-        // For 'score' and 'commentDate', sort in descending order
-        if (sortdir === "asc") {
-          return dateA.getDate() - dateB.getDate();
-        } else {
-          return dateB.getDate() - dateA.getDate();
-        }
-    } else if (sortby.toLowerCase() === "relavancy") {
-      //we want those that are MORE relvant then others
-      if (sortdir === "asc") {
-        return a.score - b.score;
-      } else {
-        return b.score - a.score;
-      }
-    }
-    if (sortby.toLowerCase() === "relavancy") {
-      console.log(`SORTED BY SCORE results`, results);
-    }
-    if (sortby.toLowerCase() === "commentDate") {
-      console.log(`SORTED BY DATE results`, results);
-    }
-    if (sortby.toLowerCase() === "title") {
-      console.log(`SORTED BY TITLE results`, results);
-    }
-  });
-  return results;
-}
-
-
-export function filterResults(results: SearchResultType[]): SearchResultType[] {
-  if (!Array.isArray(results)) {
-    return [];
-  }
-  const scores: number[] = [];
-  results.map((result) => scores.push(result.score));
-  scores.sort((a, b) => b - a);
-  console.log("TOP SCORES", scores[0]);
-  console.log("BOTTOM SCORES", scores[scores.length - 1]);
-  console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
-  const avg = (scores[scores.length - 1] + scores[0]) / 2;
-  const filteredResults = results.filter((result) => result.score > avg);
-  console.log(
-    "🚀 ~ filterResults ~ # of filteredResults:",
-    filteredResults.length
-  );
-
-  return filteredResults;
-}
-//[TODO] Temp hack untill connected to the backend
-export const  urlFromContextPaginationAndFilters = (
-  context: SearchContextType,
-  pagination: PaginiationType,
-  filters: FilterType,
-  searchType:
-    | "search_top"
-    | "search_no_context"
-    | "text/search_no_context"
-    | "text/search_top"
-) => {
-  const { page, limit, sortby, sortdir, rowsPerPage } = pagination;
-
-  //[TODO]Get currently set filters to use in search query POST requests
-  //const activeFilters = getActiveFilters(filters);
-  const queryString = `${host}`;
-  // activeFilters.forEach((filter) => {
-  //   queryString.concat(`&${filter[field]}=${filter.value}`s);
-  // });
-  console.log(`GENTERATED QUERY STRING:`, queryString);
-  //TODO temporary hack this should be part of retriving active filters
-  const searchTerm = filters.title.length
-    ? `&title=${filters.title}`
-    : "";
-
-  //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
-  const url: string = `${host}${searchType}`;
-  console.log("🚀 ~ urlFromContextPagination ~ url:", url);
-  return url;
-};
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
 
   const [results, setResults] = useState(context.results);
   const [resultsToDisplay, setResultsToDisplay] = useState(context.results);
   const [filters, setFilterValues] = useState(context.filters);
-  const [activeFilters,setActiveFilters] = useState([]);
+  const [activeFilters, setActiveFilters] = useState(context.filters);
   const [pagination, setPaginationValues] = useState(context.pagination);
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState(context);
   const [count, setCount] = useState({});
   const [searched, setSearched] = useState(false);
   const [error, setError] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [showSnippets, setShowSnippets] = useState(false);
+  const [highlights,setHighlights] = useState<HighlightType[]>([]);
 
   const { page, limit, sortby, sortdir } = pagination;
   const {
@@ -158,8 +64,8 @@ const [loading, setLoading] = useState(false);
     action: actions,
     title,
   } = filters;
-  //const host = 'https://bighorn.sbs.arizona.edu:8443/nepaBackend/'
-  //const host = import.meta.env.VITE_API_HOST
+  const host = import.meta.env.VITE_API_HOST;
+  console.log(`SearchApp ~ host:`, host);
 
   //#region Effects
   const _mounted = React.useRef(false);
@@ -170,6 +76,7 @@ const [loading, setLoading] = useState(false);
     };
   }, []);
 
+  //effect when pagination changes
   useEffect(() => {
     console.log("FIRING PAGINATION EFFECT");
     if (_mounted.current !== true) {
@@ -189,17 +96,21 @@ const [loading, setLoading] = useState(false);
     );
     const filteredResults = results.slice(start, end);
     //Sort all results
-    const sorted = sortSearchResults(filteredResults, sortby, sortdir).splice(0,rowsPerPage)
+    const sorted = sortSearchResults(filteredResults, sortby, sortdir).splice(
+      0,
+      rowsPerPage
+    );
 
     // Reduce the number of results based on rowPerPage
 
     //const resultsToDisplay: SearchResultType[] = filterResults(sorted).splice(0, rowsPerPage);
     console.log(`paginateResults ~ start:${start}, end:${end}`);
-    //[TODO] Revisit - Do we want the existing records to disapper even if there is 
-    if(sorted.length >0 && hasSearched) {
-     setResultsToDisplay(sorted);
-    } 
+    //[TODO] Revisit - Do we want the existing records to disapper even if there is
+    if (sorted.length > 0 && hasSearched) {
+      setResultsToDisplay(sorted);
+    }
   }, [pagination]);
+
 
   //# of results to display effect
   useEffect(() => {
@@ -228,196 +139,176 @@ const [loading, setLoading] = useState(false);
   }, [limit]);
 
   //#endregion
-  const getActiveFilters = (filters) : FilterOptionType[]  => {
-    const activeFilter = {};
-      Object.keys(filters).forEach((key) => {
-        const val = filters[key];
-        if (typeof(val) !== "object" && val) {
-            console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
-            activeFilter[key] = val;
-        }
-        else if(typeof(val) === "object" && val.length > 0) {
-            console.log(`OBJECT MATCH ON key: ${key}, val: ${val}`);
-            activeFilter[key] = val;
-        }
-      });
-      
-      return activeFilters
-  }
 
-  const getFilteredValues = (options,value,meta) => {
-    if(!value) return [];
-    let filtered: FilterOptionType[] = [];
-    if(meta.action === "select-option"){
-      console.log('PUSHING VALUE LABEL - VALUE',value);
-      filtered = {
-        ...value[0],
-      },
-      console.log('Update Filter State',filtered);
+  const updateActiveFilters = (key,value,action)=>{
+    let activeFilters = {...filters};
+    if(action === "add"){
+      activeFilters = {
+        ...activeFilters,
+        [key]:value,
+      };
     }
-    else if(meta.action === "remove-value"){
-        filtered = options.filter((v) => v !== value.label) as FilterOptionType[];
+  else{
+    let obj = new Object()
+    const filters = {
+      ...activeFilters,
+      [key]:value,
+    
     }
-    else if (meta.action === "clear"){
-      filtered = [];
-    }      
-    return filtered;
   }
-
-const getFilterValue = (options,value) : FilterOptionType[] => {
-  console.log(`getFilterValue ~ value:`, value);
-  //  console.log(`getValue ~ options,value:`, options,value);
-    const filtered = options.filter((v:FilterOptionType) => options.includes(v.value));
-    console.log(`getFilterValue ~ filtered:`, filtered);
-  
-    return filtered;
-  }
-  const getFilterValues = (options:FilterOptionType[],value:FilterOptionType) => {
-    console.log('FILTER VALUE KEYS',Object.keys(value));
-    console.log(`getFilterValues ~ value:`, value);
-    if(!value || !value.label) {
-      console.warn(`The value specified is empty this is most likely an upstream issue - VALUE`,value)
-      return [];
-    }
-    console.log(`getFilterValues ~ value:`, value);
-    const vals: FilterOptionType[] = getFilterValue(options,value);
-    const items = options.filter((v:FilterOptionType) => options.includes(v)) || []
-
-    const filtered = {
-      ...value,
-      ...items
-    }
-    console.log('getFilterValues',filtered);
-    return filtered;
-  }
+  console.log("🚀 ~ updateActiveFilters ~ filters:", filters)
+  return filters;
+}
 
   const updateFilterStateValues = (key: string, value: any) => {
-    console.log(`UPDATING ${key} with the ` + `following value:`,value);
-    setFilterValues({ ...filters, [key]: value });
-  };
-
-  const hasActiveFilters = (): boolean => {
-    return Object.keys(filters).length > 0;
-  };
-  const fieldToArray = (field) => {
-    if (field) {
-      if (Array.isArray(field)) {
-        return field;
-      }
-      return [field];
+    console.log("🚀 ~ updateFilterStateValues ~ value:", value)
+    console.log("🚀 ~ updateFilterStateValues ~ key:", key)
+    if(!key){
+      console.warn('Filter Update Called with a missing KEY: ', key,' OR VALUE: ' ,value);
+      return;
     }
-    return [];
+    console.log(`UPDATING ${key} with the ` + `following value:`, value);
+    setFilterValues({ ...filters, [key]: value });
+    setActiveFilters({...filters, [key]: value });
   };
-  
-  const transformFieldToArray = (field) => {
-      if(typeof field === "string" && field.includes(";")){
-          return field.split(';')
-      }
-      else if(typeof field === "string"){
-          return [field]
-      }
-      else if(Array.isArray(field)){
-          return field
-      }
-      else{
-          return []
-      }
-  };
-
-  //#region Search Functions
 
   const searchTop = async () => {
-    try {
-      console.log('CONTEXT FILTERS', filters)
+//    try {
+
+      console.log("CONTEXT FILTERS", filters);
       if (!filters.title) {
         setError("Please enter term(s) to search for.");
         return;
       }
-      const activeFilters = getActiveFilters(context.filters);
-      const agencies:FilterOptionType[] = [];
-      filters && filters?.agency.map((agency) => {
+      console.log('GETTING ACTIVE FILTERS FROM:', filters);
+      const activeFilters = getActiveFilters(filters);
+      console.log(`searchTop ~ activeFilters:`, activeFilters);
+      const agencies: FilterOptionType[] = [];
+      filters &&
+        filters && filters.agency && filters.agency.map((agency) => {
           agencies.push(agency);
-      })
+        });
+        //[TODO] should not be need getActiveFilters needs to verify the filters are valid
+      if(filters.agency){
+        const filter = {
+//          ...activeFilters,
+          title: title,
+        };
+      }
       const filter = {
         ...activeFilters,
-        title: title,
-        agency: [filters.agency],
-      }
+        title: title
+      };
+
       setHasSearched(true);
-        const res = await post('http://localhost:8080/text/search_top',filter);
-        console.log(`searchTop ~ res:`, res);
-        const results = await res as SearchResultType[];
-        console.log(`searchTop ~ results:`, results);
+      const res = await post(
+        `${host}text/search_top`,
+        filter
+      );
+      const results = (await res) as SearchResultType[];
+      console.log(`searchTop ~ results:`, results);
 
       setResults(results);
       setResultsToDisplay(results);
       console.log(`FILTER EFFECT GOT ${results.length}:`);
-    } catch (error) {
-      const msg = `Error Searching for Results! ${error}`;
-       console.error(msg);
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
+    // } catch (error) {
+    //   const msg = `Error Searching for Results! ${error}`;
+    //   console.error(msg);
+    //   setError(msg);
+    //   setError(msg);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
-	async function searchNoTop() { //??
-    const activeFilters = getActiveFilters(context.filters);
-    if(!title){
+  async function getHighlights() {
+    //const currentResults = resultsToDisplay.splice(0, pagination.rowsPerPage);
+
+    console.log('Getting highlights for: ', resultsToDisplay.length + " our of " + results.length);
+    //We only want highlights for the currently displayed records set
+      const postData = getHighlightsFromResults(resultsToDisplay,title)
+      if(!postData || Object.keys(postData).length === 0){
+        console.log("No post data to send",postData);
+        return;
+      }
+      console.log(`getHighlights ~ postBody:`, postData);
+//    currentResults.map(async(result: SearchResultType) => {
+
+      const res = await post(`${host}text/get_highlightsFVH`, postData);
+      let resp = res as AxiosResponse;
+      console.log(`Highlights response data`, resp.data);
+      const higlights = resp.data as HighlightType[]
+      console.log(`SETTING HIGHLIGHTS ~ higlights:`, higlights);
+      setHighlights(highlights);
+       
+  //  });
+
+  }
+  async function searchNoTop() {
+    //??
+//    const activeFilters = getActiveFilters(context.filters);
+    if (!title) {
       setError("Please enter term(s) to search for.");
       return;
     }
     const filter = {
-      ...activeFilters,
-      title: title
-    }
-    console.log('SEARCH NO TOP - ACTIVE FILTERS', filter)
+     // ...activeFilters,
+      title: title,
+    };
+    console.log("SEARCH NO TOP - ACTIVE FILTERS", filter);
     setHasSearched(true);
     setLoading(true);
     try {
-      const res = await post('http://localhost:8080/text/search_no_top',filter);
-      const results = await res as SearchResultType[]; //??
-      console.log('Search No Top - # of results: ', results.length);
+      const res = await post(
+        `${host}text/search_no_top`,
+        filter
+      );
+
+      const results = (await res) as SearchResultType[];
+
+      console.log(`searchNoTop ~ res:`, res);
+
+      console.log("Search No Top - # of results: ", results.length);
       setResultsToDisplay(results);
       setResults(results);
       setLoading(false);
       return results;
-    } 
-    catch (error) {
-        console.error(`Error in searchNoTop: `,error);
-        setError(`Unable to complete search! An unexpected error occurred: ${error}`);
-    }
-    finally {
+    } catch (error) {
+      console.error(`Error in searchNoTop: `, error);
+      setError(
+        `Unable to complete search! An unexpected error occurred: ${error}`
+      );
+    } finally {
       setLoading(false);
     }
-	}
+  }
 
-  const search= async()=>{
+  const search = async () => {
     setLoading(true);
     setHasSearched(true);
-    if(!title){
+    if (!title) {
       setError("Please enter term(s) to search for.");
       return;
     }
     const filter = {
-      title: title
-    }
+      title: title,
+    };
     try {
-      const res = await post('http://localhost:8080/text/search',filter);
-      const results = await res as SearchResultType[];
+      const res = await post(`${host}text/search`, filter);
+      const results = (await res) as SearchResultType[];
       setResultsToDisplay(results);
       setResults(results);
       setLoading(false);
     } catch (error) {
       console.error(`search ~ error:`, error);
       setError(`Error Searching for Results! ${error}`);
-    }
-    finally {
+    } finally {
       setLoading(false);
     }
-  }
+  };
   const searchNoContext = async () => {
-    try {
+    console.log('START SEARCH NO CONTEXT')
+    //try {
       setLoading(true);
       setHasSearched(true);
 
@@ -426,93 +317,29 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
         return;
       }
 
-      const af = getActiveFilters(context.filters) || {};
-      console.log('AF',af);
-        const activeFilters: FilterOptionType[] = {
-          ...af
-        }
-        const filterKeys = Object.keys(filters);
-        filterKeys.forEach((key:string) => {
-          const val:FilterOptionType = filters[key];
-          if (val &&typeof(val) === "string") {
-            console.log(`filterKeys.forEach ~ val:`, val);
-            activeFilters.push(val);
-          }
-        })
-        console.log('AF',af);
-        console.log(`searchNoContext ~ activeFilters:`, activeFilters);
-        const filter = {
-          title: title,
-          ...activeFilters,
-          DocumentType: ['Draft']
-          
-        }
-        const res = await post('http://localhost:8080/text/search_no_context',filter);
-        const results = await res as SearchResultType[];
-        console.log(`SEARCH NO CONTEXT GOT ${results.length} Results`);
-        setResultsToDisplay(results);
-        setResults(results);
-        setLoading(false);
-      }
-    catch (error) {
-      console.error(`searchNoContext ~ error:`, error);
-      setError(`Error Searching for Results! ${error}`);
-    }
-    finally {
+      const activeFilters = getActiveFilters(filters);
+      console.log("🚀 ~ Searchibng with Active Filters: ", activeFilters);
+      const res = await post(
+        `${host}text/search_no_context`,
+        activeFilters
+      );
+      const results = (await res) as SearchResultType[];
+      console.log(`SEARCH NO CONTEXT GOT ${results.length} Results`);
+      setResultsToDisplay(results.slice((pagination.page*pagination.rowsPerPage), (pagination.page*pagination.rowsPerPage)+pagination.rowsPerPage));
+      setResults(results);
       setLoading(false);
-    }
+    // } catch (error) {
+    //   console.log('SEARCH NO CONTEXT ERROR',error);
+    //   console.error(`searchNoContext ~ error:`, error);
+    //   setError(`Error Searching for Results! ${error}`);
+    // } finally {
+    //   console.log('FINALLY SEARCH NO CONTEXT')
+    //   setLoading(false);
+    // }
   };
   //#endregion
 
-  // #region HTTP Methods 
-  async function get(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios(url,{
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-          },
-        });
-        const data = response.data || [];
-        resolve(data);
-      } catch (error) {
-        console.error(`Error in get: `,error);
-        reject(error);
-      }
-      finally {
-        setLoading(false);
-      }
-      
-    });
-    
-  }
   //#Regions
-	 async function post(url,postData) { //??
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios.post(
-          //"/api/text/search_no_context",
-          url,
-          postData,
-          {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-          },
-        }
-        );
-      }
-      catch (error) {
-        console.error(`Error in post: `,error);
-        reject(error);
-      }
-    });
-  }
   // #endregion
   const updatePaginationStateValues = (key: string, value: any) => {
     console.log(
@@ -520,7 +347,7 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
       key,
       value
     );
-    setPaginationValues({
+  setPaginationValues({
       ...pagination,
       [key]: value,
     });
@@ -547,7 +374,7 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
     resultsToDisplay,
     setShowSnippets,
     showSnippets,
-    hasActiveFilters: hasActiveFilters(),
+    //hasActiveFilters: hasActiveFilters(),
     getFilterValues,
   };
 
@@ -566,11 +393,6 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
           </Snackbar>
         </Box>
         <Paper elevation={1}>
-          <Grid container>
-            <Grid xs={12} flex={1}>
-              <SearchHeader />
-            </Grid>
-          </Grid>
           <Grid
             container
             borderTop={1}
@@ -584,21 +406,32 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
               </Paper>
             </Grid>
             <Grid xs={9}>
-             
               <>
-                <Grid container>
+                <Grid container borderBottom={1} borderColor={'#ccc'} marginBottom={'10px'}>
+                  <Grid xs={12} flex={1}>
+                    <SearchHeader />
+                  </Grid>
+                </Grid>
+
+                {/* <Grid container>
                   <Grid xs={4}>
-                    <Button variant="contained" onClick={async()=> await searchTop()}>
+                    <Button
+                      variant="contained"
+                      onClick={async () => await searchTop()}
+                    >
                       Search Top
                     </Button>
                   </Grid>
                   <Grid xs={4}>
-                    <Button variant="contained" onClick={async ()=> await searchNoContext()}>
+                    <Button
+                      variant="contained"
+                      onClick={async () => await searchNoContext()}
+                    >
                       Search No Context
                     </Button>
                   </Grid>
-                </Grid>
-                {JSON.stringify(filters)}
+                </Grid> */}
+
                 {loading && (
                   <>
                     <Grid container display={"flex"}>
@@ -613,23 +446,41 @@ const getFilterValue = (options,value) : FilterOptionType[] => {
                       </Grid>
                     </Grid>
                   </>
+
                 )}
-                <>
-                  {resultsToDisplay.length > 0 && (
+                <Box style={{ border: "1px solid #ccc", backgroundColor: "#f5f5f5", alignItems: "center" }}>
+                {JSON.stringify(highlights, null, 2)}
+                </Box>
+                <Button variant="contained" color="primary" onClick={async () => await getHighlights()}>
+                  Get Highlights
+                </Button>
+                <Box style={{ border: "1px solid #ccc", backgroundColor: "#f5f5f5", alignItems: "center" }}>
+                  {JSON.stringify(filters, null, 2)}
+                </Box>
+
+                <Box style={{ border: "1px solid #ccc", backgroundColor: "#f5f5f5", alignItems: "center" }}>
+                <Button onClick={() => getActiveFilters(filters)}>Get Active Filters</Button>
+                    <h5>Active Filters</h5>
+                    
+                      {JSON.stringify((activeFilters), null, 2)}
+                      
+                      Agency: {JSON.stringify(filters.agency, null, 2)}
+                </Box>
+                <>{resultsToDisplay.length > 0 && (
                     <>
-                     <Typography variant="h2">
-                     {results.length ? results.length : 0} Search Results Found
-                   </Typography>
-                    <SearchResults results={resultsToDisplay} />
-                  
-                  </>)
-}
+                      <Typography variant="h2">
+                        {results.length ? results.length : 0} Search Results
+                        Found
+                      </Typography>
+                      <SearchResults results={resultsToDisplay} />
+                    </>
+                  )}
                 </>
-                {resultsToDisplay.length === 0 && (
+                {/* {resultsToDisplay.length === 0 && (
                   <>
                     <SearchTips />
                   </>
-                )}
+                )} */}
               </>
             </Grid>
           </Grid>

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { FilterType, SearchContextType, SearchResultType,FilterOptionType } from '../interfaces/types';
+import { FilterOptionType, FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
 
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
@@ -9,10 +9,10 @@ const filters: FilterType = {
   agency: [],
   cooperatingAgency: [],
   county: [],
-  distance: "",
+  distance: [],
   decision: [],
   isFast41: false,
-  proximityDisabled: true,
+  proximityDisabled: false,
   proximityOption: "",
   states: [],
   status: [],
@@ -20,8 +20,6 @@ const filters: FilterType = {
   documentType: [],
   typeAll: false,
   typeDraft: false,
-  needsComments: false,
-  needsDocument: true,
   typeEA: false,
   typeFinal: false,
   typeNOI: false,
@@ -73,7 +71,8 @@ const SearchContext = React.createContext<SearchContextType>({
   searchTitlesOnly: false,
   setSearchTitlesOnly: (searchTitlesOnly: boolean) => {},
   getFilterValues: (options:FilterOptionType[], key:string) => [],
-  getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => []
+  getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => [],
+  getActiveFilters: (filters:FilterType) => [],
 });
 
 export default SearchContext;
