@@ -17,7 +17,7 @@ export type DocumentType = {
 	finalNoaDate?: string;
 	firstRodDate?:  string | null;
 	folder?: string | null;
-	id: number | null;
+	id: number;
 	link?: string | null;
 	noiDate?: Date | string | null;
 	notes?: string | null;
@@ -31,6 +31,9 @@ export type DocumentType = {
 	title: string;
 	isFast41?: boolean;
 }
+	export type SearchProcessType = {
+		[key:number]: SearchResultType[]
+	}
 
   export type PaginiationType = {
 	page: number;

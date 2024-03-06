@@ -288,9 +288,24 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
     }
 });
 }
+export function groupResultsByProcessId(results: SearchResultType[]): Record<string, SearchResultType[]> {
+  const groupedResults: Record<string, SearchResultType[]> = {};
+
+  results.forEach((result) => {
+    const processId = result.doc.processId;
+
+    if (!groupedResults[processId]) {
+      groupedResults[processId] = [];
+    }
+
+    groupedResults[processId].push(result);
+  });
+  console.log(`groupedResults:`, groupedResults);
+  return groupedResults;
+}
 export async function getResultHighlights(result:SearchResultType,title:string): Promise<SearchResultType> {
   const postData = getUnhighlightedFromResult(result,title);
-  const resp:AxiosResponse = await axios.post('https://bighorn.sbs.arizon.edu:8443/nepaBackend/text/get_highlightsFVH', postData);
+  const resp:AxiosResponse = await axios.post(`${host}text/get_highlightsFVH`, postData);
   console.log(`getResultHighlights ~ resp:`, resp);
   const highlights:any[] = resp.data;
   console.log(`getHighlightsFromResults ~ resp.data:`, highlights);

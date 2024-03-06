@@ -22,6 +22,7 @@ import {
   FilterType,
   HighlightsPostDataType,
   PaginiationType,
+  SearchProcessType,
 } from "../interfaces/types";
 import {
   get,
@@ -30,6 +31,7 @@ import {
   getActiveFilters,
   filterResults,
   getResultHighlights,
+  groupResultsByProcessId,
 } from "./searchUtils";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
@@ -54,7 +56,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [error, setError] = useState<string>("");
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [showSnippets, setShowSnippets] = useState<boolean>(false);
-
+  const [processes,setProcesses] = useState<SearchProcessType>({});
   const { page, limit, sortby, sortdir } = pagination;
   const { title } = filters;
   const host = import.meta.env.VITE_API_HOST;
@@ -182,7 +184,10 @@ const SearchApp = (props: SearchAppPropType) => {
 
           console.log("# of results", results.length);
           //        const resultsToDisplay = res.data.splice((page*rowsPerPage), (page*rowsPerPage)+rowsPerPage);
-          const resultsToDisplay = results.splice(0, 1);
+          const resultsToDisplay = results.splice(0, 4);
+          const groupedResults:SearchProcessType = groupResultsByProcessId(resultsToDisplay);
+          setProcesses(groupedResults);
+          console.log(`.then ~ groupedResults:`, groupedResults);
           // resultsToDisplay.map(async(result) => {
           //     console.log(`resultsToDisplay.map ~ result:`, result);
           //     const highlights = await getHighlights(result);
@@ -275,6 +280,10 @@ const SearchApp = (props: SearchAppPropType) => {
                     </Grid>
                   </>
                 )}
+                <Box>
+                    {JSON.stringify(processes,null,2)}
+                  
+                </Box>
                 <>
                   {resultsToDisplay.length > 0 ? (
                     <>
@@ -287,7 +296,6 @@ const SearchApp = (props: SearchAppPropType) => {
                           <>
                             {result && result?.doc && (
                               <div key={result.doc.id}>
-                                {JSON.stringify(resultsToDisplay)}
                                 <SearchResults results={resultsToDisplay} />{" "}
                               </div>
                             )}

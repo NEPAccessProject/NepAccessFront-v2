@@ -11,7 +11,7 @@ import {
   Box,
   Card,
   CardContent,
-  Paper,
+  Paper, TextField,
 } from "@mui/material";
 import { makeStyles, styled } from "@mui/styles";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
@@ -81,19 +81,19 @@ const SearchResult = (props: SearchResultPropsType) => {
   const { score, ids } = currentResult;
   const _mounted = react.useRef(false)
 
-  useEffect(()=>{
-    if(!_mounted.current){
-      _mounted.current= true;
-    }
-    async()=>{
-      const response= await getHighlights(result,title)
-      console.log(`async ~ response:`, response);
-      const highlights = response;
-      setHiglights(highlights);
-      console.log(`async ~ result:`, result);
-    }
-    console.log('IN EFFECT WITH RESULT',result)
-  },[])
+//   useEffect(()=>{
+//     if(!_mounted.current){
+//       _mounted.current= true;
+//     }
+//     (async()=>{
+//       const resultHighlights= await getHighlights(result,title)
+//       console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
+// //      setHiglights(resultHighlights);
+//       setHiglights(resultHighlights);
+//       console.log(`async ~ result:`, result);
+//     })();
+//     console.log('IN EFFECT WITH RESULT',result)
+//   },[result])
   const {
     commentDate,
     title,
@@ -145,7 +145,6 @@ const SearchResult = (props: SearchResultPropsType) => {
       {doc && (
         
         <Box marginTop={2}>
-          {JSON.stringify(result.highlights)}
           <Typography textAlign="center" variant="h4">
             {title}
           </Typography>
@@ -189,8 +188,8 @@ const SearchResult = (props: SearchResultPropsType) => {
               //marginBottom: 1,
             }}
           >
-            {result.highlights && result.highlights.length > 0 && (
-            showSnippet && showSnippets ? (
+            {
+            showSnippet ? (
               <Button
                 color="primary"
                 fullWidth
@@ -204,13 +203,13 @@ const SearchResult = (props: SearchResultPropsType) => {
               <Button
                 color="primary"
                 fullWidth
-                onClick={(evt) => onShowHighlight(result)}
+                onClick={(evt) => setShowSnippet(true)}
               >
                 <Typography color={"white"}> See More</Typography>
               </Button>
-            ))}
+            )}
             <Box>
-              {showSnippets && (
+              {showSnippet && (
                 <Box style={{ backgroundColor: "#fff" }}>
                   <Typography
                     color="black"
@@ -221,15 +220,35 @@ const SearchResult = (props: SearchResultPropsType) => {
                     variant="body2"
                   >
                     <Box>
-                      {result.highlights.map((highlight, index) => (
+                      <b>Highlight?</b>
+                      <b>Show Snippet</b> {showSnippet ? "true" : "false"}
+                      {highlights.map((highlight, index) => (
                         <Box
                           key={index}
                           padding={1}
                           borderBottom={1}
                           borderColor="grey.300"
                         >
-                          <Box border={1}>
-                            {JSON.stringify(highlights)}
+                          <Box>
+                            <b>HIGHLIGHT # {highlights.length}</b>
+                            {highlights.map((highlight, index) => {
+                              return (
+                                <Box
+                                  key={index}
+                                  padding={1}
+                                  borderBottom={1}
+                                  borderColor="grey.300"
+                                >
+                                  <Box>
+                                    {JSON.stringify(highlight)}
+                                  </Box>
+                                  <Box
+                                    dangerouslySetInnerHTML={convertToHTML(highlight.slice(0, 100))}
+                                  >
+                                  </Box>
+                                </Box>
+                              );
+                            })}
                           </Box>
                         </Box>
                       ))}

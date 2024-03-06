@@ -91,7 +91,6 @@ const SearchResults = (props: SearchResultsType) => {
       {resultsToDisplay && resultsToDisplay.length > 0 && resultsToDisplay.map((result,index) => {
       return (
           <div key={`result-${result.doc.id}-${result.doc.processId}`}>
-            {index}
             <SearchResult result={result} />
           </div>
         )
