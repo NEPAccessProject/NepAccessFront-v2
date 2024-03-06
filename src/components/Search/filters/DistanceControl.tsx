@@ -14,7 +14,7 @@ const DistanceControl = () => {
   const context = useContext(SearchContext);
   const results = context.results;
   const { updateFilterStateValues, filters,loading,error } = context;
-  console.log("🚀 ~ DistanceControl ~ # of results:", results.length);
+//  console.log("🚀 ~ DistanceControl ~ # of results:", results.length);
 
   const { sortby, sortdir } = context.pagination;
   const { distance } = filters;

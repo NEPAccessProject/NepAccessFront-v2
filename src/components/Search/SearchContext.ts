@@ -1,6 +1,7 @@
 
 import React from "react";
 import { FilterOptionType, FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
+import SearchResult from "./SearchResult";
 
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor
@@ -9,7 +10,7 @@ const filters: FilterType = {
   agency: [],
   cooperatingAgency: [],
   county: [],
-  distance: [],
+  distance: "",
   decision: [],
   isFast41: false,
   proximityDisabled: false,
@@ -47,11 +48,11 @@ const SearchContext = React.createContext<SearchContextType>({
     sortdir: "DESC",
     totalCount: 0,
   },
-  fragmentSizeValue: 0,
+  fragmentSizeValue: 2,
   hideOrganization: false,
   isAvailableFilesDialogOpen: false,
   showPDFDialog: false,
-  showSnippets: false,
+  showSnippets: true,
   hasActiveFilters: false,
   setHasActiveFilters: () => false,
   setShowSnippets: (showSnippets:boolean) => {},
@@ -70,9 +71,9 @@ const SearchContext = React.createContext<SearchContextType>({
   paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => {},
   searchTitlesOnly: false,
   setSearchTitlesOnly: (searchTitlesOnly: boolean) => {},
-  getFilterValues: (options:FilterOptionType[], key:string) => [],
-  getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => [],
-  getActiveFilters: (filters:FilterType) => [],
+  getResultHighlights: (result:SearchResultType,title:string) => {
+    return result;
+  }
 });
 
 export default SearchContext;

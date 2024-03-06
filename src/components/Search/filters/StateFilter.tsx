@@ -1,15 +1,11 @@
 import { useContext } from "react";
 import SearchContext from "../SearchContext";
-import {
-  counties,
-  locations as options
-} from "../data/dropdownValues";
+import { counties, locations as options } from "../data/dropdownValues";
 import FilterSelect from "./FilterSelect";
+import { FilterOptionType } from "@/components/interfaces/types";
 export default function StateFilter() {
   const context = useContext(SearchContext);
   const {
-    getFilterValues,
-    getFilteredValues,
     updateFilterStateValues,
     updatePaginationStateValues,
     filters,
@@ -17,29 +13,48 @@ export default function StateFilter() {
     loading,
     error,
   } = context;
-  const states = filters.states;
-
-  const onChange = (value, meta) => {
-    const filtered = getFilteredValues(options, value, meta);
-    console.log(`onChange ~ filtered:`, filtered);
-    updateFilterStateValues("county", counties);
-
-    //onCountyChange(countyOptions.filter(countyObj => this.state.county.includes(countyObj.value)));
+  
+  const filterState = filters.states as FilterOptionType[];
+  const filterValue = filters.states as FilterOptionType[];
+  options.map((v) => {
+        options.filter((val) => {
+          if(val.value === v.value){
+ //           console.log(`filtered ~ val:`, val, ' V  ',v);
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+  });
+  const narrowCountyOptions = (filtered, value) => {
+    console.log("narrowCountyOptions", filtered, " value ", value);
   };
-
-  const narrowCountyOptions = (filtered,value)=> {
-    console.log('narrowCountyOptions',filtered, ' value ',value)
-  };
-
+  const states = filters.states as FilterOptionType[];
+  const filtered = [];
+  options.filter((v) => {
+    const filtered = states.filter((val) => {
+      if(val.value === v.value){
+        return true;
+      }
+      else {
+        return false;
+      }
+    })
+    return filtered;
+  });
   return (
     <>
       {/* [TODO] we will need to pass a function to handle the narrowing of counties or other post select action behavior */}
-      <FilterSelect options={options} filterValue={states || []} keyLabel="states" placeholder="Type or Select States"
-      
-        callback={narrowCountyOptions}
+      <FilterSelect
+        options={options}
+        filterValue={filtered}
+        keyLabel="states"
+        placeholder="Type or Select States"
+        // callback={narrowCountyOptions}
       />
     </>
-  )
+  );
 
   // return (
   //   <Box>

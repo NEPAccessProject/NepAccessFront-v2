@@ -22,23 +22,12 @@ export default function DecisionFilter() {
     loading,
     error,
     searchTitlesOnly,
-    getFilterValues,
-    getFilteredValues,
   } = context;
 
-  const decision = filters.decision;
-
-  const onChange = (value,meta) => {
-    const filtered = getFilteredValues(options,value,meta);
-    console.log(`onDecisionChange ~ filteredDecisions:`, filtered);
-    updateFilterStateValues("decision", filtered);
-    //updateFilterStateValues("decisionsRaw", evt);
-  };
-
-
+  const filterValue = filters.decision as FilterOptionType[];
   return (
     <>
-      <FilterSelect options={options} filterValue={decision} keyLabel="decision" placeholder="Type of Select a Decision(s)" />
+      <FilterSelect options={options} filterValue={filterValue} keyLabel="decision" placeholder="Type of Select a Decision(s)" />
     </>
 
   )

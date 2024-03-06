@@ -118,8 +118,7 @@ const SearchFilters = (props) => {
   };
   const formLabelProps = {
     //margin:1,
-    marginTop: 0.5,
-    marginBottom: 0.5,
+    //marginBottom: 0.5,
     fontWeight:'bold',
     border:'1px solid black',
     fontSize: 28,
@@ -368,7 +367,7 @@ export function SearchFilterButton(){
   const {  searchNoContext, loading, hasActiveFilters,searchTop } = context;
   return(
     <>
-    <Grid xs={12} marginBottom={1}>
+    <Grid xs={12}>
           <Button 
             style={{ margin: 0 }} 
             onClick={async() => await searchTop()}  

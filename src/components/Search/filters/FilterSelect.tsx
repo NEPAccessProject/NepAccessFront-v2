@@ -16,16 +16,16 @@ export default function FilterSelect(props:FilterSelectProps) {
     const {options,filterValue,keyLabel,placeholder,callback} = props;
     const {setError,filters,loading,error,updateFilterStateValues,searchTitlesOnly} = useContext(SearchContext);
     const {title} = filters;
-    if(!keyLabel){
-            const msg = `Missing key, please provide a key for the filter select. Key: ${keyLabel} - ${props.keyLabel}`
-        setError(msg);
+    // if(!keyLabel){
+    //         const msg = `Missing key, please provide a key for the filter select. Key: ${keyLabel} - ${props.keyLabel}`
+    //     setError(msg);
 
-    }    
+    // }    
     const onChange = (value, meta,key:string) => {
       console.log(`onChange ~ value, meta,key:`, value, meta,key);
       if(!key){
-        console.error('Filter Update Called with a missing KEY: ', keyLabel);
-        
+        console.warn('Filter Update Called with a missing KEY: ', key);
+        return;        
       }
       if(meta.action ==='select-option'){
         updateFilterStateValues(key, value);
@@ -64,7 +64,7 @@ export default function FilterSelect(props:FilterSelectProps) {
               isClearable={true}
               value={options.filter((v) => filterValue.includes(v))}
               placeholder={placeholder}
-              onChange={(newValue, actionMeta) => onChange(newValue, actionMeta,'agency')}
+              onChange={(newValue, actionMeta) => onChange(newValue, actionMeta,keyLabel)}
               isLoading={loading}
               name={keyLabel}
               options={options}

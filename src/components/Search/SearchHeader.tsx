@@ -150,7 +150,7 @@ const SearchHeader = () => {
             <Button
               variant="contained"
               color="primary"
-              onClick={(evt) => searchNoContext()}
+              onClick={async(evt) => await searchTop()}
             >
               Search
             </Button>

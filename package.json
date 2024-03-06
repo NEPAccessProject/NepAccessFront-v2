@@ -51,6 +51,7 @@
     "http-proxy-middleware": "^2.0.6",
     "json-server": "^1.0.0-alpha.23",
     "loadash": "^1.0.0",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-ga": "^3.3.1",

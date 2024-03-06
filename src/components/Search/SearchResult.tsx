@@ -1,3 +1,4 @@
+import react,{useEffect} from 'react'
 import {
   DocumentType,
   SearchResultPropsType,
@@ -16,13 +17,21 @@ import { makeStyles, styled } from "@mui/styles";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { useContext, useState } from "react";
 import SearchContext from "./SearchContext";
+import SearchResultCards from "./SearchResultCards";
 //import SearchResultCards from "./SearchResultCards";
 import { spacing } from "material-ui/styles";
+import {
+  getResultHighlights,
+  getUnhighlightedFromResult,
+  post,
+  getHighlights
+} from "./searchUtils";
+import axios, { AxiosResponse, AxiosError } from "axios";
 const CardItem = styled(Paper)(() => ({
   elevation: 1,
   padding: 0,
   margin: 0.5,
-  border:0,
+  border: 0,
 }));
 
 const GridContainerProps = {
@@ -55,15 +64,36 @@ const GridItemProps = {
   //   },
   // },
 };
+
 const SearchResult = (props: SearchResultPropsType) => {
   const result: SearchResultType = props.result;
+  if (!result || !result.doc) return null;
   const doc: DocumentType = result.doc;
   const context = useContext(SearchContext);
+  const { getResultHighlights, error, loading, setError } = context;
   //applies only to the current result
-  const [showSnippet, setShowSnippet] = useState(false);
+  const [highlights, setHiglights] = useState<string[]>([]);
   //applies to all snippets
-  const { showSnippets, setShowSnippets } = context;
-  const { filters } = context;
+  const [showSnippet, setShowSnippet] = useState<boolean>(true);
+  const [currentResult, setCurrentResult] = useState(result);
+  const { filters, showSnippets } = context;
+  const docTitle = filters.title;
+  const { score, ids } = currentResult;
+  const _mounted = react.useRef(false)
+
+  useEffect(()=>{
+    if(!_mounted.current){
+      _mounted.current= true;
+    }
+    async()=>{
+      const response= await getHighlights(result,title)
+      console.log(`async ~ response:`, response);
+      const highlights = response;
+      setHiglights(highlights);
+      console.log(`async ~ result:`, result);
+    }
+    console.log('IN EFFECT WITH RESULT',result)
+  },[])
   const {
     commentDate,
     title,
@@ -74,27 +104,71 @@ const SearchResult = (props: SearchResultPropsType) => {
     registerDate,
     action,
   } = doc;
+  const onShowHighlight = async (searchResult: SearchResultType) => {
+    console.log(`onShowHighlight ~ searchResult:`, searchResult);
+    try {
+      const host = import.meta.env.VITE_API_HOST;
+      //const unhighlighted = getUnhighlightedFromResult(result,'Copper Mine');
+      //let highlights:string[] = [];
+      console.log("RESULT", result.ids);
+      setShowSnippet(!showSnippet);
+    } catch (err) {
+      console.error("SEARCH RESULT ERROR", err);
+      const msg = `Error getting highlights for result:`;
+      console.error(`onShowHighlight ~ ${msg}`);
+      setError(msg);
+    }
+  };
+
+  //  result.highlights = data[0];
+  const renderHighlights = (text = "") => {
+    console.log(`renderHighlights ~ text:`, text);
+    if (!text || !text.length) {
+      console.log(`NO TEXT RECEIVED :`, text);
+      return "";
+    }
+    const highlight = text.replace(/<\/?[^>]+(>|$)/g, "");
+    const snippet = highlight.substring(
+      0,
+      highlight.length ? highlight.length - 1 : 0
+    );
+    console.log(`renderSnippet ~ snippet:`, snippet);
+
+    return snippet;
+  };
+  //    console.log(`🚀 ~ file: SearchResultSnippets.jsx:65 ~ Snippets ~ snippet:`, snippet);
+  function convertToHTML(content) {
+    return { __html: content };
+  }
   return (
     <>
-      {/* <SearchResultCards result={result}/> */}
       {doc && (
-        <>
-          <ProcessCards result={result} />
+        
+        <Box marginTop={2}>
+          {JSON.stringify(result.highlights)}
           <Typography textAlign="center" variant="h4">
             {title}
           </Typography>
-          <Grid marginTop={1} marginBottom={1} {...GridContainerProps} flex={1}>
-            <Grid xs={2} {...GridItemProps}>
+          <Box display={"flex"}>
+            <SearchResultCards result={result} />
+          </Box>
+
+          <Grid
+            id={`search-result-container${doc.id}`}
+            border={0}
+            {...GridContainerProps}
+            display={"flex"}
+            flex={1}
+          >
+            ``{" "}
+            <Grid xs={2} {...GridItemProps} display={"flex"}>
               {documentType}
             </Grid>
             <Grid xs={2} {...GridItemProps}>
               {action}
             </Grid>
-            <Grid xs={1} {...GridItemProps}>
+            <Grid xs={2} {...GridItemProps}>
               {agency}
-            </Grid>
-            <Grid xs={1} {...GridItemProps}>
-              {result.score}
             </Grid>
             <Grid xs={2} {...GridItemProps}>
               {`${registerDate ? registerDate : "N/A"}`}
@@ -108,26 +182,35 @@ const SearchResult = (props: SearchResultPropsType) => {
               </Button>
             </Grid>
           </Grid>
-          <Box style={{ background: "#3D669C", border: "1px solid #ddd" }}>
-            {showSnippets || showSnippet ? (
+          <Box
+            style={{
+              background: "#3D669C",
+              border: "1px solid #ddd",
+              //marginBottom: 1,
+            }}
+          >
+            {result.highlights && result.highlights.length > 0 && (
+            showSnippet && showSnippets ? (
               <Button
                 color="primary"
                 fullWidth
-                onClick={() => setShowSnippet(!showSnippet)}
+                onClick={(evt) => setShowSnippet(false)}
               >
-                <Typography color={"white"}>See Less</Typography>
+                <Typography color={"white"}>
+                  See Less
+                </Typography>
               </Button>
             ) : (
               <Button
                 color="primary"
                 fullWidth
-                onClick={() => setShowSnippet(!showSnippet)}
+                onClick={(evt) => onShowHighlight(result)}
               >
                 <Typography color={"white"}> See More</Typography>
               </Button>
-            )}
+            ))}
             <Box>
-              {showSnippet && (
+              {showSnippets && (
                 <Box style={{ backgroundColor: "#fff" }}>
                   <Typography
                     color="black"
@@ -137,122 +220,28 @@ const SearchResult = (props: SearchResultPropsType) => {
                     fontSize={"1rem"}
                     variant="body2"
                   >
-                    urna molestie at. Sollicitudin ac orci phasellus egestas
-                    tellus rutrum tellus. Quam quisque id diam vel quam
-                    elementum pulvinar. Elit pellentesque habitant morbi
-                    tristique senectus.
+                    <Box>
+                      {result.highlights.map((highlight, index) => (
+                        <Box
+                          key={index}
+                          padding={1}
+                          borderBottom={1}
+                          borderColor="grey.300"
+                        >
+                          <Box border={1}>
+                            {JSON.stringify(highlights)}
+                          </Box>
+                        </Box>
+                      ))}
+                    </Box>
                   </Typography>
                 </Box>
               )}
             </Box>
           </Box>
-        </>
+        </Box>
       )}
     </>
   );
 };
-
 export default SearchResult;
-
-const useStyles = makeStyles(() => ({
-  resultsHeader: {
-    fontFamily: "open sans",
-    fontSize: 50,
-    fontWeight: "bolder",
-    padding: 4,
-    margin: 2,
-  },
-  resultItemHeader: {
-    fontSize: 25,
-    fontWeight: "bold",
-    margin: 0.5,
-    padding: 1,
-    elevation: 1,
-  },
-  itemHeader: {
-    fontFamily: "open sans",
-    fontSize: 40,
-    fontWeight: "bold",
-    margin: 0.5,
-    padding: 1,
-    elevation: 1,
-    p: 1,
-    "&:hover": {
-      //textDecoration: 'underline'
-      boxShadow: "0px 4px 8px rgba(0.5, 0.5, 0.5, 0.15)",
-    },
-    infoCard: {
-      padding: 1,
-      margin: 1,
-    },
-  },
-}));
-const ProcessCards = (props) => {
-  const result: SearchResultType = props.result;
-  const doc: DocumentType = result.doc;
-  const context = useContext(SearchContext);
-  const {
-    agency,
-    cooperatingAgency,
-    documentType,
-    registerDate,
-    status,
-    title,
-    action,
-    commentDate,
-    id,
-  } = doc;
-  const classes = useStyles();
-  return (
-    <>
-    {/* <Typography>{doc.title}</Typography> */}
-      {/* <Grid container flex={1} display={"flex"} spacing={0.5} margin={1}>
-        {result.doc.title}
-        {Object.keys(doc).map((key) => (
-          <span key={key}>
-            {doc[key] && doc[key].length && (
-                <CardItem style={{
-                  margin:0,
-                  border:0,
-                }}>
-                  <Grid {...GridItemProps} border={0} justifyContent={"flex-start"} padding={1} margin={1}>
-                    <Typography>
-                      <b>
-                        
-                        {key.substring(0, 1).toUpperCase() + key.substring(1)}: {' '}
-                      </b>
-                      {doc[key] ? doc[key] : "N/A"}
-                    </Typography>
-                  </Grid>
-                </CardItem>
-            )}
-          </span>
-        ))}
-      </Grid> */}
-    </>
-  );
-};
-//    //       className={classes.itemHeader}
-//           sx={{
-//             margin: 0.5,
-//             padding: 1,
-//             elevation: 1,
-//           }}
-//         >
-//           State: <b>{state ? state : 'N/A'}</b>
-//         </Grid>
-
-// <Grid item xs={12} display={'flex'} id="grid-snippet-expand-box" width={'100%'}>
-//             <Button
-//               id="grid-snippet-expand-button"
-//               fullWidth={true}
-//               variant='contained'
-//               color="primary"
-//               onClick={(evt) => toggleContentExpansion(evt, id)}
-//               sx={{
-//                 width:'100%',
-//                 borderRadius: 0,
-//               }}
-//             >
-//               Click to See {isContentExpanded ? 'Less' : 'More'}
-//             </Button>

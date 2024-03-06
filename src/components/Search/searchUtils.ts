@@ -1,6 +1,7 @@
 
 
 //[TODO][REFACTOR]  values for look ups such as agencies, stqtes etc should be stored in lookup tables.
+import { result } from "lodash";
 import {
     FilterOptionType,
     FilterType,
@@ -11,8 +12,10 @@ import {
     HighlightType,
     HighlightIdsType,
     HighlightsPostDataType,
+    UnhighlightedType,
   } from "../interfaces/types";
   import axios,{AxiosResponse} from "axios";
+import { func } from "prop-types";
   //[TODO][CRITICAL] move this to a ENV value
   const host = import.meta.env.VITE_API_HOST;
   console.log(`host:`, host);
@@ -60,202 +63,257 @@ export function sortSearchResults(
       }
     });
     return results;
+}
+export function filterResults(results: SearchResultType[]): SearchResultType[] {
+  if (!Array.isArray(results)) {
+    return [];
   }
-  
-  export function filterResults(results: SearchResultType[]): SearchResultType[] {
-    if (!Array.isArray(results)) {
-      return [];
+  const scores: number[] = [];
+//    results.map((result:SearchResultType) => scores.push(result.score));
+  scores.sort((a, b) => b - a);
+  console.log("TOP SCORES", scores[0]);
+  console.log("BOTTOM SCORES", scores[scores.length - 1]);
+  console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
+  const avg = (scores[scores.length - 1] + scores[0]) / 2;
+  const filteredResults = results.filter((result) => result && result.score && result.score > avg);
+  console.log(
+    "🚀 ~ filterResults ~ # of filteredResults:",
+    filteredResults.length
+  );
+
+  return filteredResults;
+}
+  // #region HTTP Methods
+export async function get(url) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await axios(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        },
+      });
+      const data = response.data || [];
+      resolve(data);
+    } catch (error) {
+      console.error(`Error in get: `, error);
+      reject(error);
     }
-    const scores: number[] = [];
-    results.map((result) => scores.push(result.score));
-    scores.sort((a, b) => b - a);
-    console.log("TOP SCORES", scores[0]);
-    console.log("BOTTOM SCORES", scores[scores.length - 1]);
-    console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
-    const avg = (scores[scores.length - 1] + scores[0]) / 2;
-    const filteredResults = results.filter((result) => result.score > avg);
-    console.log(
-      "🚀 ~ filterResults ~ # of filteredResults:",
-      filteredResults.length
-    );
-  
-    return filteredResults;
-  }
-    // #region HTTP Methods
-  export async function get(url) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-          },
-        });
-        const data = response.data || [];
-        resolve(data);
-      } catch (error) {
-        console.error(`Error in get: `, error);
-        reject(error);
-      }
-    });
-  }
-  //[TODO] Temp hack untill connected to the backend
-  export const urlFromContextPaginationAndFilters = (
-    context: SearchContextType,
-    pagination: PaginiationType,
-    filters: FilterType,
-    searchType:
-      | "search_top"
-      | "search_no_context"
-      | "text/search_no_context"
-      | "text/search_top"
-  ) => {
-    const { page, limit, sortby, sortdir, rowsPerPage } = pagination;
-  
-    //[TODO]Get currently set filters to use in search query POST requests
-    //const activeFilters = getActiveFilters(filters);
-    const queryString = `${host}`;
-    // activeFilters.forEach((filter) => {
-    //   queryString.concat(`&${filter[field]}=${filter.value}`s);
-    // });
-    console.log(`GENTERATED QUERY STRING:`, queryString);
-    //TODO temporary hack this should be part of retriving active filters
-    const searchTerm = filters.title.length ? `&title=${filters.title}` : "";
-  
-    //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
-    const url: string = `${host}${searchType}`;
-    console.log("🚀 ~ urlFromContextPagination ~ url:", url);
-    return url;
-  };
-  export async function post(url, postData) {
+  });
+}
+//[TODO] Temp hack untill connected to the backend
+export const urlFromContextPaginationAndFilters = (
+  context: SearchContextType,
+  pagination: PaginiationType,
+  filters: FilterType,
+  searchType:
+    | "search_top"
+    | "search_no_context"
+    | "text/search_no_context"
+    | "text/search_top"
+) => {
+  const { page, limit, sortby, sortdir, rowsPerPage } = pagination;
+
+  //[TODO]Get currently set filters to use in search query POST requests
+  //const activeFilters = getActiveFilters(filters);
+  const queryString = `${host}`;
+  // activeFilters.forEach((filter) => {
+  //   queryString.concat(`&${filter[field]}=${filter.value}`s);
+  // });
+  console.log(`GENTERATED QUERY STRING:`, queryString);
+  //TODO temporary hack this should be part of retriving active filters
+  const searchTerm = filters.title.length ? `&title=${filters.title}` : "";
+
+  //const url: string = `${host}${searchType}?_start=${page * limit}&_end=${limit * page + limit}${searchTerm}`;
+  const url: string = `${host}${searchType}`;
+  console.log("🚀 ~ urlFromContextPagination ~ url:", url);
+  return url;
+};
+
+export async function post(url, postData): Promise<any> {
+  return new Promise(async (resolve, reject) => {
+
     console.log(`Posting to URL ${url} with data:`, postData);
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios.post(
-          //"/api/text/search_no_context",
-          url,
-          postData,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-              "Access-Control-Allow-Origin": "*", // Required for CORS support to work
-            },
+    axios.post(
+      //"/api/text/search_no_context",
+      url,
+      postData,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          
+          //"Access-Control-Allow-Origin": "*", // Required for CORS support to work
+        },
+      }
+    )
+    .then((response:AxiosResponse) => {
+      const data = response.data || [];
+      console.log('RESPONSE RETURNED DATA',data);
+      resolve(data);
+    })
+    .catch((error) => {
+      const msg = `Error in post: ${error}`;
+      reject(msg);
+    });
+  });
+}  
+export function getActiveFilters(filters:FilterType): FilterType {
+  const activeFilter = {
+    title: '',
+  } as FilterType;
+  Object.keys(filters).forEach((key) => {
+    const val = filters[key];
+    if(!key || (!val || val === "" || val === undefined)){
+      //console.warn(`��� ~ getActiveFilters ~ ${key} is empty - val?`,val);
+      return;
+    }
+//      console.log(`Getting Filters for key : ${key} type ${typeof val} ~ val:`, val);
+    if (typeof val === "object" && val.length > 0) {
+      console.log(`OBJECT MATCH ON key: ${key}, val: ${val[0].label}`);
+      activeFilter[key] = [val[0].label];
+    } else if (typeof val === "string" && val !== "") {
+      console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
+      activeFilter[key] = val;
+    }
+    else if (typeof val === "string" && val === "") {
+      console.warn(`EMPTY STRING MATCH ON key: ${key}, val: ${val}`);
+    }else if (typeof val === "boolean") {
+      if(val === true){
+//        console.log(`BOOLEAN MATCH ON - on key: ${key} - value:`,val)
+        activeFilter[key] = true
+      }
+      //[TODO] We will probally need to handle when a boolean value is turned to false after being true in a previous action
+    }
+    else {
+      //console.warn(`getActiveFilters ~ No match for key: ${key} and val: ${val} - type: ${typeof val}`);
+      //activeFilter[key] = val;
+    }
+  });
+  console.log(`RETURNING ACTIVE FILTERS`, activeFilter);
+  return activeFilter;
+};
+
+
+export function getUnhighlightedFromResults(results:SearchResultType[],searchTerm:string): HighlightsPostDataType {
+  const postData:HighlightsPostDataType = {
+    unhighlighted: [],
+    terms: searchTerm,
+    markup: false,
+    fragmentSizeValue: 2,
+  };
+  results.map((result:SearchResultType) => {
+    result.ids.forEach((id) => {
+      const item:UnhighlightedType = {
+        luceneId: [id],
+        filename: result.filenames,            
+      }
+      postData.unhighlighted.push(item);
+    });
+  });
+  console.log(`getUnhighlightedFromResults ~ postData:`, postData);
+   return postData;
+}
+// Creates the data strucutre to send as the body of the highlight POST request
+export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:string): HighlightsPostDataType {
+  const postData:HighlightsPostDataType = {
+    unhighlighted: [],
+    terms: searchTerm,
+    markup: false,
+    fragmentSizeValue: 2,
+  };
+  try{
+  //const luceneIds:HighlightIdsType[] = [];
+//     results.map((result:SearchResultType) => {        
+        result.ids.forEach((id) => {
+          console.log('ID',id, ' FROM Result ', result);
+          if(id){
+            const item:UnhighlightedType = {
+              luceneId: [id],
+              filename: result.filenames,            
+            }
+            postData.unhighlighted.push(item);
           }
-        );
-        resolve(response.data);
-      } catch (error) {
-        console.error(`Error in post: `, error);
-        reject(error);
+        });
       }
-    });
+  catch(err){
+    console.error(`Error getting highlights POST data`,err)
   }
-  
-  export function getActiveFilters(filters:FilterType): FilterType {
-    const activeFilter = {
-      title: '',
-    } as FilterType;
-    Object.keys(filters).forEach((key) => {
-      const val = filters[key];
-      if(!key || (!val || val === "" || val === undefined)){
-        console.warn(`��� ~ getActiveFilters ~ ${key} is empty - val?`,val);
-      }
-  //      console.log(`Getting Filters for key : ${key} type ${typeof val} ~ val:`, val);
-      if (typeof val === "object" && val.length > 0) {
-        console.log(`OBJECT MATCH ON key: ${key}, val: ${val[0].label}`);
-        activeFilter[key] = [val[0].label];
-      } else if (typeof val === "string" && val !== "") {
-        console.log(`PRIMITIVE MATCH ON key: ${key}, val: ${val}`);
-        activeFilter[key] = val;
-      }
-      else if (typeof val === "string" && val === "") {
-        console.warn(`EMPTY STRING MATCH ON key: ${key}, val: ${val}`);
-      }else if (typeof val === "boolean") {
-        if(val === true){
-          console.log(`BOOLEAN MATCH ON - on key: ${key} - value:`,val)
-          activeFilter[key] = true
-        }
-        //[TODO] We will probally need to handle when a boolean value is turned to false after being true in a previous action
-      }
-      else {
-        console.warn(`getActiveFilters ~ No match for key: ${key} and val: ${val} - type: ${typeof val}`);
-        //activeFilter[key] = val;
-      }
-    });
-    console.log(`RETURNING ACTIVE FILTERS`, activeFilter);
-    return activeFilter;
-  };
-  export const hasActiveFilters = (filters:FilterType) => {
-    const activeFilters = getActiveFilters(filters);
-    console.log(`hasActiveFilters ~ activeFilters:`, activeFilters);
-    return Object.keys(activeFilters).length > 0;
-  };
-  export function getFilterValue(options, value): FilterOptionType[]{
-    console.log(`getFilterValue ~ value:`, value);
-    if(!options ||!value) {
-      return [];
-    }
-    //  console.log(`getValue ~ options,value:`, options,value);
-    const filtered = options.filter((v: FilterOptionType) =>
-      options.includes(v.value)
-    );
-    console.log(`getFilterValue ~ filtered:`, filtered);
-  
-    return filtered;
-  };
 
-export const getFilterValues = (
-    options: FilterOptionType[],
-    value: FilterOptionType
-  ) => {
-    console.log('GET FILTER VALUE - value', value, ' options', options)
-    if (!value || !value.label) {
-      console.warn(
-        `The value specified is empty this is most likely an upstream issue - VALUE`,
-        value
-      );
-      return [];
+  console.log(`getUnhighlightedFromResult ~ postData:`, postData);
+   return postData;
+}
+export const getHighlights = async(result:SearchResultType,title:string,fragmentSizeValue:number = 2):Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+  //                const filenames = result.filenames as string[];
+    const doc = result.doc;
+    const { id } = doc;
+    console.log("ID", id, " FROM Result ", result);
+
+    if (id) {
+      const postData = {
+        unhighlighted: [
+          {
+            luceneIds: [id],
+            filename: result.filenames[0],
+          },
+        ],
+        terms: title,
+        markup: true,
+        fragmentSizeValue: fragmentSizeValue,
+      };
+      axios
+        .post(`${host}text/get_highlightsFVH`, postData, {
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Content-Type": "application/json;charset=utf-8;text/*",
+          },
+        })
+        .then((resp) => resp.data)
+        .then((highlights: string[]) => {
+          console.log(`.then ~ highlights:`, highlights);
+          resolve(highlights);
+        })
+        .catch((err) => {
+          const msg = `Unexpected Error highlighting search results ${err.message}`;
+          console.error(msg);
+          reject(msg);
+          //setError(msg);
+        });
+    } else {
+      resolve([]);
     }
-    console.log(`getFilterValues ~ value:`, value);
-    const vals: FilterOptionType[] = getFilterValue(options, value);
-    const items =
-      options.filter((v: FilterOptionType) => options.includes(v)) || [];
+});
+}
+export async function getResultHighlights(result:SearchResultType,title:string): Promise<SearchResultType> {
+  const postData = getUnhighlightedFromResult(result,title);
+  const resp:AxiosResponse = await axios.post('https://bighorn.sbs.arizon.edu:8443/nepaBackend/text/get_highlightsFVH', postData);
+  console.log(`getResultHighlights ~ resp:`, resp);
+  const highlights:any[] = resp.data;
+  console.log(`getHighlightsFromResults ~ resp.data:`, highlights);
+  result.highlights = highlights;
+  console.log(`getResultHighlights ~ result:`, result);
+  return result;
   
-    const filtered = {
-      ...value,
-      ...items,
+}
+export const updateActiveFilters = (filters:FilterType,key:string,value:any,action:string)=>{
+  let activeFilters = {...filters};
+  if(action === "add"){
+    activeFilters = {
+      ...activeFilters,
+      [key]:value,
     };
-    console.log("getFilterValues", filtered);
-    return filtered;
-  };
-
-  // Creates the data strucutre to send as the body of the highlight POST request
-  export function getHighlightsFromResults(results,term): HighlightsPostDataType {
-        console.log('GET HIGHLIGHTS FROM RESULTS', results.length,' TERM ',term);
-      const highlightIds:HighlightIdsType[] = [];
-      const luceneIds:HighlightIdsType[] = [];
-        results.map(result => {
-          result.ids && result.ids.length &&  result.ids.map((id:number)=> {
-            highlightIds.push({
-              luceneId:id,
-              filename: result.filenames
-            })
-  
-            luceneIds.push({
-              luceneId: id,
-              filename: result.filenames || "",
-            });
-          })
-      })
-      const rtn:HighlightsPostDataType = {
-        'unhighlighted': highlightIds,
-        'terms': [term],
-        'markup': true, //[TODO] need to wire this into the values in context (passed in as args)
-        'fragmentSizeValue': 2
-    }
-      console.log('LUCENE IDS DATA',rtn)
-      return rtn;
   }
+  else{
+    let obj = new Object()
+    const filters = {
+      ...activeFilters,
+      [key]:value,
+    }
+  }
+  console.log("🚀 ~ updateActiveFilters ~ filters:", filters)
+  return filters;
+}

@@ -37,7 +37,7 @@ export default function SearchDatePickers(props: SearchDatePickersProps) {
   return (
     <Grid container id="date-filters-container">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <Box marginBottom={2} padding={0} width="100%">
+        <Box padding={0} width="100%">
           <DatePicker
             name="startPublish"
             format='yyyy-MM-dd'

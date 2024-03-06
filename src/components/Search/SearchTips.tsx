@@ -11,7 +11,7 @@ export default function SearchTips(props: SearchTipsPropType): ReactElement {
               <Grid item xs={12}>
                     <Typography variant='h4'>Search Tips</Typography>
                 </Grid>
-                <Grid item xs={12} marginBottom={2}>
+                <Grid item xs={12}>
                 <Typography variant='body1'>You can improve your search results, by using the various operators below as part of your search. For example a search such as &quot;Tucson AND Water NOT Sahuaro&quot; will return results that have both Tucson and Water in the title and or content. Excluding documents that have Sahuro as part of the title and or content even if there is a match for Tucson and Water.</Typography>
                 </Grid>
             </Grid>
@@ -50,7 +50,9 @@ export default function SearchTips(props: SearchTipsPropType): ReactElement {
                 (all caps) to search to <b>exclude</b>words or a phrase.
               </Grid>
             </Grid>
-            <Grid container spacing={1} marginBottom={2}>
+            <Grid container spacing={1}
+              //marginBottom={2}
+              >
               <Grid item xs={2}>
                 <b>{'" "'}</b>
               </Grid>

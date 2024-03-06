@@ -32,11 +32,6 @@ export type DocumentType = {
 	isFast41?: boolean;
 }
 
-export type HighlightType = {
-    [key: string]: string[];
-  };
-
-  
   export type PaginiationType = {
 	page: number;
 	limit: number;
@@ -51,7 +46,7 @@ export type SearchResultType = {
   doc: DocumentType;
   highlights: string[];
   filenames: string[];//string[];
-  score: number;
+  score?: number;
 }
 
 export type HighlightIdsType = {
@@ -60,12 +55,20 @@ export type HighlightIdsType = {
   }
 
   export type HighlightsPostDataType = {
-	unhighlighted: HighlightIdsType[];
-	terms: string[];
+	unhighlighted: UnhighlightedType[];
+	terms: string;
 	markup: boolean;
 	fragmentSizeValue: number;
-
   }
+  export type UnhighlightedType = {
+    luceneId:number[],
+    filename:string[]
+  }
+
+
+export type HighlightType = {
+    highlights: string[];
+  };
 
 export type FilterType = {
 	action?: FilterOptionType[];
@@ -96,43 +99,43 @@ export type FilterType = {
 	typeScoping?: boolean;
   
 };
+export type FilterOptionType = {
+	label: string;
+	value: any;
+  }
+
 export type SearchContextType = {
 	error: string;
 	filters: FilterType;
 	fragmentSizeValue?: number;
+//	getHiglightsFromResult: (result:SearchResultType,searchTerm:string) => HighlightIdsType[];
+//	getHiglightsFromResults: (results:SearchResultType[], searchTerm:string) => void;
+	getResultHighlights: (result:SearchResultType,title:string) => SearchResultType;
+	hasActiveFilters: boolean;
 	hideOrganization?: boolean;
 	isAvailableFilesDialogOpen: boolean;
 	loading: boolean;
+	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
 	pagination: PaginiationType;
 	results: SearchResultType[];
 	resultsToDisplay: SearchResultType[];
-	setResultsToDisplay: (results:SearchResultType[]) => void;
-	searchNoContext: () => void;
 	searched: boolean;
+	searchNoContext: () => void;
+	searchTitlesOnly: boolean;
 	searchTop: () => void;
-	showSnippets: boolean;
+	setError: (error:string) => void;
 	setHasActiveFilters: () => boolean;
-	hasActiveFilters: boolean;
+	setLoading: (loading:boolean) => void;
+	setResults: (results:SearchResultType[]) => void;
+	setResultsToDisplay: (results:SearchResultType[]) => void;
+	setSearched: (searched:boolean) => void;
+	setSearchTitlesOnly: (searchTitlesOnly:boolean) => void;
 	setShowSnippets: (showSnippets:boolean) => void;
 	showPDFDialog: boolean;
+	showSnippets: boolean;
 	updateFilterStateValues : (key:string, value:any) => void;
 	updatePaginationStateValues : (key:string, value:any) => void;
-	setError: (error:string) => void;
-	// sortSearchResults: (results:SearchResultType[], sortBy:string) => SearchResultType[]
-	setLoading: (loading:boolean) => void;
-	setSearched: (searched:boolean) => void;
-	setResults: (results:SearchResultType[]) => void;
-	paginateResults: (results:SearchResultType[], pageNumber: number, pageSize: number) => void;
-	setSearchTitlesOnly: (searchTitlesOnly:boolean) => void;
-	searchTitlesOnly: boolean;
-	getActiveFilters: (filters:FilterType) => FilterOptionType[],
-	getFilterValues: (options:FilterOptionType[], key:string) => FilterOptionType[],
-	getFilteredValues: (options:FilterOptionType[], value:FilterOptionType, meta:any) => FilterOptionType[]
   };
-  export type FilterOptionType = {
-	label: string;
-	value: any;
-  }
   enum LOG_LEVEL {
 	DEBUG = "debug",
 	INFO = "info",
@@ -158,14 +161,6 @@ export type SearchResultPropsType = {
   result: SearchResultType
 }
 
-export type SearchHeaderPropsType = {
-  //[TODO] placeholder implement when needed
-}
-
-export type SearchAppPropsType ={
-  //results: ISearchResult[];
-}
-
 export interface SearchFiltersPropType {
 	filtersHidden: boolean;
 }
@@ -176,8 +171,8 @@ export type SearchTipsPropType = {
   }
 
 export type SearchFilterResultsType = {
-		key: string;
-		value: any;
+	key: string;
+	value: any;
 }
 
 

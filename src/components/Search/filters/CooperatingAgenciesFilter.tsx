@@ -4,6 +4,7 @@ import { Box, Autocomplete, TextField } from "@mui/material";
 import { agencyOptions as options } from "../data/dropdownValues";
 import { FilterOptionType } from "@/components/interfaces/types";
 import FilterSelect from "./FilterSelect";
+//import {getFilteredValues} from "../searchUtils";
 //import _ from "underscore";
 import _debounce from "lodash/debounce";
 import Select from "react-select";
@@ -11,17 +12,12 @@ import Select from "react-select";
 export default function CooperatingAgenciesFilter(props) {
   const context = useContext(SearchContext);
   const {
-    pagination,
     filters,
     updatePaginationStateValues,
     updateFilterStateValues,
-    loading,
-    searchTitlesOnly,
-    getFilterValues,
-    getFilteredValues,
-  } = context;
+   } = context;
 
-  const filterValue:FilterOptionType[] = filters.cooperatingAgency;
+  const filterValue = filters.cooperatingAgency as FilterOptionType[];
   
   const onChange = (value, meta) => {
     let filteredAgencies = getFilteredValues(options, value, meta);

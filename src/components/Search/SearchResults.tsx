@@ -39,13 +39,13 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
+
 const SearchResults = (props: SearchResultsType) => {
   const classes = useStyles(theme);
   const _mounted = useRef(false);
   const context = React.useContext(SearchContext);
   const { filters, pagination, updatePaginationStateValues, results,setError,setResults,resultsToDisplay } = context;
   const { page, sortby, limit, sortdir,rowsPerPage } = pagination;
-
   //  const results = response.search_top; //context.results
   // console.log(`SearchResults ~ results:`, results);
 
@@ -64,18 +64,13 @@ const SearchResults = (props: SearchResultsType) => {
 
   const onPaginationChange = (evt) => {
   console.log(`onPaginationChange ~ PAGE:`, evt.target.value);
-//    updatePaginationStateValues("page", page);
       const newPage = evt.target.value;
       //Use effect should detect the pagination change, so ... a direct call should not be needed?
       updatePaginationStateValues("page", newPage);
-//      setResults(paginatedResults);
   };
-
-  
   return (
     <Paper elevation={0} id="search-results-root">
       <>
-        
         <TablePagination
           rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
           onChange={(evt)=>onPaginationChange(evt)}
@@ -91,19 +86,19 @@ const SearchResults = (props: SearchResultsType) => {
           component={`div`}
         />
       </> 
-      {resultsToDisplay &&  resultsToDisplay.map((result:SearchResultType, idx:number) => {
-         
-          return (
-            <Box key={result.doc.processId + "_" + result.doc.id}> 
-              
-              <Grid {...GridItemProps} key={`${result.doc.id+'_'+result.doc.processId+'_'+result.doc.documentType}`}>
-                <>
-                  <Box> <SearchResult result={result} /></Box> 
-                </>
-              </Grid>
-            </Box>
-          )
+      <Box>
+     <Box>
+      {resultsToDisplay && resultsToDisplay.length > 0 && resultsToDisplay.map((result,index) => {
+      return (
+          <div key={`result-${result.doc.id}-${result.doc.processId}`}>
+            {index}
+            <SearchResult result={result} />
+          </div>
+        )
       })}
+     </Box>
+
+      </Box>
     </Paper>
   );
 };

@@ -9,7 +9,10 @@ import mkcert from 'vite-plugin-mkcert' //used for https on local
 const env = loadEnv(path.resolve(__dirname, '.env'), process.env.NODE_ENV);
 console.log("🚀 ~ env:", env)
 export default defineConfig({
-  plugins: [react(),mkcert()],
+  plugins: [
+    react(),
+   //mkcert(),
+  ],
   build: {},
   preview:{
     host: 'localhost',

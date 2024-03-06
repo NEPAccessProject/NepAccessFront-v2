@@ -1,5 +1,5 @@
 @host=http://localhost:8080/
- @host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
+@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
 ###
  GET {{host}}check HTTP/1.1
 
@@ -11,88 +11,16 @@ Accept: application/json, text/plain, */*
 Content-Type: application/json;charset=utf-8
 
 ###
-
-POST {{host}}/user/checkApprover HTTP/1.1
-Access-Control-Allow-Origin: *
-Pragma: no-cache
-Accept: application/json, text/plain, */*
-Sec-Fetch-Site: same-site
-Accept-Language: en-US,en;q=0.9
-Cache-Control: no-cache
-Sec-Fetch-Mode: cors
-Accept-Encoding: gzip, deflate
-Origin: http://localhost:3000
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15
-Referer: http://localhost:3000/
-Content-Length: 0
-X-Content-Type-Options: no-sniff
-Connection: keep-alive
-Sec-Fetch-Dest: empty
-Host: localhost:8080
-
-
-###
-POST {{host}}user/get_role HTTP/1.1
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDU2MTc2NTUsImp0aSI6IjY0NSJ9.BWHi9ebwR5rFIDnBgmZXQqdMyED7c46gFfogbPhJH0pc8cQto-SXnqVi7FsO4XfBWUyx_vXjb7FG0IY8dNCMfw
-
-### 
-GET {{host}}user/getAll HTTP/1.1
-#Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDU2MTc2NTUsImp0aSI6IjY0NSJ9.BWHi9ebwR5rFIDnBgmZXQqdMyED7c46gFfogbPhJH0pc8cQto-SXnqVi7FsO4XfBWUyx_vXjb7FG0IY8dNCMfw
-
-###
 GET {{host}}stats/fast41_count HTTP/1.1
-
-###
-POST https://bighorn.sbs.arizona.edu:8443/nepaBackend/user/get_role HTTP/1.1
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDU2MTc2NTUsImp0aSI6IjY0NSJ9.BWHi9ebwR5rFIDnBgmZXQqdMyED7c46gFfogbPhJH0pc8cQto-SXnqVi7FsO4XfBWUyx_vXjb7FG0IY8dNCMfw
-
-###
-GET {{host}}/file/uploadCSV_ids HTTP/1.1
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDUxMDIwOTMsImp0aSI6IjY0NSJ9.m5ncV6LWWy6iMkyZyNZiMpMrbuyjHAd-b9bxGhqv3isKy6oN8FlXMVNrBJ0Cas5nOyCAa8xWto7X9b3Hq0y7LA
-
-###
-GET {{host}}file/can_link_folder_type?path=EisDocuments-441633.zip HTTP/1.1
-#Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDUyNzE2OTUsImp0aSI6IjY0NSJ9.zh_om30fE8wQtHTSCrdiX3miXfFpo9D_Xo3lCTj8Kh9kLb6R4jvL8nThrPba_6grJ0nxpf2Mv5ux3V35q2Hn1A
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDU1MjMyNDMsImp0aSI6IjY0NSJ9.qSEMFaEqUedMadbR3bpyJITt2hdw7PdFo2VaRmwtX_4bMN_h9GmSr3CkE_ET8M9IB1JeHBLJ6RNkoolhwUoE-Q
-
-#localhost
-###
-GET {{host}}file/can_link_folder_type?path=EisDocuments-442559.zip
-Authorization: Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDUyNzE2OTUsImp0aSI6IjY0NSJ9.zh_om30fE8wQtHTSCrdiX3miXfFpo9D_Xo3lCTj8Kh9kLb6R4jvL8nThrPba_6grJ0nxpf2Mv5ux3V35q2Hn1
-Content-Type: multipart/form-data
-
-###
-GET {{host}}stats/fast41_count HTTP/1.1
-
-###
-POST {{host}}text/search HTTP/1.1
-Content-Type: application/json
-Accept: application/json, text/plain, */*
-
-{   
-    "title": "Copper AND Mine"
-}
-
-###
-
-POST {{host}}text/search_no_context HTTP/1.1
-Content-Type: application/json
-Accept: application/json, text/plain, */*
-
-{   
-    "documentType": ["draft"]
-}
 
 ###
 POST {{host}}text/search_top HTTP/1.1
 Content-Type: application/json
 
 {   
-    "agency": ["Bureau of Land Management"],
-    "documentType": "Final"
+
 }
 ###
-
 
 
 ###
@@ -100,78 +28,54 @@ POST {{host}}text/search_no_context HTTP/1.1
 Content-Type: application/json
 
 {       
-        "agency": ["Bureau of Land Management"],
-        "draftNOA": 1,
-        "isFast41": 1,
-        "finalNoa":1,
-        "state": ["Multi"]
+    "title":"copper and mine",
+    "agency":["Advisory Council on Historic Preservation (ACHP)"],
+    "states": ["AZ"]
+
 }
 
 ###
-POST {{host}}text/search_no_context HTTP/1.1
+POST {{host}}text/search_top HTTP/1.1
 Content-Type: application/json
 
-{"title":"Copper Mine","documentType":["DRAFT"],"isFast41":1,"state":["OR"]}
+{
+    "title":"Copper Mine",
+    "agency":["Advisory Council on Historic Preservation (ACHP)"],
+    "states": ["AZ"]
+
+}
 
 
+### Works
+POST {{host}}text/get_highlightsFVH HTTP/1.1
+Accept: application/json, text/plain, */*
+Content-Type: application/json;charset=utf-8;text/*
+
+{
+  "unhighlighted": [
+    {
+      "luceneIds": [
+        11430
+      ],
+      "filename": "SMFEIS_Vol 3_Comment Response_05_Business-Form Letter-Petition.pdf"
+    }
+  ],
+  "terms": "sahuaro",
+  "markup": "true",
+  "fragmentSizeValue": 2
+}
+###
 ###
 POST {{host}}text/get_highlightsFVH HTTP/1.1
 Accept: application/json, text/plain, */*
-Content-Type: application/json;charset=utf-8
+Content-Type: application/json;charset=utf-8;text/*
 
-{"unhighlighted":[{"luceneIds":[11430],"filename":"SMFEIS_Vol 3_Comment Response_05_Business-Form Letter-Petition.pdf"},{"luceneIds":[21129],"filename":"NonWeb_Comments.pdf"}],"terms":"sahuaro","markup":true,"fragmentSizeValue":2}
-
-###
-GET {{host}}user/getAll HTTP/1.1
+{"unhighlighted":[{"luceneIds":[11430],"filename":"SMFEIS_Vol 3_Comment Response_05_Business-Form Letter-Petition.pdf"},{"luceneIds":[21129],"filename":"NonWeb_Comments.pdf"}],"terms":"sahuaro","markup":"true","fragmentSizeValue":2}
 
 ###
-GET {{host}}stats/fast41_count HTTP/1.1
+POST {{host}}text/search_top HTTP/1.1
+Accept: application/json, text/plain, */*
+Content-Type: application/json;charset=utf-8;text/*
 
-# ###
-# POST {{host}}user/register HTTP/1.1
-# Accept: application/json, text/plain, */*
-# Content-Type: application/json;charset=utf-8
-# #Content-Type: application/x-www-form-urlencoded;charset=utf-8
+{"title":"Copper Mine","agency":["Advisory Council on Historic Preservation (ACHP)"]}
 
-# {
-
-# }
-
-# ###
-# POST {{host}}user/register HTTP/1.1
-# Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbXMiLCJleHAiOjE3MDY5OTYxMjEsImp0aSI6IjY0NSJ9.CECHI_YiXBO1PTXL74Vk1lhlAVppwQgl4na_Bw81JOxjNGOWhLC_Kh6O1kVc8Rl8f3VHSyp1hYoU4tDof04txg
-
-# {{ 
-#     "jsonUser:" \'{"username":"test2","password":"test2","email":"the46and2@hotmail.com","firstName":"george","lastName":"schaffer","affiliation":"FEDERAL AGENCY","organization":"NEPA","jobTitle":"test"}
-# }}
-
-# ###
-
-# POST {{host}}user/pre_register HTTP/1.1
-# Content-Disposition: form-data; name="jsonUser"
-
-# {"username":"test3","password":"smIdAOOn","email":"the46and2@hotmail.com","firstName":"Test","lastName":"User","affiliation":"Federal government","organization":"","jobTitle":""}
-
-# ### 
-# POST {{host}}user/login HTTP/1.1
-
-# Content-Type: application/json
-# Access-Control-Allow-Origin: *
-# Pragma: no-cache
-# Accept: application/json, text/plain, */*
-# Authorization: null
-# Sec-Fetch-Site: cross-site
-# Accept-Language: en-US,en;q=0.9
-# Cache-Control: no-cache
-# Sec-Fetch-Mode: cors
-# Accept-Encoding: gzip, deflate, br
-# Origin: https://www.nepaccess.org
-# Referer: https://www.nepaccess.org/
-# User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15
-# Content-Length: 53
-# X-Content-Type-Options: no-sniff
-# Connection: keep-alive
-# Sec-Fetch-Dest: empty
-# Host: bighorn.sbs.arizona.edu:8443
-
-# {"username":"madelynulatowski","password":"ayDrv5vR"}

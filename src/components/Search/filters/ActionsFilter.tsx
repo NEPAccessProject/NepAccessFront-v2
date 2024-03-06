@@ -10,14 +10,16 @@ import SearchContext from "../SearchContext";
 import { actionOptions as options } from "../data/dropdownValues";
 import Select from 'react-select'
 import FilterSelect from "./FilterSelect";
+import {getFilteredValues} from '../searchUtils'
 
 const ActionsFilter = () => {
 
     const context = useContext(SearchContext);
-    const { updateFilterStateValues, filters,searchTitlesOnly,loading,getFilterValues,getFilteredValues } = context;
+    const { updateFilterStateValues, filters,searchTitlesOnly,loading } = context;
     const action = filters.action || [];
     const onChange = (value,meta) => {
-      const filtered = getFilteredValues(options,value,meta);
+      //const filtered = getFilteredValues(options,value,meta);
+      const filtered = options.map((o) => o.value).filter((o) => value.includes(o));
       updateFilterStateValues("action", filtered);
 //      updateFilterStateValues("decisionsRaw", evt);
     }
