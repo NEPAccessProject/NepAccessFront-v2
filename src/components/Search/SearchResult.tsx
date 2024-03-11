@@ -21,7 +21,6 @@ import SearchResultCards from "./SearchResultCards";
 //import SearchResultCards from "./SearchResultCards";
 import { spacing } from "material-ui/styles";
 import {
-  getResultHighlights,
   getUnhighlightedFromResult,
   post,
   getHighlights
@@ -81,19 +80,19 @@ const SearchResult = (props: SearchResultPropsType) => {
   const { score, ids } = currentResult;
   const _mounted = react.useRef(false)
 
-//   useEffect(()=>{
-//     if(!_mounted.current){
-//       _mounted.current= true;
-//     }
-//     (async()=>{
-//       const resultHighlights= await getHighlights(result,title)
-//       console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
-// //      setHiglights(resultHighlights);
-//       setHiglights(resultHighlights);
-//       console.log(`async ~ result:`, result);
-//     })();
-//     console.log('IN EFFECT WITH RESULT',result)
-//   },[result])
+  useEffect(()=>{
+    if(!_mounted.current){
+      _mounted.current= true;
+    }
+    (async()=>{
+      const resultHighlights= await getHighlights(result,title)
+      console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
+//      setHiglights(resultHighlights);
+      setHiglights(resultHighlights);
+      console.log(`async ~ result:`, result);
+    })();
+    console.log('IN EFFECT WITH RESULT',result)
+  },[result])
   const {
     commentDate,
     title,
@@ -137,10 +136,14 @@ const SearchResult = (props: SearchResultPropsType) => {
     return snippet;
   };
   //    console.log(`🚀 ~ file: SearchResultSnippets.jsx:65 ~ Snippets ~ snippet:`, snippet);
-  function convertToHTML(content) {
+  function convertToHTML(content:string) {
+    !content?.length{
+      return false
+    }
+    // const html = content.substring(0, 100) as string;
     return { __html: content };
   }
-  return (
+   return (
     <>
       {doc && (
         
@@ -220,8 +223,6 @@ const SearchResult = (props: SearchResultPropsType) => {
                     variant="body2"
                   >
                     <Box>
-                      <b>Highlight?</b>
-                      <b>Show Snippet</b> {showSnippet ? "true" : "false"}
                       {highlights.map((highlight, index) => (
                         <Box
                           key={index}
@@ -230,7 +231,6 @@ const SearchResult = (props: SearchResultPropsType) => {
                           borderColor="grey.300"
                         >
                           <Box>
-                            <b>HIGHLIGHT # {highlights.length}</b>
                             {highlights.map((highlight, index) => {
                               return (
                                 <Box
@@ -240,10 +240,9 @@ const SearchResult = (props: SearchResultPropsType) => {
                                   borderColor="grey.300"
                                 >
                                   <Box>
-                                    {JSON.stringify(highlight)}
                                   </Box>
                                   <Box
-                                    dangerouslySetInnerHTML={convertToHTML(highlight.slice(0, 100))}
+                                    dangerouslySetInnerHTML={convertToHTML(highlight)}
                                   >
                                   </Box>
                                 </Box>

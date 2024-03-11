@@ -11,7 +11,7 @@ console.log("🚀 ~ env:", env)
 export default defineConfig({
   plugins: [
     react(),
-   //mkcert(),
+   mkcert(),
   ],
   build: {},
   preview:{

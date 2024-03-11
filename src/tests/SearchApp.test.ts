@@ -2,7 +2,7 @@
 import { FilterType,DocumentType, SearchResultType } from "../components/interfaces/types";
 import {it,describe,expect,test} from 'vitest'
 import { resourceLimits } from "worker_threads";
-import {post,get, getResultHighlights,getUnhighlightedFromResult,getUnhighlightedFromResults} from '../components/Search/searchUtils';
+import {post,get, getHighlights,getUnhighlightedFromResults,getUnhighlightedFromResult} from '../components/Search/searchUtils';
 import axios, { AxiosResponse,AxiosError } from "axios";
 	const filters = {
 		title: 'Copper Mine',
@@ -88,6 +88,9 @@ import axios, { AxiosResponse,AxiosError } from "axios";
 			const unhighlighted = getUnhighlightedFromResult(result,result.doc.title);
 			console.log(`test.only ~ unhighlighted:`, unhighlighted);
 			expect(unhighlighted).toBeDefined();
+			const higlights: string[] = await getHighlights(result,"Copper Mine");
+			expect(higlights).toBeDefined();
+			expect(higlights.length).toBeGreaterThan(0);
 		})
 
 		test("Retrives highlights for a single result", async()=>{

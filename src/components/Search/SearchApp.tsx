@@ -6,6 +6,8 @@ import {
   Paper,
   Snackbar,
   Typography,
+  TablePagination,
+  Divider,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -30,16 +32,18 @@ import {
   sortSearchResults,
   getActiveFilters,
   filterResults,
-  getResultHighlights,
   groupResultsByProcessId,
+  getUnhighlightedFromResults,
 } from "./searchUtils";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResults from "./SearchResults";
+import SearchResult from "./SearchResult";
 import { number } from "prop-types";
 import { title } from "process";
 import data from "@/tests/data/search_no_context";
 import SearchTips from "./SearchTips";
+import { BorderColor } from "@mui/icons-material";
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
 
@@ -56,7 +60,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [error, setError] = useState<string>("");
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [showSnippets, setShowSnippets] = useState<boolean>(false);
-  const [processes,setProcesses] = useState<SearchProcessType>({});
+  const [processes, setProcesses] = useState<SearchProcessType>({});
   const { page, limit, sortby, sortdir } = pagination;
   const { title } = filters;
   const host = import.meta.env.VITE_API_HOST;
@@ -185,9 +189,35 @@ const SearchApp = (props: SearchAppPropType) => {
           console.log("# of results", results.length);
           //        const resultsToDisplay = res.data.splice((page*rowsPerPage), (page*rowsPerPage)+rowsPerPage);
           const resultsToDisplay = results.splice(0, 4);
-          const groupedResults:SearchProcessType = groupResultsByProcessId(resultsToDisplay);
+          
+          const groupedResults: SearchProcessType =
+            groupResultsByProcessId(resultsToDisplay);
           setProcesses(groupedResults);
           console.log(`.then ~ groupedResults:`, groupedResults);
+          const unhiglighted = getUnhighlightedFromResults(resultsToDisplay,"Cooper Mine");
+          console.log(`.then ~ unhiglighted:`, unhiglighted);
+          // axios.post(`${host}text/get_highlightsFVH`, 
+          //   unhiglighted,{
+          //     headers: {
+          //       "Content-Type": "application/json",
+          //       Accept: "application/json",
+      
+          //     },
+          //   })
+          //   .then((response: AxiosResponse) => {
+          //     console.log(`.then ~ response:`, response);
+          //     return response.data as string[]
+          //   })
+          //   .then((highlights) => {
+          //     debugger;
+          //     console.log('RESPONSE HIGHLIGHTS',highlights);
+          //     highlights.map((highlight,index) => {
+          //         console.log('HIGHLIGHT',highlight,index);
+          //     })
+          //   })
+          //   .catch((error) => {
+          //     console.error("SEARCH RESULT ERROR", error);
+          //   })
           // resultsToDisplay.map(async(result) => {
           //     console.log(`resultsToDisplay.map ~ result:`, result);
           //     const highlights = await getHighlights(result);
@@ -214,6 +244,7 @@ const SearchApp = (props: SearchAppPropType) => {
     });
     //    console.log("FINSHED FILTERS UPDATE - Filters are now", filters);
   };
+
   const value = {
     ...context,
     results,
@@ -251,20 +282,31 @@ const SearchApp = (props: SearchAppPropType) => {
             </Alert>
           </Snackbar>
         </Box>
-        <Paper elevation={1}>
-          <Grid container borderTop={1} borderColor={"#ccc"} spacing={2}>
+        <Paper
+          id="search-filters-container"
+          elevation={1}
+          sx={{ borderRadius: 0 }}
+        >
+          <Grid container borderTop={0} borderColor={"#ccc"} spacing={2}>
             <Grid xs={3}>
-              <Paper style={{ padding: 5, flexGrow: 1 }}>
+              <Paper
+                elevation={1}
+                //style={{ padding: 2, flexGrow: 1, borderRadius: 0 }}
+              >
                 <SearchFilters />
               </Paper>
             </Grid>
-            <Grid xs={9}>
+            <Grid xs={9} id="search-results-container-item">
               <>
-                <Grid container borderBottom={1} borderColor={"#ccc"}>
+                <Paper
+                  id="search-header-container-grid"
+                  elevation={1}
+                  sx={{ borderRadius: 0 }}
+                >
                   <Grid xs={12} flex={1}>
                     <SearchHeader />
                   </Grid>
-                </Grid>
+                </Paper>
                 {loading && (
                   <>
                     <Grid container display={"flex"}>
@@ -280,35 +322,22 @@ const SearchApp = (props: SearchAppPropType) => {
                     </Grid>
                   </>
                 )}
-                <Box>
-                    {JSON.stringify(processes,null,2)}
-                  
-                </Box>
-                <>
-                  {resultsToDisplay.length > 0 ? (
-                    <>
-                      <Typography variant="h2">
-                        {results.length ? results.length : 0} Search Results
-                        Found
-                      </Typography>
-                      {resultsToDisplay.map(
-                        (result: SearchResultType, index) => (
-                          <>
-                            {result && result?.doc && (
-                              <div key={result.doc.id}>
-                                <SearchResults results={resultsToDisplay} />{" "}
-                              </div>
-                            )}
-                          </>
-                        )
-                      )}
-                    </>
-                  ) : (
-                    <Box marginTop={1}>
+                <div
+                  id="search-results-container"
+                  style={{ padding: 1, marginTop: 2, borderRadius: 0,border:1 }}
+                >
+                    {processes && Object.keys(processes).length 
+                    ? (
+                      <>
+                        <DisplayProcesses processes={processes} />
+                          <Divider />
+                      </>
+                    )
+                    : (
                       <SearchTips />
-                    </Box>
-                  )}
-                </>
+                    )
+                    }
+                </div>
               </>
             </Grid>
           </Grid>
@@ -316,6 +345,76 @@ const SearchApp = (props: SearchAppPropType) => {
       </Container>
     </SearchContext.Provider>
   );
-  };
+};
 
 export default SearchApp;
+
+export const DisplayProcesses = (props) => {
+  const { processes } = props;
+  const context = React.useContext(SearchContext);
+  const { filters, pagination, updatePaginationStateValues, results } = context;
+  console.log(`Context DisplayProcesses ~ results:`, results.length);
+  const { page, sortby, limit, sortdir, rowsPerPage } = pagination;
+  const handleChangeRowsPerPage = (evt) => {
+    const rowsPerPage: Number = parseInt(
+      (evt.target as HTMLInputElement).value,
+      10
+    );
+    updatePaginationStateValues("limit", rowsPerPage);
+  };
+
+  const onPaginationChange = (evt) => {
+    console.log(`onPaginationChange ~ PAGE:`, evt.target.value);
+    const newPage = evt.target.value;
+    //Use effect should detect the pagination change, so ... a direct call should not be needed?
+    updatePaginationStateValues("page", newPage);
+  };
+
+  const handleChangePage = (evt, newPage: number) => {
+    //setPage(newPage);
+    updatePaginationStateValues("page", newPage);
+    //    paginateResults(results,newPage,limit)
+  };
+
+  const processIds = Object.keys(processes);
+  console.log(`DisplayProcesses ~ processes:`, processes);
+  return (
+    <Box sx={{ border: "1px solid #F0F0F0"}} >
+      <TablePagination
+        rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
+        onChange={(evt) => onPaginationChange(evt)}
+        //count={results.length} [TODO] Need to get count from the server
+        count={results.length}
+        rowsPerPage={rowsPerPage} //{limit}
+        page={page}
+        onPageChange={(evt, page) => handleChangePage(evt, page)}
+        onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
+        showFirstButton={true}
+        showLastButton={true}
+        color="primary"
+        component={`div`}
+      />
+        <Box
+          id="search-process-root"
+        >
+          {processIds.map((processId, key) => (
+            <Grid container key={key}>
+                 <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
+                   <Typography
+                    textAlign={"center"}
+                    variant="h3"
+                  >
+                    {processes[processId][0].doc.title}
+                  </Typography>
+                 </Box>
+                  {processes[processId].map((result) => (
+                    <Box id={`search-result-${result.doc.id}-container`} key={processId}>
+                        <SearchResult result={result} />{" "}
+                    </Box>
+                ))}
+              </Grid>
+          ))}
+        </Box>
+    </Box>
+  );
+};

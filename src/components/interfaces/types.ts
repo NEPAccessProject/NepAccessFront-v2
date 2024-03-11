@@ -32,7 +32,7 @@ export type DocumentType = {
 	isFast41?: boolean;
 }
 	export type SearchProcessType = {
-		[key:number]: SearchResultType[]
+		[key: string]: SearchResultType[]
 	}
 
   export type PaginiationType = {
@@ -48,12 +48,12 @@ export type SearchResultType = {
   ids: number[];
   doc: DocumentType;
   highlights: string[];
-  filenames: string[];//string[];
+  filenames: string;//string[];
   score?: number;
 }
 
 export type HighlightIdsType = {
-	luceneId:number;
+	luceneIds:number;
 	filename:string[];
   }
 
@@ -64,8 +64,8 @@ export type HighlightIdsType = {
 	fragmentSizeValue: number;
   }
   export type UnhighlightedType = {
-    luceneId:number[],
-    filename:string[]
+    luceneIds:number[],
+    filename:string
   }
 
 

@@ -1,7 +1,6 @@
 
 
 //[TODO][REFACTOR]  values for look ups such as agencies, stqtes etc should be stored in lookup tables.
-import { result } from "lodash";
 import {
     FilterOptionType,
     FilterType,
@@ -17,7 +16,8 @@ import {
   import axios,{AxiosResponse} from "axios";
 import { func } from "prop-types";
   //[TODO][CRITICAL] move this to a ENV value
-  const host = import.meta.env.VITE_API_HOST;
+  //const host = import.meta.env.VITE_API_HOST;
+  const host = "https://bighorn.sbs.arizona.edu:8443/nepaBackend/";
   console.log(`host:`, host);
 export function sortSearchResults(
     results,
@@ -74,7 +74,7 @@ export function filterResults(results: SearchResultType[]): SearchResultType[] {
   console.log("TOP SCORES", scores[0]);
   console.log("BOTTOM SCORES", scores[scores.length - 1]);
   console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
-  const avg = (scores[scores.length - 1] + scores[0]) / 2;
+  const avg:number = (scores[scores.length - 1] + scores[0]) / 2;
   const filteredResults = results.filter((result) => result && result.score && result.score > avg);
   console.log(
     "🚀 ~ filterResults ~ # of filteredResults:",
@@ -197,7 +197,6 @@ export function getActiveFilters(filters:FilterType): FilterType {
   return activeFilter;
 };
 
-
 export function getUnhighlightedFromResults(results:SearchResultType[],searchTerm:string): HighlightsPostDataType {
   const postData:HighlightsPostDataType = {
     unhighlighted: [],
@@ -205,13 +204,21 @@ export function getUnhighlightedFromResults(results:SearchResultType[],searchTer
     markup: false,
     fragmentSizeValue: 2,
   };
+  //[TODO][CRITICAL] Need to seperate each entry in filenames as array 
   results.map((result:SearchResultType) => {
+    console.log(`FILENAMES ~ type: ${typeof result.filenames} ~ result:`, result.filenames);
+    const filenames = result.filenames && result.filenames.length  && result.filenames.split('>') as string[] || [result.filenames];
+    console.log(`results.map ~ filenames:`, filenames);
+    console.log(`results.map ~ result:`, result);
     result.ids.forEach((id) => {
+      filenames.map(filename => {
+        console.log(`ID: ${id} | Filename: ${filename}`);
       const item:UnhighlightedType = {
-        luceneId: [id],
-        filename: result.filenames,            
+        luceneIds: [id],
+        filename: filename
       }
       postData.unhighlighted.push(item);
+    });
     });
   });
   console.log(`getUnhighlightedFromResults ~ postData:`, postData);
@@ -221,29 +228,34 @@ export function getUnhighlightedFromResults(results:SearchResultType[],searchTer
 export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:string): HighlightsPostDataType {
   const postData:HighlightsPostDataType = {
     unhighlighted: [],
-    terms: searchTerm,
+    terms: searchTerm, 
     markup: false,
     fragmentSizeValue: 2,
   };
   try{
   //const luceneIds:HighlightIdsType[] = [];
-//     results.map((result:SearchResultType) => {        
+//     results.map((result:SearchResultType) => {
+        const filenames = result.filenames.split('>') as string[];
+        console.log(' filenames',filenames);
+        console.log(`//results.map ~ filenames:`, filenames);
         result.ids.forEach((id) => {
           console.log('ID',id, ' FROM Result ', result);
+            
           if(id){
-            const item:UnhighlightedType = {
-              luceneId: [id],
-              filename: result.filenames,            
+            {
+              filenames.forEach((filename) => {
+                const item:UnhighlightedType = {
+                luceneIds: [id],
+                filename:filename     
             }
             postData.unhighlighted.push(item);
-          }
-        });
-      }
+          })
+        }
+      }})}
   catch(err){
     console.error(`Error getting highlights POST data`,err)
   }
 
-  console.log(`getUnhighlightedFromResult ~ postData:`, postData);
    return postData;
 }
 export const getHighlights = async(result:SearchResultType,title:string,fragmentSizeValue:number = 2):Promise<string[]> => {
@@ -258,15 +270,17 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
         unhighlighted: [
           {
             luceneIds: [id],
-            filename: result.filenames[0],
+            filename: result.filenames,
           },
         ],
         terms: title,
         markup: true,
         fragmentSizeValue: fragmentSizeValue,
       };
+      const url = `${host}text/get_highlightsFVH`;
+      console.log('HIGHLIGHT URL:', url);
       axios
-        .post(`${host}text/get_highlightsFVH`, postData, {
+        .post(url, postData, {
           headers: {
             Accept: "application/json, text/plain, */*",
             "Content-Type": "application/json;charset=utf-8;text/*",
@@ -302,17 +316,6 @@ export function groupResultsByProcessId(results: SearchResultType[]): Record<str
   });
   console.log(`groupedResults:`, groupedResults);
   return groupedResults;
-}
-export async function getResultHighlights(result:SearchResultType,title:string): Promise<SearchResultType> {
-  const postData = getUnhighlightedFromResult(result,title);
-  const resp:AxiosResponse = await axios.post(`${host}text/get_highlightsFVH`, postData);
-  console.log(`getResultHighlights ~ resp:`, resp);
-  const highlights:any[] = resp.data;
-  console.log(`getHighlightsFromResults ~ resp.data:`, highlights);
-  result.highlights = highlights;
-  console.log(`getResultHighlights ~ result:`, result);
-  return result;
-  
 }
 export const updateActiveFilters = (filters:FilterType,key:string,value:any,action:string)=>{
   let activeFilters = {...filters};

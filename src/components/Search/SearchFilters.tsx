@@ -120,7 +120,7 @@ const SearchFilters = (props) => {
     //margin:1,
     //marginBottom: 0.5,
     fontWeight:'bold',
-    border:'1px solid black',
+//    border:'1px solid black',
     fontSize: 28,
   }
   const gridItemProps = {
@@ -141,7 +141,7 @@ const SearchFilters = (props) => {
     // alignItems: "center",
   };
   return (
-    <>
+    <Box padding={1}>
       <Box alignItems={"center"}>
         <FormLabel {...formLabelProps}>
           <Typography>
@@ -165,8 +165,14 @@ const SearchFilters = (props) => {
           onChange={(e) => updatePaginationStateValues("is_fast41", !isFast41)}
         />
       </Box>
-      <Box>
-          <SearchFilterButton />
+      <Box marginBottom={1}>
+          <Button 
+            style={{ margin: 0 }}
+            variant="contained"
+            onClick={async() => await searchTop()}  
+            disabled={loading} fullWidth color="primary">
+              Search
+          </Button>
       </Box>
       <Box>
         <Button
@@ -339,7 +345,7 @@ const SearchFilters = (props) => {
           }
         />
       </Box>
-    </>
+    </Box>
   );
 };
 //export default withStyles(useStyles)(SideBarFilters);

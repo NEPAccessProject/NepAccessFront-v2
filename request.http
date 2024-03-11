@@ -44,24 +44,32 @@ Content-Type: application/json;charset=utf-8;text/*
 {
   "unhighlighted": [
     {
-      "luceneIds": [
-        11430
-      ],
-      "filename": "SMFEIS_Vol 3_Comment Response_05_Business-Form Letter-Petition.pdf"
-    }
-  ],
+    "luceneIds": [
+      13172
+    ],
+    "filename": 
+      "Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf"
+    },
+    {
+    "luceneIds":[ 
+      13174
+    ],
+    "filename": 
+      "Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf"
+  }
+],
   "terms": "sahuaro",
-  "markup": "true",
+  "markup": "false",
   "fragmentSizeValue": 2
 }
+
 ###
 ###
 POST {{host}}text/get_highlightsFVH HTTP/1.1
 Accept: application/json, text/plain, */*
 Content-Type: application/json;charset=utf-8;text/*
 
-{"unhighlighted":[{"luceneIds":[11430],"filename":"SMFEIS_Vol 3_Comment Response_05_Business-Form Letter-Petition.pdf"},{"luceneIds":[21129],"filename":"NonWeb_Comments.pdf"}],"terms":"sahuaro","markup":"true","fragmentSizeValue":2}
-
+{"unhighlighted":[{"luceneIds":[8870],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[13172],"filename":"Copper Flat Final EIS.pdf"},{"luceneIds":[13172],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 2.pdf"},{"luceneIds":[13172],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf"},{"luceneIds":[13172],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf"},{"luceneIds":[13174],"filename":"Copper Flat Final EIS.pdf"},{"luceneIds":[13174],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 2.pdf"},{"luceneIds":[13174],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf"},{"luceneIds":[13174],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf"},{"luceneIds":[13159],"filename":"Copper Flat Final EIS.pdf"},{"luceneIds":[13159],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 2.pdf"},{"luceneIds":[13159],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf"},{"luceneIds":[13159],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf"},{"luceneIds":[13165],"filename":"Copper Flat Final EIS.pdf"},{"luceneIds":[13165],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 2.pdf"},{"luceneIds":[13165],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 3.pdf"},{"luceneIds":[13165],"filename":"Copper Flat Copper Mine Final EIS Volume 2 Appendices_Part 1.pdf"},{"luceneIds":[22371],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22371],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"},{"luceneIds":[22307],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22307],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"},{"luceneIds":[22250],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22250],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"},{"luceneIds":[22334],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22334],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"},{"luceneIds":[22352],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22352],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"},{"luceneIds":[22272],"filename":"Copper Flat Copper Mine Draft EIS Volume 1.pdf"},{"luceneIds":[22272],"filename":"Copper Flat Copper Mine Draft EIS Volume 2.pdf"}],"terms":"Copper Mine","markup":false,"fragmentSizeValue":2}
 ###
 POST {{host}}text/search_top HTTP/1.1
 Accept: application/json, text/plain, */*

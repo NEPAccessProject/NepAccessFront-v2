@@ -33,49 +33,46 @@ const SearchResultCards = (props) => {
 
     
     const itemCardProps= {
-      fontFamily: 'open sans',
-      fontSize: 12,
       display:'flex',
+
 //      margin: 0.5,
 //      padding: 1,
+fontSize: '0.7rem',
       elevation: 1,
-      alignItems: 'flex-start',
-      justifyContent: 'flex-start',
       border: '1px solid #ddd',
       borderRadius: 1,
       padding: 0.5,
       margin: 0.5,
-      spacing: 0.5,
     }
         return (
               <>
                <Grid padding={2} container display={'flex'}  justifyContent={'flex-start'} flex={1}>
                  <Grid {...itemCardProps}
                 >
-                  Status:&nbsp;{status ? status : "N/A"}
+                  <b>Status:</b>&nbsp;{status ? status : "N/A"}
                 </Grid>
                 <Grid {...itemCardProps}
                 >
-                  Register Date:&nbsp;{moment(registerDate).format("MM/DD/YYYY") || "N/A"}
+                  <b>Register Date:</b>&nbsp;{moment(registerDate).format("MM/DD/YYYY") || "N/A"}
                 </Grid>
                 <Grid {...itemCardProps}
                 >
-                  State:&nbsp;<b>{state ? state : 'N/A'}</b>
+                  <b>State:</b>&nbsp;<b>{state ? state : 'N/A'}</b>
                 </Grid>
                 <Grid {...itemCardProps}
                 >
-                  County:&nbsp;<b>{county ? county : 'N/A'}</b>
+                  <b>County:</b>&nbsp;{county ? county : 'N/A'}
                 </Grid>
                 <Grid
                  {...itemCardProps}
                 >
-                  Action:&nbsp;<b>{action ? action : 'N/A'}</b>
+                  <b>Action:</b>&nbsp;{action ? action : 'N/A'}
                 </Grid>
                 <Grid
                   //className={classes.itemHeader}
                  {...itemCardProps}
                 >
-                  Decision:&nbsp;<b>{decision ? decision : 'N/A'}</b>
+                  <b>Decision:</b>&nbsp;{decision ? decision : 'N/A'}
                 </Grid>
                 {/* {(commentDate)
                       ? ( */}
@@ -83,29 +80,29 @@ const SearchResultCards = (props) => {
                   //className={classes.itemHeader}
                   {...itemCardProps}
                 >
-                  Project Start Date:&nbsp;<>{(registerDate) ? moment(registerDate).format("MM/DD/YYYY") : 'N/A'}</>
+                  <b>Project Start Date:</b>&nbsp;<>{(registerDate) ? moment(registerDate).format("MM/DD/YYYY") : 'N/A'}</>
                 </Grid>
                 <Grid
                   //className={classes.itemHeader}
                   {...itemCardProps}>
-                  Project Endate Date:&nbsp;<b>{finalNoa ? moment(finalNoaDate).format("MM/DD/YYYY") : 'N/A'}</b>
+                  <b>Project Endate Date:</b>&nbsp;<>{finalNoa ? moment(finalNoaDate).format("MM/DD/YYYY") : 'N/A'}</>
                 </Grid>
                 <Grid
                   //className={classes.itemHeader}
                  {...itemCardProps}
                 >
-                  Final NOA:&nbsp; <>{finalNoa? moment(finalNoaDate).format("MM/DD/YYYY") : 'N/A'}</>                </Grid>
+                  <b>Final NOA:</b>&nbsp; <>{finalNoa? moment(finalNoaDate).format("MM/DD/YYYY") : 'N/A'}</>                </Grid>
                 <Grid
                   //className={classes.itemHeader}
                   {...itemCardProps}
                 >
-                  Draft NOA:&nbsp; <>{draftNoa? moment(draftNoa).format("MM/DD/YYYY") : 'N/A'}</>
+                  <b>Draft NOA:</b>&nbsp; <>{draftNoa? moment(draftNoa).format("MM/DD/YYYY") : 'N/A'}</>
                 </Grid>
                 <Grid
                   //className={classes.itemHeader}
                   {...itemCardProps}
                 >
-                  Process ID:&nbsp; <b>{processId ? processId : 'N/A'}</b>
+                  <b>Process ID</b>:&nbsp; {processId ? processId : 'N/A'}
                 </Grid>
               </Grid>
               </>

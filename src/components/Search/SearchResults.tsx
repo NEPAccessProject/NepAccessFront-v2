@@ -7,12 +7,6 @@ import { SearchResultsType,SearchResultType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchResult from "./SearchResult";
 import SearchResultCards from "./SearchResultCards";
-const GridItemProps = {
-  padding: 0.5,
-  elevation: 1,
-  border: 0,
-  borderRadius: 1,
-};
 const useStyles = makeStyles(() => ({
   resultsHeader: {
     fontFamily: "open sans",
@@ -47,58 +41,19 @@ const SearchResults = (props: SearchResultsType) => {
   const { filters, pagination, updatePaginationStateValues, results,setError,setResults,resultsToDisplay } = context;
   const { page, sortby, limit, sortdir,rowsPerPage } = pagination;
   //  const results = response.search_top; //context.results
-  // console.log(`SearchResults ~ results:`, results);
+  console.log(`SearchResults ~ results:`, resultsToDisplay);
 
-  const handleChangePage = (evt, newPage: number) => {
-    //setPage(newPage);
-    updatePaginationStateValues("page", newPage);
-//    paginateResults(results,newPage,limit)
-  };
-  const handleChangeRowsPerPage = (evt) => {
-    const rowsPerPage: Number = parseInt(
-      (evt.target as HTMLInputElement).value,
-      10
-    );
-    updatePaginationStateValues("limit", rowsPerPage);
-  };
-
-  const onPaginationChange = (evt) => {
-  console.log(`onPaginationChange ~ PAGE:`, evt.target.value);
-      const newPage = evt.target.value;
-      //Use effect should detect the pagination change, so ... a direct call should not be needed?
-      updatePaginationStateValues("page", newPage);
-  };
   return (
-    <Paper elevation={0} id="search-results-root">
-      <>
-        <TablePagination
-          rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
-          onChange={(evt)=>onPaginationChange(evt)}
-          //count={results.length} [TODO] Need to get count from the server
-          count={results.length}
-          rowsPerPage={rowsPerPage}//{limit}
-          page={page}
-          onPageChange={(evt, page) => handleChangePage(evt, page)}
-          onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
-          showFirstButton={true}
-          showLastButton={true}
-          color="primary"
-          component={`div`}
-        />
-      </> 
-      <Box>
-     <Box>
+    <Box id="search-results-root">
       {resultsToDisplay && resultsToDisplay.length > 0 && resultsToDisplay.map((result,index) => {
       return (
-          <div key={`result-${result.doc.id}-${result.doc.processId}`}>
-            <SearchResult result={result} />
-          </div>
+          <Box key={`result-${result.doc.id}-${result.doc.processId}`} id={"search-result-"+result.doc.id+""} style={{padding: 0, marginBottom: 20,marginTop:20}}>
+          <SearchResult result={result} />
+          </Box>
         )
       })}
-     </Box>
 
-      </Box>
-    </Paper>
+    </Box>
   );
 };
 export default SearchResults;
