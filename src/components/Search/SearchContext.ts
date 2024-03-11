@@ -1,7 +1,6 @@
 
 import React from "react";
-import { FilterOptionType, FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
-import SearchResult from "./SearchResult";
+import { FilterType, SearchContextType, SearchResultType } from '../interfaces/types';
 
 
 //[TODO][REFACTOR] does the fooRaw values still needed after the refactor

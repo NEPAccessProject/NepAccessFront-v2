@@ -5,7 +5,8 @@ import {
   FormControl,
   FormLabel,
   IconButton,
-  TextField
+  TextField,
+  Checkbox,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
@@ -54,7 +55,7 @@ const SearchHeader = () => {
     searchTop,
     setShowSnippets,
   } = context;
-  const { proximityDisabled, proximityOption, title: title } = filters;
+  const { proximityDisabled, proximityOption, title } = filters;
   const { page, limit, sortby, sortdir } = pagination;
 
   const onChange = (evt: React.SyntheticEvent) => {
@@ -96,11 +97,24 @@ const SearchHeader = () => {
     updatePaginationStateValues(key, val);
   };
 
-  const onShowSnippetsChange = (evt: React.SyntheticEvent) => {
-    console.log(`onShowSnippetsChange ~ evt:`, evt.target);
-    const showSnippets = (evt.target as HTMLInputElement).value;
-    console.log(`onShowSnippetsChange ~ showSnippets:`, showSnippets);
-    setShowSnippets(showSnippets ? true : false);
+  const onShowSnippetsChange = (evt:React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = (evt.target as HTMLInputElement).value;
+    console.log(`onShowSnippetsChange ~ isChecked:`, isChecked);
+//    const isChecked = evt.target.checked;
+      setShowSnippets(!showSnippets);
+    console.log(`onShowSnippetsChange ~ isChecked:`, isChecked);
+    //setShowSnippets(isChecked);
+ 
+//    console.log(`onShowSnippetsChange ~ evt:`, evt.target, ' Value', evt.target.value);
+    //const showSnippets = (evt.target as HTMLInputElement).value;
+    // console.log(`onShowSnippetsChange ~ showSnippets:`, showSnippets);
+    // if (showSnippets === "on") {
+    //   setShowSnippets(false);
+    // }
+    // else{
+    //   setShowSnippets(true);
+    // }
+  
   };
 
   return (
@@ -171,27 +185,26 @@ const SearchHeader = () => {
           <Grid {...GridItemProps} xs={3}>
             <LimitControl />
           </Grid>
-          <Grid {...GridItemProps} xs={2}>
+          <Grid flex={1} {...GridItemProps} xs={2}>
             {/* [TODO] Abstract this to it's own control component */}
-            <Grid
-              container
-              display={"flex"}
-              flex={1}
-              justifyContent={"flex-end"}
-            >
-              <Grid xs={9} flex={1}>
-                <FormLabel htmlFor="searchAgency">Show Snippets:</FormLabel>
+              <Grid container flex={1}>
+                <Grid xs={11} flex={1} border={0}>
+                  <FormLabel htmlFor="searchAgency">Show Snippets:</FormLabel>
+                </Grid>
+                <Grid
+                xs={1}
+                  flex={1}
+                  margin={0}
+                  padding={0}
+                  justifyContent={"flex-end"}
+                >
+                  <Checkbox
+                    name="showSnippets"
+                    onClick={(evt) => setShowSnippets(!showSnippets)}
+                    checked={showSnippets} 
+                  />
               </Grid>
-              <Grid
-                xs={2}
-                flex={1}
-                justifyContent={"flex-start"}
-              >
-                <CheckBox 
-//                  checked={showSnippets}  
-                  onChange={(evt) => onShowSnippetsChange(evt)} />
               </Grid>
-            </Grid>
           </Grid>
         </Grid>
       </Grid>

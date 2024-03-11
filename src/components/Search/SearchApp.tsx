@@ -1,51 +1,38 @@
 import {
   Alert,
   Box,
-  Button,
   Container,
   Paper,
   Snackbar,
-  Typography,
   TablePagination,
-  Divider,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Unstable_Grid2";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import SearchFilters from "../Search/SearchFilters";
-import { getUnhighlightedFromResult } from "./searchUtils";
 import {
-  UnhighlightedType,
   FilterOptionType,
-  SearchResultType,
-  SearchAppPropType,
-  HighlightType,
   FilterType,
-  HighlightsPostDataType,
   PaginiationType,
+  SearchAppPropType,
   SearchProcessType,
+  SearchResultType,
 } from "../interfaces/types";
-import {
-  get,
-  post,
-  sortSearchResults,
-  getActiveFilters,
-  filterResults,
-  groupResultsByProcessId,
-  getUnhighlightedFromResults,
-} from "./searchUtils";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
-import SearchResults from "./SearchResults";
 import SearchResult from "./SearchResult";
-import { number } from "prop-types";
-import { title } from "process";
-import data from "@/tests/data/search_no_context";
 import SearchTips from "./SearchTips";
-import { BorderColor } from "@mui/icons-material";
+import {
+  getActiveFilters,
+  getUnhighlightedFromResults,
+  groupResultsByProcessId,
+  post,
+  sortSearchResults,
+} from "./searchUtils";
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
+  console.log('SEARCH APP CONTENXT:', context);
 
   const [results, setResults] = useState<SearchResultType[]>([]);
   const [resultsToDisplay, setResultsToDisplay] = useState<SearchResultType[]>(
@@ -58,7 +45,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searched, setSearched] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [hasSearched, setHasSearched] = useState<boolean>(context.showSnippets);
   const [showSnippets, setShowSnippets] = useState<boolean>(false);
   const [processes, setProcesses] = useState<SearchProcessType>({});
   const { page, limit, sortby, sortdir } = pagination;
@@ -189,19 +176,22 @@ const SearchApp = (props: SearchAppPropType) => {
           console.log("# of results", results.length);
           //        const resultsToDisplay = res.data.splice((page*rowsPerPage), (page*rowsPerPage)+rowsPerPage);
           const resultsToDisplay = results.splice(0, 4);
-          
+
           const groupedResults: SearchProcessType =
             groupResultsByProcessId(resultsToDisplay);
           setProcesses(groupedResults);
           console.log(`.then ~ groupedResults:`, groupedResults);
-          const unhiglighted = getUnhighlightedFromResults(resultsToDisplay,"Cooper Mine");
+          const unhiglighted = getUnhighlightedFromResults(
+            resultsToDisplay,
+            "Cooper Mine"
+          );
           console.log(`.then ~ unhiglighted:`, unhiglighted);
-          // axios.post(`${host}text/get_highlightsFVH`, 
+          // axios.post(`${host}text/get_highlightsFVH`,
           //   unhiglighted,{
           //     headers: {
           //       "Content-Type": "application/json",
           //       Accept: "application/json",
-      
+
           //     },
           //   })
           //   .then((response: AxiosResponse) => {
@@ -271,7 +261,12 @@ const SearchApp = (props: SearchAppPropType) => {
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <Snackbar
             style={{ backgroundColor: "red", color: "white" }}
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -285,63 +280,59 @@ const SearchApp = (props: SearchAppPropType) => {
         <Paper
           id="search-filters-container"
           elevation={1}
-          sx={{ borderRadius: 0 }}
         >
-          <Grid container borderTop={0} borderColor={"#ccc"} spacing={2}>
+          <Grid container spacing={2}>
             <Grid xs={3}>
               <Paper
                 elevation={1}
-                //style={{ padding: 2, flexGrow: 1, borderRadius: 0 }}
               >
                 <SearchFilters />
               </Paper>
             </Grid>
             <Grid xs={9} id="search-results-container-item">
-              <>
-                <Paper
-                  id="search-header-container-grid"
-                  elevation={1}
-                  sx={{ borderRadius: 0 }}
-                >
-                  <Grid xs={12} flex={1}>
-                    <SearchHeader />
-                  </Grid>
-                </Paper>
-                {loading && (
-                  <>
-                    <Grid container display={"flex"}>
-                      <Grid
-                        xs={12}
-                        display={"flex"}
-                        alignItems={"center"}
-                        justifyContent={"center"}
-                        alignContent={"center"}
-                      >
-                        <CircularProgress size={100} />
-                      </Grid>
+              <Paper
+                id="search-header-container-grid"
+                elevation={1}
+                sx={{ borderRadius: 0, marginBottom: 1, border: 0 }}
+              >
+                <Grid xs={12} flex={1}>
+                  <SearchHeader />
+                </Grid>
+              {loading && (
+                <Box>
+                  <Grid container display={"flex"}>
+                    <Grid
+                      xs={12}
+                      display={"flex"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      alignContent={"center"}
+                    >
+                      <CircularProgress size={100} />
                     </Grid>
+                  </Grid>
+                </Box>
+              )}
+              <Box
+                id="search-results-container"
+                elevation={1}
+                style={{ padding: 1, marginTop: 2 }}
+              >
+                {processes && Object.keys(processes).length ? (
+                  <>
+                    <DisplayProcesses processes={processes} />
                   </>
+                ) : (
+                  <Box padding={1}>
+                    <SearchTips />
+                  </Box>
                 )}
-                <div
-                  id="search-results-container"
-                  style={{ padding: 1, marginTop: 2, borderRadius: 0,border:1 }}
-                >
-                    {processes && Object.keys(processes).length 
-                    ? (
-                      <>
-                        <DisplayProcesses processes={processes} />
-                          <Divider />
-                      </>
-                    )
-                    : (
-                      <SearchTips />
-                    )
-                    }
-                </div>
-              </>
+              </Box>
+              </Paper>
             </Grid>
           </Grid>
         </Paper>
+            
       </Container>
     </SearchContext.Provider>
   );
@@ -379,7 +370,9 @@ export const DisplayProcesses = (props) => {
   const processIds = Object.keys(processes);
   console.log(`DisplayProcesses ~ processes:`, processes);
   return (
-    <Box sx={{ border: "1px solid #F0F0F0"}} >
+    <Box
+    //style={{ border: "1px solid #F0F0F0"}}
+    >
       <TablePagination
         rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
         onChange={(evt) => onPaginationChange(evt)}
@@ -394,27 +387,32 @@ export const DisplayProcesses = (props) => {
         color="primary"
         component={`div`}
       />
-        <Box
-          id="search-process-root"
-        >
+      <Box id="search-process-root" bgcolor={'#F8F8F8'} paddingLeft={1} paddingRight={1}>
+        <Box bgcolor={'#fff'}>
           {processIds.map((processId, key) => (
             <Grid container key={key}>
-                 <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
-                   <Typography
-                    textAlign={"center"}
-                    variant="h3"
+              {/* <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
+                     <Typography
+                      textAlign={"center"}
+                      variant="h3"
+                    >
+                      {processes[processId][0].doc.title}
+                    </Typography>
+                   </Box> */}
+              <Box  marginBottom={0}>
+                {processes[processId].map((result) => (
+                  <Box
+                    id={`search-result-${result.doc.id}-container`}
+                    key={processId}
                   >
-                    {processes[processId][0].doc.title}
-                  </Typography>
-                 </Box>
-                  {processes[processId].map((result) => (
-                    <Box id={`search-result-${result.doc.id}-container`} key={processId}>
-                        <SearchResult result={result} />{" "}
-                    </Box>
+                    <SearchResult result={result} />
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
+            </Grid>
           ))}
         </Box>
+      </Box>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 @host=http://localhost:8080/
-@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
+#@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
 ###
  GET {{host}}check HTTP/1.1
 
@@ -19,8 +19,8 @@ Content-Type: application/json
 
 {       
     "title":"copper and mine",
-    "agency":["Advisory Council on Historic Preservation (ACHP)"],
-    "states": ["AZ"]
+    "agency":["Bureau of Land Management"],
+   // "states": ["AZ"]
 
 }
 
@@ -29,10 +29,10 @@ POST {{host}}text/search_top HTTP/1.1
 Content-Type: application/json
 
 {
-    "title":"Copper Mine",
-    "agency":["Advisory Council on Historic Preservation (ACHP)"],
-    "states": ["AZ"]
-
+  "agency": ["Bureau of Land Management"],
+    "needsComments": true,
+    "typeOther": 1,
+    "needsDocument": 1
 }
 
 

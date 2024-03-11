@@ -1,12 +1,10 @@
-import { Paper, TablePagination,Pagination, Box } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import { Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import React, { useRef } from "react";
 import theme from "../../themes/theme";
-import { SearchResultsType,SearchResultType } from "../interfaces/types";
+import { SearchResultsType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchResult from "./SearchResult";
-import SearchResultCards from "./SearchResultCards";
 const useStyles = makeStyles(() => ({
   resultsHeader: {
     fontFamily: "open sans",

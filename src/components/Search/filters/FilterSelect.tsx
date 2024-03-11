@@ -32,7 +32,7 @@ export default function FilterSelect(props:FilterSelectProps) {
       }
       else if(meta.action ==='remove-value'){
         //remove selected item only
-        let filtered = options.filter((v) => v !== value)
+        let filtered = options.filter((v) => v === value)
         updateFilterStateValues(key, filtered);
       }
       else if(meta.action ==='clear'){
@@ -62,7 +62,7 @@ export default function FilterSelect(props:FilterSelectProps) {
               classNamePrefix="select"
               isDisabled={searchTitlesOnly || !title}
               isClearable={true}
-              value={options.filter((v) => filterValue.includes(v))}
+              value={options.filter((v) => filterValue.includes(v.value))}
               placeholder={placeholder}
               onChange={(newValue, actionMeta) => onChange(newValue, actionMeta,keyLabel)}
               isLoading={loading}

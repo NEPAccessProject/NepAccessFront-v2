@@ -17,7 +17,8 @@ import {
 import { func } from "prop-types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
-  const host = "https://bighorn.sbs.arizona.edu:8443/nepaBackend/";
+  console.log(import.meta.env.VITE_API_HOST)
+  const host = import.meta.env.VITE_API_HOST;
   console.log(`host:`, host);
 export function sortSearchResults(
     results,
@@ -304,8 +305,10 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
 }
 export function groupResultsByProcessId(results: SearchResultType[]): Record<string, SearchResultType[]> {
   const groupedResults: Record<string, SearchResultType[]> = {};
-
+  console.log('RESULTS', results);
   results.forEach((result) => {
+    if(result.doc && result.doc.processId){
+
     const processId = result.doc.processId;
 
     if (!groupedResults[processId]) {
@@ -313,6 +316,7 @@ export function groupResultsByProcessId(results: SearchResultType[]): Record<str
     }
 
     groupedResults[processId].push(result);
+  }
   });
   console.log(`groupedResults:`, groupedResults);
   return groupedResults;
