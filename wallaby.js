@@ -11,11 +11,11 @@ module.exports = function (wallaby) {
         // for node.js tests you need to set env property as well
         // https://wallabyjs.com/docs/integration/node.html
             // Example override: only detect and configure 'vitest'
-    // autoDetect: ['vitest','jest'],
+    autoDetect: ['vitest'],
     // testFramework: 'jest',
     // delay: 1000,
     // trace: true,
-    // debug: true,
-    // runMode: 'onsave',
+        debug: true,
+     runMode: 'onsave',
     };
   };

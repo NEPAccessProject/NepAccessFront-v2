@@ -1,12 +1,12 @@
 import { Divider, Grid, Typography } from '@mui/material';
-import React, { ReactElement } from 'react';
-import {SearchTipsPropType} from '../interfaces/types';
+import { ReactElement } from 'react';
+import { SearchTipsPropType } from '../interfaces/types';
 
 export default function SearchTips(props: SearchTipsPropType): ReactElement {
   //console.log('searchTips Props',props);
     return(
         <>
-        <div id="search-tips-root">
+        <div id="search-tips-root" style={{height:'100%'}}>
             <Grid container spacing={1}  borderBottom={1} borderColor={'#ccc'}>
               <Grid item xs={12}>
                     <Typography variant='h4'>Search Tips</Typography>
@@ -15,7 +15,7 @@ export default function SearchTips(props: SearchTipsPropType): ReactElement {
                 <Typography variant='body1'>You can improve your search results, by using the various operators below as part of your search. For example a search such as &quot;Tucson AND Water NOT Sahuaro&quot; will return results that have both Tucson and Water in the title and or content. Excluding documents that have Sahuro as part of the title and or content even if there is a match for Tucson and Water.</Typography>
                 </Grid>
             </Grid>
-          <Grid container id="search-tips-grid-container" justifyContent={'center'} justifyItems={'center'} borderBottom={1} borderColor={'#ccc'}>
+          <Grid container id="search-tips-grid-container" justifyContent={'center'} justifyItems={'center'} borderBottom={0} borderColor={'#ccc'}>
                    <Grid container spacing={1}>
               <Grid item xs={2}>
                 <b>AND</b>
@@ -47,7 +47,7 @@ export default function SearchTips(props: SearchTipsPropType): ReactElement {
                 <b>NOT</b>
               </Grid>
               <Grid item xs={10}>
-                (all caps) to search to <b>exclude</b>words or a phrase.
+                (all caps) to search to <b>exclude</b> words or a phrase.
               </Grid>
             </Grid>
             <Grid container spacing={1}

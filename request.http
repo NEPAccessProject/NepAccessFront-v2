@@ -1,5 +1,5 @@
 @host=http://localhost:8080/
-#@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
+@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
 ###
  GET {{host}}check HTTP/1.1
 
@@ -14,16 +14,29 @@ Content-Type: application/json;charset=utf-8
 GET {{host}}stats/fast41_count HTTP/1.1
 
 ###
+# Note adding a "title" to the post causes fuzzy search
 POST {{host}}text/search_no_context HTTP/1.1
 Content-Type: application/json
 
-{       
-    "title":"copper and mine",
+{      
+  "title": "Copper", 
     "agency":["Bureau of Land Management"],
-   // "states": ["AZ"]
-
+    "state": ["zzz"]
 }
 
+
+###
+POST {{host}}text/search_top HTTP/1.1
+Content-Type: application/json
+
+{
+  "title": "Copper Mine",
+  "agency": ["Bureau of Land Management"],
+    "needsComments": true,
+    "typeOther": 1,
+    "needsDocument": 1,
+    "state": ["AZ"]
+}
 ###
 POST {{host}}text/search_top HTTP/1.1
 Content-Type: application/json
@@ -32,7 +45,8 @@ Content-Type: application/json
   "agency": ["Bureau of Land Management"],
     "needsComments": true,
     "typeOther": 1,
-    "needsDocument": 1
+    "needsDocument": 1,
+    "state": ["AZ"]
 }
 
 

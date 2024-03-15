@@ -3,7 +3,7 @@ import {
   SearchResultPropsType,
   SearchResultType,
 } from "@/components/interfaces/types";
-import { Box, Button, Paper, Typography,Divider } from "@mui/material";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { styled } from "@mui/styles";
 import react, { useContext, useEffect, useState } from "react";
@@ -58,23 +58,23 @@ const SearchResult = (props: SearchResultPropsType) => {
   const { score, ids } = currentResult;
   const _mounted = react.useRef(false);
 
-  // useEffect(() => {
-  //   if (!_mounted.current) {
-  //     _mounted.current = true;
-  //   }
-  //   (async () => {
-  //     if(!showSnippets || !showSnippet){
-  //        console.log('showSnippets is false - exiting');
-  //       return;
-  //     }
-  //     const resultHighlights = await getHighlights(result, title);
-  //     console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
-  //     //      setHiglights(resultHighlights);
-  //     setHiglights(resultHighlights);
-  //     console.log(`async ~ result:`, result);
-  //   })();
-  //   console.log("IN EFFECT WITH RESULT", result);
-  // }, [result]);
+  useEffect(() => {
+    // if (!_mounted.current) {
+    //   _mounted.current = true;
+    // }
+    (async () => {
+      // if(!showSnippets || !showSnippet){
+      //    console.log('showSnippets is false - exiting');
+      //   return;
+      // }
+      const resultHighlights = await getHighlights(result, title);
+      console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
+      //      setHiglights(resultHighlights);
+      setHiglights(resultHighlights);
+      console.log(`async ~ result:`, result);
+    })();
+    console.log("IN EFFECT WITH RESULT", result);
+  }, [result]);
   const {
     commentDate,
     title,
@@ -96,12 +96,14 @@ const SearchResult = (props: SearchResultPropsType) => {
   // }
 
   function convertToHTML(text: string) {
-    if (!text?.length) {
-      return false;
-    }
-    const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
-    const end = content && content.length > 255 ? 255 : content.length;
-    const html = content.substring(0, end as number) + "...";
+    //console.log("🚀 ~ convertToHTML ~ text:", text)
+    // if (!text?.length) {
+    //   return false;
+    // }
+    //const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
+    const end = text && text.length > 512 ? 512 : text.length;
+    const html = text.substring(0, end as number) + "...";
+    console.log("🚀 ~ convertToHTML ~ html:", html)
     return { __html: html };
   }
   return (
@@ -154,7 +156,7 @@ const SearchResult = (props: SearchResultPropsType) => {
                 marginBottom: 0,
               }}
             >
-              { (showSnippet || showSnippets) ? (
+              { (showSnippet) ? (
                 <Button
                   color="primary"
                   fullWidth
@@ -172,7 +174,7 @@ const SearchResult = (props: SearchResultPropsType) => {
                 </Button>
               )}
               <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
-                {(showSnippet || showSnippets) && (
+                {(showSnippet) && (
                   <Box style={{ backgroundColor: "#fff" }}>
                     <Typography
                       color="black"
@@ -184,8 +186,6 @@ const SearchResult = (props: SearchResultPropsType) => {
                       variant="body2"
                     >
                       <Box>
-                      <b>#of highlights: </b> {highlights.length}
-
                         {highlights.map((highlight, index) => (
                           <Box
                             key={index}
@@ -196,17 +196,20 @@ const SearchResult = (props: SearchResultPropsType) => {
                             <Box
                               id={`search-result-highlight-container-${doc.id}`}
                             >
-                              {highlights.map((highlight, index) => {
+                             {highlights.map((highlight, index) => {
                                 return (
                                   <Box
                                     key={index}
                                     padding={0}
+                                    fontSize="0.75rem"
                                   >
-                                    <Box
+
+                                    <Box 
                                       dangerouslySetInnerHTML={convertToHTML(
                                         highlight[0]
                                       )}
-                                    ></Box>
+                                    >
+                                    </Box>
                                   </Box>
                                 );
                               })}

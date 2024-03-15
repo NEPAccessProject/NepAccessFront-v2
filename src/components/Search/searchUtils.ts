@@ -1,24 +1,19 @@
 
 
 //[TODO][REFACTOR]  values for look ups such as agencies, stqtes etc should be stored in lookup tables.
+import axios, { AxiosResponse } from "axios";
 import {
-    FilterOptionType,
-    FilterType,
-    PaginiationType,
-    SearchContextType,
-    SearchResultType,
-    SearchAppPropType,
-    HighlightType,
-    HighlightIdsType,
-    HighlightsPostDataType,
-    UnhighlightedType,
-  } from "../interfaces/types";
-  import axios,{AxiosResponse} from "axios";
-import { func } from "prop-types";
+  FilterType,
+  HighlightsPostDataType,
+  PaginiationType,
+  SearchContextType,
+  SearchResultType,
+  UnhighlightedType
+} from "../interfaces/types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
   console.log(import.meta.env.VITE_API_HOST)
-  const host = import.meta.env.VITE_API_HOST;
+  const host = import.meta.env.VITE_API_HOST || "http://localhost:8080/"; //look into passing this via an ENV variable
   console.log(`host:`, host);
 export function sortSearchResults(
     results,
@@ -230,7 +225,7 @@ export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:st
   const postData:HighlightsPostDataType = {
     unhighlighted: [],
     terms: searchTerm, 
-    markup: false,
+    markup: true,
     fragmentSizeValue: 2,
   };
   try{
@@ -304,7 +299,7 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
 });
 }
 export function groupResultsByProcessId(results: SearchResultType[]): Record<string, SearchResultType[]> {
-  const groupedResults: Record<string, SearchResultType[]> = {};
+  const groupedResults: Record<string, Process[]> = {};
   console.log('RESULTS', results);
   results.forEach((result) => {
     if(result.doc && result.doc.processId){
@@ -315,7 +310,9 @@ export function groupResultsByProcessId(results: SearchResultType[]): Record<str
       groupedResults[processId] = [];
     }
 
-    groupedResults[processId].push(result);
+    groupedResults[processId] = [...groupedResults[processId], result];{
+      results.push(result);
+    }
   }
   });
   console.log(`groupedResults:`, groupedResults);

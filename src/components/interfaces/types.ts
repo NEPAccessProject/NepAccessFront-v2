@@ -31,9 +31,7 @@ export type DocumentType = {
 	title: string;
 	isFast41?: boolean;
 }
-	export type SearchProcessType = {
-		[key: string]: SearchResultType[]
-	}
+	
 
   export type PaginiationType = {
 	page: number;
@@ -178,6 +176,17 @@ export type SearchFilterResultsType = {
 	value: any;
 }
 
-
+export type ProcessObjectType = {
+	results: SearchResultType[];
+	processId: number;
+	title: string;
+	status?: string;
+	startDate?: Date | string;
+	endDate?: Date | string;
+	score?: number;
+  }
+  export type SearchProcessType = {
+	[key: string]: ProcessObjectType
+}
 export type InputEvent = React.ChangeEvent<HTMLInputElement>;
 export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;

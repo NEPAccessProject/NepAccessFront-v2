@@ -1,12 +1,12 @@
-import { CheckBox, SearchOutlined } from "@mui/icons-material";
+import { SearchOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Button,
+  Checkbox,
   FormControl,
   FormLabel,
   IconButton,
   TextField,
-  Checkbox,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import React, { useContext } from "react";
@@ -168,6 +168,12 @@ const SearchHeader = () => {
             >
               Search
             </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={async(evt) => await searchNoContext()}
+            > No Context
+              </Button>
           </Grid>
         </Grid>
         <Grid

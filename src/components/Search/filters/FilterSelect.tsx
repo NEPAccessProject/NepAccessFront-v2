@@ -60,9 +60,9 @@ export default function FilterSelect(props:FilterSelectProps) {
               isSearchable={true}
               isMulti={true}
               classNamePrefix="select"
-              isDisabled={searchTitlesOnly || !title}
+              isDisabled={searchTitlesOnly}
               isClearable={true}
-              value={options.filter((v) => filterValue.includes(v.value))}
+              value={options.filter((v) => filterValue.includes(v))}
               placeholder={placeholder}
               onChange={(newValue, actionMeta) => onChange(newValue, actionMeta,keyLabel)}
               isLoading={loading}

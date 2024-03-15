@@ -16,7 +16,7 @@ const filters: FilterType = {
   proximityOption: "",
   states: [],
   status: [],
-  title: "Copper Mine",
+  title: "copper mine",
   documentType: [],
   typeAll: false,
   typeDraft: false,

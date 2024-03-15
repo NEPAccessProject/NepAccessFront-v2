@@ -168,22 +168,22 @@ const SearchApp = (props: SearchAppPropType) => {
       const agencies: FilterOptionType[] = [];
       console.log(`searchTop ~ agencies:`, agencies);
       axios
-        .post(`${host}text/search_top`, activeFilters)
+        .post(`${host}text/search_no_context`, activeFilters)
         .then((res) => res.data)
         .then((results: SearchResultType[]) => {
           setResults(results);
 
           console.log("# of results", results.length);
           //        const resultsToDisplay = res.data.splice((page*rowsPerPage), (page*rowsPerPage)+rowsPerPage);
-          const resultsToDisplay = results.splice(0, 4);
-
+          const resultsToDisplay = results.splice(0, 10);
+          console.log(`Displaying ${resultsToDisplay.length} results out of ${results.length} results`);
           const groupedResults: SearchProcessType =
             groupResultsByProcessId(resultsToDisplay);
           setProcesses(groupedResults);
           console.log(`.then ~ groupedResults:`, groupedResults);
           const unhiglighted = getUnhighlightedFromResults(
             resultsToDisplay,
-            "Cooper Mine"
+            title
           );
           console.log(`.then ~ unhiglighted:`, unhiglighted);
           // axios.post(`${host}text/get_highlightsFVH`,
@@ -296,7 +296,7 @@ const SearchApp = (props: SearchAppPropType) => {
                 sx={{ borderRadius: 0, marginBottom: 1, border: 0 }}
               >
                 <Grid xs={12} flex={1}>
-                  <SearchHeader />
+                  <Paper elevation={1}><SearchHeader /></Paper>
                 </Grid>
               {loading && (
                 <Box>
@@ -370,7 +370,7 @@ export const DisplayProcesses = (props) => {
   const processIds = Object.keys(processes);
   console.log(`DisplayProcesses ~ processes:`, processes);
   return (
-    <Box
+    <Paper elevation={2}
     //style={{ border: "1px solid #F0F0F0"}}
     >
       <TablePagination
@@ -388,8 +388,9 @@ export const DisplayProcesses = (props) => {
         component={`div`}
       />
       <Box id="search-process-root" bgcolor={'#F8F8F8'} paddingLeft={1} paddingRight={1}>
-        <Box bgcolor={'#fff'}>
+         
           {processIds.map((processId, key) => (
+        <Paper elevation={5} style={{border:'1px solid #EEE',borderTop:0, marginBottom:20, padding:1, borderRadius:1}}>
             <Grid container key={key}>
               {/* <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
                      <Typography
@@ -399,20 +400,21 @@ export const DisplayProcesses = (props) => {
                       {processes[processId][0].doc.title}
                     </Typography>
                    </Box> */}
-              <Box  marginBottom={0}>
+              <Box>
                 {processes[processId].map((result) => (
                   <Box
                     id={`search-result-${result.doc.id}-container`}
-                    key={processId}
+                    key={`${result.doc.id}-${result.doc.processId}`}
                   >
                     <SearchResult result={result} />
                   </Box>
                 ))}
               </Box>
             </Grid>
+            </Paper>
           ))}
-        </Box>
+
       </Box>
-    </Box>
+    </Paper>
   );
 };
