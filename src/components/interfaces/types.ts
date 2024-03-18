@@ -137,12 +137,6 @@ export type SearchContextType = {
 	updateFilterStateValues : (key:string, value:any) => void;
 	updatePaginationStateValues : (key:string, value:any) => void;
   };
-  enum LOG_LEVEL {
-	DEBUG = "debug",
-	INFO = "info",
-	WARN = "warn",
-	ERROR = "error"
-  }
   export type NotifcationMessageType = {
 	message: string;
 	type: LOG_LEVEL;
@@ -157,9 +151,16 @@ export type SearchResultsType = {
 	results: SearchResultType[];
   }
 
+  enum LOG_LEVEL {
+	DEBUG = "debug",
+	INFO = "info",
+	WARN = "warn",
+	ERROR = "error"
+  }
+
 // PROPS INTERFACES
 export type SearchResultPropsType = {
-  result: SearchResultType
+  result: SearchResultType;
 }
 
 export interface SearchFiltersPropType {
@@ -180,13 +181,30 @@ export type ProcessObjectType = {
 	results: SearchResultType[];
 	processId: number;
 	title: string;
+	decision?: string;
 	status?: string;
+	location?: string;
+	county?: string;
+	state?: string;
+	region?: string;
+	register_date?: Date | string;
 	startDate?: Date | string;
 	endDate?: Date | string;
+	agency?: string;
 	score?: number;
   }
-  export type SearchProcessType = {
+  export type ProcessesType = {
 	[key: string]: ProcessObjectType
 }
 export type InputEvent = React.ChangeEvent<HTMLInputElement>;
 export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
+
+export enum DocumentTypeEnum {
+	'FINAL' = 1,
+	'Final Supplement' = 22,
+	'Draft Supplement' = 33,
+	'PLAN' = 44,
+	'DRAFT' = 55,
+	'ROD' = 66,
+
+}

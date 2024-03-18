@@ -1,5 +1,5 @@
 @host=http://localhost:8080/
-@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
+#@host=https://bighorn.sbs.arizona.edu:8443/nepaBackend/
 ###
  GET {{host}}check HTTP/1.1
 

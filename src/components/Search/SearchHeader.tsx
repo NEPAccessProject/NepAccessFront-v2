@@ -134,7 +134,7 @@ const SearchHeader = () => {
             <TextField
               fullWidth
               //onError={(evt) => onError(evt)}
-              error={!searched && error ? true : false}
+              //error={!searched && error ? true : false}
               //[TODO] need to see if can be only true affer uses so it doesnt' default to true, only validate on enter
               disabled={loading ? true : false}
               value={title || ""}
@@ -186,7 +186,7 @@ const SearchHeader = () => {
           </Grid>
 
           <Grid {...GridItemProps} xs={3}>
-            <SortByControl />
+            {/* <SortByControl /> */}
           </Grid>
           <Grid {...GridItemProps} xs={3}>
             <LimitControl />

@@ -58,23 +58,16 @@ const SearchResult = (props: SearchResultPropsType) => {
   const { score, ids } = currentResult;
   const _mounted = react.useRef(false);
 
-  useEffect(() => {
-    // if (!_mounted.current) {
-    //   _mounted.current = true;
-    // }
-    (async () => {
-      // if(!showSnippets || !showSnippet){
-      //    console.log('showSnippets is false - exiting');
-      //   return;
-      // }
-      const resultHighlights = await getHighlights(result, title);
-      console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
-      //      setHiglights(resultHighlights);
-      setHiglights(resultHighlights);
-      console.log(`async ~ result:`, result);
-    })();
-    console.log("IN EFFECT WITH RESULT", result);
-  }, [result]);
+  // useEffect(() => {
+  //   (async () => {
+  //     const resultHighlights = await getHighlights(result, title);
+  //     console.log(`async ~ HIGHLIGHTS:`, resultHighlights);
+  //     //      setHiglights(resultHighlights);
+  //     setHiglights(resultHighlights);
+  //     console.log(`async ~ result:`, result);
+  //   })();
+  //   console.log("IN EFFECT WITH RESULT", result);
+  // }, [result]);
   const {
     commentDate,
     title,
@@ -114,12 +107,12 @@ const SearchResult = (props: SearchResultPropsType) => {
           <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
               {/* <div><b>Snippets</b>{showSnippets ? 'false' : 'true'}</div>
               <div><b>Snippet</b>{showSnippet ? 'false' : 'true'}</div> */}
-            <Typography textAlign="center" variant="h4">
+            {/* <Typography textAlign="center" variant="h4">
               {title}
-            </Typography>
-            <Box display={"flex"} id={`search-result-card-box-${doc.id}`}>
+            </Typography> */}
+            {/* <Box display={"flex"} id={`search-result-card-box-${doc.id}`}>
               <SearchResultCards result={result} />
-            </Box>
+            </Box> */}
 
             <Grid
               id={`search-result-container${doc.id}`}
@@ -127,8 +120,11 @@ const SearchResult = (props: SearchResultPropsType) => {
               display={"flex"}
               flex={1}
             >
-              <Grid xs={2} {...GridItemProps} display={"flex"}>
+              <Grid xs={1} {...GridItemProps} display={"flex"}>
                 {documentType}
+              </Grid>
+              <Grid xs={1} {...GridItemProps} display={"flex"}>
+                {doc.processId}
               </Grid>
               <Grid xs={2} {...GridItemProps}>
                 {action}

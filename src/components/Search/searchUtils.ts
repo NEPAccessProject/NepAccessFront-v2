@@ -6,16 +6,109 @@ import {
   FilterType,
   HighlightsPostDataType,
   PaginiationType,
+  ProcessesType,
   SearchContextType,
   SearchResultType,
-  UnhighlightedType
+  UnhighlightedType,
+  ProcessObjectType,
+  DocumentType
 } from "../interfaces/types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
   console.log(import.meta.env.VITE_API_HOST)
   const host = import.meta.env.VITE_API_HOST || "http://localhost:8080/"; //look into passing this via an ENV variable
-  console.log(`host:`, host);
-export function sortSearchResults(
+  
+
+  export enum SortBy {
+    StartDate = 'startDate',
+    EndDate = 'endDate',
+    DocumentType = 'documentType',
+    Score = 'score',
+    Status = 'status',
+    Decision = 'decision',
+    Title = 'title'
+  }
+
+  export function sortProcessObjects(
+    processObjects: ProcessObjectType[],
+    sortBy: SortBy,
+    sortDir: string = "asc"
+  ): ProcessObjectType[] {
+    return processObjects.sort((a, b) => {
+      if (a[sortBy] < b[sortBy]) {
+        return sortDir === "asc" ? -1 : 1;
+      }
+      if (a[sortBy] > b[sortBy]) {
+        return sortDir === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }
+  export function sortProcessObjectByPropertyType(processObject: ProcessObjectType): ProcessObjectType {
+    const sortedProcessObject = { ...processObject };
+    const keys = Object.keys(sortedProcessObject);
+    
+    keys.sort((a, b) => {
+      const aValue = sortedProcessObject[a];
+      const bValue = sortedProcessObject[b];
+      
+      const aType = typeof aValue;
+      const bType = typeof bValue;
+      
+      if (aType < bType) return -1;
+      if (aType > bType) return 1;
+      return 0;
+    }).forEach(key => {
+      const value = sortedProcessObject[key];
+      delete sortedProcessObject[key];
+      sortedProcessObject[key] = value;
+    });
+    
+    console.log(`sortProcessObjectByPropertyType ~ sortedProcessObject:`, sortedProcessObject);
+    return sortedProcessObject;
+  }
+ 
+  export function sortProcessObjectByStartDate(processObject: ProcessObjectType, sortdir: string = "asc"): ProcessObjectType {
+    const sortedProcessObject = { ...processObject };
+    console.log(`Trying to Sort Process`, processObject);
+
+    // Sort the properties of the process object
+    const sortedKeys = Object.keys(sortedProcessObject).sort((a, b) => {
+      if (sortdir === "asc") {
+        return new Date(sortedProcessObject[a].StartDate).getTime() - new Date(sortedProcessObject[b].StartDate).getTime();
+      } else {
+        return new Date(sortedProcessObject[b].StartDate).getTime() - new Date(sortedProcessObject[a].StartDate).getTime();
+      }
+    });
+
+    const result: ProcessObjectType = {};
+    for (let key of sortedKeys) {
+      result[key] = sortedProcessObject[key];
+    }
+
+    console.log(`sortProcessObjectByStartDate ~ sortedProcessObject:`, result);
+    return result;
+  }
+  export function sortProcessObjectByDocumentType(processObject: ProcessObjectType, sortby: string, sortdir: string = "asc"): ProcessObjectType {
+    const sortedProcessObject = { ...processObject };
+    console.log(`Trying to Sort Process`, processObject);
+    // Sort the properties of the process object
+    Object.keys(sortedProcessObject).sort().forEach(key => {
+      if (Array.isArray(sortedProcessObject[key])) {
+        sortedProcessObject[key].sort((a: any, b: any) => {
+          if (sortdir === "asc") {
+            return a[sortby] > b[sortby] ? 1 : -1;
+          } else {
+            return a[sortby] < b[sortby] ? 1 : -1;
+          }
+        });
+      }
+    });
+    console.log(`sortProcessObject ~ sortedProcessObject:`, sortProcessObjectByDocumentType);
+    return sortedProcessObject;
+  }
+
+  export function sortSearchResults(
     results,
     sortby: string,
     sortdir: string = "asc"
@@ -31,9 +124,9 @@ export function sortSearchResults(
         } else {
           return a.doc.title.localeCompare(b.doc.title);
         }
-      } else if (sortby.toLowerCase() === "commentDate") {
-        let dateA = new Date(a.doc.commentDate);
-        let dateB = new Date(b.doc.commentDate);
+      } else if (sortby.toLowerCase() === "startdate") {
+        let dateA = new Date(a.doc.register_date);
+        let dateB = new Date(b.doc.register_date);
         // For 'score' and 'commentDate', sort in descending order
         if (sortdir === "asc") {
           return dateA.getDate() - dateB.getDate();
@@ -231,7 +324,7 @@ export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:st
   try{
   //const luceneIds:HighlightIdsType[] = [];
 //     results.map((result:SearchResultType) => {
-        const filenames = result.filenames.split('>') as string[];
+        const filenames = result.filenames && result.filenames.split('>') as string[];
         console.log(' filenames',filenames);
         console.log(`//results.map ~ filenames:`, filenames);
         result.ids.forEach((id) => {
@@ -239,7 +332,7 @@ export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:st
             
           if(id){
             {
-              filenames.forEach((filename) => {
+              filenames && filenames.forEach((filename) => {
                 const item:UnhighlightedType = {
                 luceneIds: [id],
                 filename:filename     
@@ -298,9 +391,9 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
     }
 });
 }
-export function groupResultsByProcessId(results: SearchResultType[]): Record<string, SearchResultType[]> {
-  const groupedResults: Record<string, Process[]> = {};
-  console.log('RESULTS', results);
+
+function groupResults(results: SearchResultType[]): Record<string, SearchResultType[]> {
+  const groupedResults: Record<string, SearchResultType[]> = {};
   results.forEach((result) => {
     if(result.doc && result.doc.processId){
 
@@ -310,12 +403,74 @@ export function groupResultsByProcessId(results: SearchResultType[]): Record<str
       groupedResults[processId] = [];
     }
 
-    groupedResults[processId] = [...groupedResults[processId], result];{
-      results.push(result);
-    }
+    groupedResults[processId].push(result);
   }
   });
   console.log(`groupedResults:`, groupedResults);
+  return groupedResults;
+}
+/*
+  This function should group each result into a larger process object, where things like start date and status 
+*/
+export function groupResultsByProcessId(results: SearchResultType[]): ProcessesType {
+  const processes: ProcessesType = {};
+
+  const groupedResults = groupResults(results);
+  console.log(`groupResultsByProcessId ~ groupedResults:`, groupedResults);
+
+  results.forEach((result) => {
+    if (result.doc && result.doc.processId) {
+      const processId = result.doc.processId as number;
+
+      if (!processes[result.doc.processId]) {
+        processes[processId] = {
+          agency: result.doc.agency,
+          county: result.doc.county,
+          decision: result.doc.decision,
+          endDate: result.doc.finalNoaDate || result.doc.firstRodDate || result.doc.noiDate || result.doc.registerDate || result.doc.commentDate,
+          processId: result.doc.processId,
+          region: result.doc.county,
+          results: groupedResults[result.doc.processId],
+          startDate: result.doc.commentDate,
+          state: result.doc.state,
+          status: result.doc.status,
+          title: result.doc.title,
+          //decision: result.doc.decision,
+          score: result.score,
+        } as ProcessObjectType;
+        //{{  processes[processId] }}
+      } else {
+        {{  
+          const thisProcess = processes[processId];
+          thisProcess.results.push(result);
+          thisProcess.agency = result.doc.agency && thisProcess.agency?.concat(result.doc.agency,';');
+          thisProcess.county = result.doc.county && thisProcess.county?.concat(result.doc.county,';');
+          thisProcess.decision = result.doc.decision && thisProcess.decision?.concat(result.doc.decision,';');
+          thisProcess.endDate = result.doc.finalNoaDate || result.doc.firstRodDate || result.doc.noiDate || result.doc.registerDate || result.doc.commentDate;
+
+        }}
+        processes[processId].results.push(result);        
+        console.log(`processId: ${processId} already exists for new Process`, processes[processId]);
+      }
+    }
+  });
+
+  return processes;
+}
+export function groupProcessResults(results: SearchResultType[]): Record<string, SearchResultType[]> {
+  const groupedResults: Record<string, SearchResultType[]> = {};
+
+  results.forEach((result) => {
+    const processId = result.doc.processId;
+    console.log(`results.forEach ~ processId:`, processId);
+
+    if (!groupedResults[processId]) {
+      groupedResults[processId] = [];
+    }
+
+    groupedResults[processId].push(result);
+  });
+  //console.log(`groupedResults:`, groupedResults);
   return groupedResults;
 }
 export const updateActiveFilters = (filters:FilterType,key:string,value:any,action:string)=>{

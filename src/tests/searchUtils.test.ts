@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { HighlightsPostDataType, SearchResultType,ProcessObjectType,SearchProcessType } from '../components/interfaces/types';
-import { getUnhighlightedFromResults,post } from "../components/Search/searchUtils";
+import { HighlightsPostDataType, SearchResultType,ProcessObjectType, ProcessesType,DocumentTypeEnum } from '../components/interfaces/types';
+import { getUnhighlightedFromResults,post ,groupResultsByProcessId,sortSearchResults,sortProcessObjectByPropertyType,sortProcessObjects,sortProcessObjectByDocumentType} from "../components/Search/searchUtils";
+import { number } from "prop-types";
 const host = "https://bighorn.sbs.arizona.edu:8443/nepaBackend/"
 let doc1 = {
   "id": 2707,
@@ -352,6 +353,84 @@ describe("get", () => {
     [key: number]: SearchResultType[]
   }
 
+
+  test('Creates a correct process objects',()=>{
+      const processes = groupResultsByProcessId(results);
+      console.log(`Got ${Object.keys(processes).length} of Processes`,Object.keys(processes));
+      Object.keys(processes).map((key)=>{
+        console.log(`processes[${key}]:`, ' # of results: ', processes[key].results.length);
+      })
+      expect(Object.keys(processes).length).toBeGreaterThan(0);
+      expect(processes).toBeDefined();
+      expect(Object.keys(processes).length).toBeGreaterThan(0);
+  });
+});
+  test('Correctly sort results for a process',()=>{
+    const processes = groupResultsByProcessId(results) || {};
+    const arrProcesses = Object.entries(processes) || [];
+    console.log(arrProcesses);
+    expect(arrProcesses).toBeDefined();
+    arrProcesses.map((process,idx)=>{
+      console.log(`process[${idx}]:`,process[idx]);
+    })
+    // console.log(`test ~ arrProcesses:`, arrProcesses);
+    // expect(arrProcesses).toBeDefined();
+    // const sortedProcesses = sortProcessObjects(arrProcesses,'startDate','desc');
+    // console.log(`Got ${Object.keys(processes).length} of Processes`,Object.keys(processes));
+  
+  });
+
+  test('Sorts Processes using an enum',()=>{
+    const processes = groupResultsByProcessId(results);
+    Object.keys(processes).map((key)=>{
+      const process = processes[key];
+      const sorted = sortProcessObjectByPropertyType(process);
+      console.log(`Object.keys ~ sorted:`, sorted);
+      expect(sorted).toBeDefined();
+    }) 
+
+  })
+  test('Sorts Processe by Start Date',()=>{
+    const processes = groupResultsByProcessId(results);
+    Object.keys(processes).map((key)=>{
+      const process = processes[key];
+      expect(process).toBeDefined();
+      const sortedByStartDate = sortProcessObjectByPropertyType(process);
+    })
+  });
+
+
+
+  
+// export function groupResultsByProcessId(results: SearchResultType[]): ProcessesType{
+//   const processes:ProcessesType = {};
+//     const groupedResults = groupByResults(results);
+//     results.forEach((result) => {
+//     if(result.doc && result.doc.processId){
+
+//       const processId = result.doc.processId as number;
+
+//       if(!processes[result.doc.processId]) 
+//       {
+//         const processes[processId] = {
+//           processId: result.doc.processId,
+//           results: groupedResults[result.doc.processId],
+//           title: result.doc.title,
+//           status: result.doc.status,
+//           startDate: result.doc.commentDate,
+//           endDate: result.doc.finalNoaDate || result.doc.firstRodDate || result.doc.noiDate || result.doc.registerDate || result.doc.commentDate,
+//           //decision: result.doc.decision,
+//           score: result.score,
+//         }
+//       }
+//       else {
+//         console.log(`processId: ${processId} already exists`);
+//       }
+//     }});
+//   return processes;
+// }
+
+
   // test("Moves the correct values to the process level",()=>{
     
   //   const processes = groupResultsByProcessId(results);
@@ -388,49 +467,3 @@ describe("get", () => {
   //   expect(unhighlighted).toBeDefined();
   //   expect(Object.keys(unhighlighted).length).toBeGreaterThan(0);
   // })
-
-  test('Creates a correct process objects',()=>{
-    console.log('First result',results[0])
-      const processes = groupResultsByProcessId(results);
-      expect(processes).toBeDefined();
-      expect(Object.keys(processes).length).toBeGreaterThan(0);
-  });
-});
-type ProcessType = {
-  results: SearchResultType[];
-  processId: number;
-  title: string;
-  status?: string;
-  startDate?: Date | string;
-  endDate?: Date | string;
-  score?: number;
-  decision?: string;
-}
-  export function groupResultsByProcessId(results: SearchResultType[]): Record<number, ProcessType> {
-    
-    const groupedResults: ProcessType[] = [];
-    
-    results.forEach((result) => {
-      if(result.doc && result.doc.processId){
-  
-      const processId = result.doc.processId;
-      if (!groupedResults[processId as number]) {
-          groupedResults[processId as number] = {
-            processId: processId,
-            results:results,
-            title: result.doc.title,
-            status: result.doc.status,
-            startDate: result.doc.commentDate,
-            endDate: result.doc.finalNoaDate || result.doc.firstRodDate || result.doc.noiDate || result.doc.registerDate || result.doc.commentDate,
-            decision: result.doc.decision,
-            score: result.score,
-          }
-      }
-      else {
-        groupedResults[processId].results.push(result);
-      }
-    }
-    });
-    console.log(`groupedResults:`, groupedResults);
-    return groupedResults;
-  }

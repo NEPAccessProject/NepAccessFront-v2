@@ -5,6 +5,7 @@ import {
   Paper,
   Snackbar,
   TablePagination,
+  Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -15,8 +16,9 @@ import {
   FilterOptionType,
   FilterType,
   PaginiationType,
+  ProcessObjectType,
+  ProcessesType,
   SearchAppPropType,
-  SearchProcessType,
   SearchResultType,
 } from "../interfaces/types";
 import SearchContext from "./SearchContext";
@@ -30,9 +32,11 @@ import {
   post,
   sortSearchResults,
 } from "./searchUtils";
+import { keyBy } from "lodash";
+import SearchResultCards from "./SearchResultCards";
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
-  console.log('SEARCH APP CONTENXT:', context);
+  console.log("SEARCH APP CONTENXT:", context);
 
   const [results, setResults] = useState<SearchResultType[]>([]);
   const [resultsToDisplay, setResultsToDisplay] = useState<SearchResultType[]>(
@@ -47,7 +51,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [error, setError] = useState<string>("");
   const [hasSearched, setHasSearched] = useState<boolean>(context.showSnippets);
   const [showSnippets, setShowSnippets] = useState<boolean>(false);
-  const [processes, setProcesses] = useState<SearchProcessType>({});
+  const [processes, setProcesses] = useState<ProcessesType>();
   const { page, limit, sortby, sortdir } = pagination;
   const { title } = filters;
   const host = import.meta.env.VITE_API_HOST;
@@ -93,23 +97,23 @@ const SearchApp = (props: SearchAppPropType) => {
     }
   }, [pagination]);
 
-  //# of results to display effect
-  useEffect(() => {
-    //handle changes to the # of results displayed per page
-    if (_mounted.current === false || results.length === 0) {
-      return;
-    }
-    console.log(`useEffect ~ # of results for the limit of ${limit}:`, results);
-    setPaginationValues({
-      ...pagination,
-      limit: limit,
-    });
-    const limitedResults = results.slice(
-      0,
-      limit > results.length ? limit : results.length
-    );
-    setResultsToDisplay(limitedResults);
-  }, [limit]);
+  //   //# of results to display effect
+  //   useEffect(() => {
+  //     //handle changes to the # of results displayed per page
+  //     if (_mounted.current === false || results.length === 0) {
+  //       return;
+  //     }
+  // //    console.log(`useEffect ~ # of results for the limit of ${limit}:`, results);
+  //     setPaginationValues({
+  //       ...pagination,
+  //       limit: limit,
+  //     });
+  //     const limitedResults = results.slice(
+  //       0,
+  //       limit > results.length ? limit : results.length
+  //     );
+  //     setResultsToDisplay(limitedResults);
+  //   }, [limit]);
 
   //#endregion effects
 
@@ -167,56 +171,30 @@ const SearchApp = (props: SearchAppPropType) => {
       console.log(`searchTop ~ activeFilters:`, activeFilters);
       const agencies: FilterOptionType[] = [];
       console.log(`searchTop ~ agencies:`, agencies);
-      axios
-        .post(`${host}text/search_no_context`, activeFilters)
-        .then((res) => res.data)
-        .then((results: SearchResultType[]) => {
-          setResults(results);
-
-          console.log("# of results", results.length);
-          //        const resultsToDisplay = res.data.splice((page*rowsPerPage), (page*rowsPerPage)+rowsPerPage);
-          const resultsToDisplay = results.splice(0, 10);
-          console.log(`Displaying ${resultsToDisplay.length} results out of ${results.length} results`);
-          const groupedResults: SearchProcessType =
-            groupResultsByProcessId(resultsToDisplay);
-          setProcesses(groupedResults);
-          console.log(`.then ~ groupedResults:`, groupedResults);
-          const unhiglighted = getUnhighlightedFromResults(
-            resultsToDisplay,
-            title
-          );
-          console.log(`.then ~ unhiglighted:`, unhiglighted);
-          // axios.post(`${host}text/get_highlightsFVH`,
-          //   unhiglighted,{
-          //     headers: {
-          //       "Content-Type": "application/json",
-          //       Accept: "application/json",
-
-          //     },
-          //   })
-          //   .then((response: AxiosResponse) => {
-          //     console.log(`.then ~ response:`, response);
-          //     return response.data as string[]
-          //   })
-          //   .then((highlights) => {
-          //     debugger;
-          //     console.log('RESPONSE HIGHLIGHTS',highlights);
-          //     highlights.map((highlight,index) => {
-          //         console.log('HIGHLIGHT',highlight,index);
-          //     })
-          //   })
-          //   .catch((error) => {
-          //     console.error("SEARCH RESULT ERROR", error);
-          //   })
-          // resultsToDisplay.map(async(result) => {
-          //     console.log(`resultsToDisplay.map ~ result:`, result);
-          //     const highlights = await getHighlights(result);
-          //     console.log(`resultsToDisplay.map ~ highlights:`, highlights);
-          //     result.highlights = [...highlights];
-          // });
-          console.log(`.then ~ resultsToDisplay:`, resultsToDisplay);
-          setResultsToDisplay(resultsToDisplay);
-        });
+      let processesToDisplay: ProcessObjectType[] = [];
+      const response = await axios.post(
+        `${host}text/search_top`,
+        activeFilters
+      );
+      //   .then((res) => {
+      console.log(`searchTop ~ response:`, response);
+      const results = (await response.data) as SearchResultType[];
+      console.log(`//.then ~ results:`, results);
+      //const resultsToDisplay = results.slice(0,limit > results.length? limit : results.length);
+      const resultsToDisplay = results.slice(0, 10);
+      if (resultsToDisplay && resultsToDisplay.length > 0) {
+        const processesResults = groupResultsByProcessId(resultsToDisplay);
+        console.log(`processesResults:`, processesResults);
+        // processesToDisplay = groupResultsByProcessId(resultsToDisplay.slice(0,limit > results.length ? limit : results.length)) as ProcessObjectType[];
+        setResultsToDisplay(resultsToDisplay);
+        console.log(
+          `searchTop ~ resultsToDisplay:`,
+          Object.keys(resultsToDisplay)
+        );
+        setProcesses(processesResults);
+      }
+      console.log(`.then ~ processes to Display:`, processes);
+      console.log(`//.then ~ processesToDisplay:`, processesToDisplay);
     } catch (error) {
       console.error(error);
     }
@@ -277,15 +255,10 @@ const SearchApp = (props: SearchAppPropType) => {
             </Alert>
           </Snackbar>
         </Box>
-        <Paper
-          id="search-filters-container"
-          elevation={1}
-        >
+        <Paper id="search-filters-container" elevation={1}>
           <Grid container spacing={2}>
             <Grid xs={3}>
-              <Paper
-                elevation={1}
-              >
+              <Paper elevation={1}>
                 <SearchFilters />
               </Paper>
             </Grid>
@@ -296,43 +269,60 @@ const SearchApp = (props: SearchAppPropType) => {
                 sx={{ borderRadius: 0, marginBottom: 1, border: 0 }}
               >
                 <Grid xs={12} flex={1}>
-                  <Paper elevation={1}><SearchHeader /></Paper>
+                  <Paper elevation={1}>
+                    <SearchHeader />
+                  </Paper>
                 </Grid>
-              {loading && (
-                <Box>
-                  <Grid container display={"flex"}>
-                    <Grid
-                      xs={12}
-                      display={"flex"}
-                      alignItems={"center"}
-                      justifyContent={"center"}
-                      alignContent={"center"}
-                    >
-                      <CircularProgress size={100} />
+                {loading && (
+                  <Box>
+                    <Grid container display={"flex"}>
+                      <Grid
+                        xs={12}
+                        display={"flex"}
+                        alignItems={"center"}
+                        justifyContent={"center"}
+                        alignContent={"center"}
+                      >
+                        <CircularProgress size={100} />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Box>
-              )}
-              <Box
-                id="search-results-container"
-                elevation={1}
-                style={{ padding: 1, marginTop: 2 }}
-              >
-                {processes && Object.keys(processes).length ? (
-                  <>
-                    <DisplayProcesses processes={processes} />
-                  </>
-                ) : (
-                  <Box padding={1}>
-                    <SearchTips />
                   </Box>
                 )}
-              </Box>
+                <Paper elevation={2}
+                style={{
+                  //border:' 1px solid #EEE',
+                  padding: 5,
+                }}
+                  id="search-results-container"
+                >
+                  <>
+                    {/* {JSON.stringify(Object.keys(processes))} */}
+                    
+                    {processes && Object.keys(processes).map((key, index) =>  (
+                      <div key={`${processes[key].processId}`}>
+                        <Typography textAlign="center" variant="h4">
+              {processes[key].results[0].doc.title}
+            </Typography>
+                        <Paper elevation={2} style={{border:'1px solid #eee', margin:5, marginBottom:15}}>
+                          <SearchResultCards process={processes[key]} />
+                          {processes[key].results.map(result => (
+                          <span key={`${result.doc.id}-${result.doc.decision}`}>  <SearchResult result={result} /></span>
+                          ))}
+                           
+                          </Paper>
+                      </div>
+                      // <Box border={2}>{processes[key].results.length}</Box>
+                    ))}
+                    {/* {processes &&
+                      Object.keys(processes).map((key) => {
+                        ({ key });
+                      })} */}
+                  </>
+                </Paper>
               </Paper>
             </Grid>
           </Grid>
         </Paper>
-            
       </Container>
     </SearchContext.Provider>
   );
@@ -370,8 +360,9 @@ export const DisplayProcesses = (props) => {
   const processIds = Object.keys(processes);
   console.log(`DisplayProcesses ~ processes:`, processes);
   return (
-    <Paper elevation={2}
-    //style={{ border: "1px solid #F0F0F0"}}
+    <Paper
+      elevation={2}
+      //style={{ border: "1px solid #F0F0F0"}}
     >
       <TablePagination
         rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
@@ -387,33 +378,29 @@ export const DisplayProcesses = (props) => {
         color="primary"
         component={`div`}
       />
-      <Box id="search-process-root" bgcolor={'#F8F8F8'} paddingLeft={1} paddingRight={1}>
-         
-          {processIds.map((processId, key) => (
-        <Paper elevation={5} style={{border:'1px solid #EEE',borderTop:0, marginBottom:20, padding:1, borderRadius:1}}>
-            <Grid container key={key}>
-              {/* <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
+      <Box
+        id="search-process-root"
+        bgcolor={"#F8F8F8"}
+        paddingLeft={1}
+        paddingRight={1}
+        border={2}
+      >
+
+        {/* <Paper elevation={5} style={{border:'1px solid #EEE',borderTop:0, marginBottom:20, padding:1, borderRadius:1}}>
+            <Grid container key={processId}>
+              <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
                      <Typography
                       textAlign={"center"}
                       variant="h3"
                     >
                       {processes[processId][0].doc.title}
                     </Typography>
-                   </Box> */}
+                   </Box>
               <Box>
-                {processes[processId].map((result) => (
-                  <Box
-                    id={`search-result-${result.doc.id}-container`}
-                    key={`${result.doc.id}-${result.doc.processId}`}
-                  >
-                    <SearchResult result={result} />
-                  </Box>
-                ))}
+                
               </Box>
             </Grid>
-            </Paper>
-          ))}
-
+            </Paper> */}
       </Box>
     </Paper>
   );
