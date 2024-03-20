@@ -12,7 +12,10 @@ import {
   ProcessesType,
   SearchContextType,
   SearchResultType,
-  UnhighlightedType
+  UnhighlightedType,
+  DocumentType,
+  ResultDocumentType,
+  SearchResultsType,
 } from "../interfaces/types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
@@ -268,7 +271,7 @@ export function sortResultsByDecision(results: SearchResultType[], sortDir: stri
   const decisionTypeOrder = Object.values(DecisionTypeEnum);
   const sorted = results.sort((a, b) => {
     if (a.doc.decision && b.doc.decision) {
-      const val =   decisionTypeOrder.indexOf(b.doc.decision) - decisionTypeOrder.indexOf(a.doc.decision);
+      const val =   decisionTypeOrder.indexOf(b.doc.decision as string) - decisionTypeOrder.indexOf(a.doc.decision as string);
       console.log(`a ${a.doc.decision} vs b ${b.doc.decision}`, val);
       return val;
     }
@@ -281,7 +284,7 @@ export function sortResultsByDocumentType(results: SearchResultType[], sortDir: 
   const toBeSorted = [...results];
   const sorted = toBeSorted.sort((a, b) => {
     if (a.doc.documentType && b.doc.documentType) {
-      const val =  documenTypeOrder.indexOf(a.doc.documentType) - documenTypeOrder.indexOf(b.doc.documentType)
+      const val =  documenTypeOrder.indexOf(a.doc.documentType as string) - documenTypeOrder.indexOf(b.doc.documentType as string)
       console.log(`a ${a.doc.documentType} vs b ${b.doc.documentType}`, val);
       return val;
     }
@@ -344,7 +347,7 @@ export function getUnhighlightedFromResults(results:SearchResultType[],searchTer
         console.log(`ID: ${id} | Filename: ${filename}`);
       const item:UnhighlightedType = {
         luceneIds: [id],
-        filename: filename
+        filename: result.doc.filename?.split(';') || [result.doc.filename]
       }
       postData.unhighlighted.push(item);
     });
@@ -432,9 +435,24 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
 });
 }
 
+export function handleDocumentTypeConversion(document: ResultDocumentType): DocumentType {
+ let {decision,documentType,action} = document;
+ const newDoc = {
+  ...document,
+   decision: decision && decision.split(',') || [],
+   documentType: documentType && documentType && documentType.split(';') || [],
+   action: action && action.split(';') || [],
+ }
+return newDoc as DocumentType;
+}
+
 function groupResults(results: SearchResultType[]): Record<string, SearchResultType[]> {
   const groupedResults: Record<string, SearchResultType[]> = {};
   results.forEach((result) => {
+    let doc = result.doc as ResultDocumentType;
+    let newDoc = {}
+    const {decision,documentType,action} = doc;
+
     if(result.doc && result.doc.processId){
 
     const processId = result.doc.processId;
@@ -456,76 +474,100 @@ export function groupResultsByProcessId(results: SearchResultType[]): ProcessesT
   const processes: ProcessesType = {};
 
   const groupedResults = groupResults(results);
+  
   results.forEach((result) => {
+    let doc = result.doc;
+    const newDoc = result.doc;
+    let {decision,documentType,action} = doc;
+
     if (result.doc && result.doc.processId) {
       const processId = result.doc.processId as number;
       const process = processes[processId];
 
       if (!processes[result.doc.processId]) {
           processes[processId] = {
-            agency: result.doc.agency,
-            county: result.doc && result.doc.county?.length && result.doc.county.split(';') || [],
-            decision: result.doc.decision,
-            documentType: result.doc.documentType,
-            endDate: result.doc.finalNoaDate || result.doc.draftNoa || result.doc.noiDate || result.doc.commentDate && result.doc.registerDate,
+            //county: (result.doc && result.doc.county?.length && typeof(doc.county?.length) === "string") ? result.doc.county.split(';') || [],
+            //decision: result.doc && result.doc?.decision.length && result.doc.decision.split(';') || [],
+            //action: result.doc.action && result.doc.action.split(';') || [],
+            //documentType: documentType,
+  //          endDate: result.doc.finalNoaDate || result.doc.draftNoa || result.doc.noiDate || result.doc.commentDate && result.doc.registerDate,
             processId: result.doc.processId,
-            region: result.doc.county,
+//            region: result.doc.county,
             results: groupedResults[result.doc.processId],
-            startDate: result.doc.registerDate,
-            state: [result.doc.state],
-            status: result.doc.status,
+            //startDate: result.doc?.registerDate && result.doc.registerDate | ""
+//            state: result.doc.state,
+            //status: result.doc.status,
             title: result.doc.title,
             //decision: result.doc.decision,
             score: result.score,
-          } as ProcessObjectType;
+          };
         //{{  processes[processId] }}
       } else {
         {{  
           const thisProcess = process;
-          thisProcess && thisProcess.results.push(result);
-          if(result.doc.decision && thisProcess.decision !== result.doc.decision){
-            thisProcess.decision?.concat(result.doc.decision,';');
-            //[TODO] We need to Sort the decisions by a decision enumeration
-          }
-          if(!result.doc.county?.includes(result.doc.county)) {
-            thisProcess.county?.push(result.doc.county || ''); //[TODO] need to have a better type guards
-          }
-          if(!result.doc.county?.includes(result.doc.county)) {
-            thisProcess.county?.push(result.doc.county || ''); //[TODO] need to have a better type guards
-          }
+          let doc = result.doc;
+          let filenames = result.filenames;
+          const newDoc = {
+            ...doc,
+            decision: (decision && typeof(doc.decision) === "string") ? [decision] : decision,
+            action: (action && typeof(action) === "string") ? [action] : action,
+            documentType: ((documentType && typeof(documentType)) ? [documentType] : documentType)
+          } as DocumentType;
+
+          const newResult:SearchResultType = {
+            ...result,
+            doc: newDoc,
+            filenames: (filenames && typeof(filenames) === "string")? filenames.split(';') : filenames
+          };
+          // if(doc.decision.includes(";")){
+          //     doc.decision = doc.decision.split(';');
+          // }
+          thisProcess && thisProcess.results.push(newResult);
+          //[TODO] once we have converted decision,documentType and action to arrays we should be able to merge them into the existing process's results dod
+
+          // if(!result.doc.decision && thisProcess.decision !== result.doc.decision){
+          //   thisProcess.decision?.concat(result.doc.decision,';');
+          //   //[TODO] We need to Sort the decisions by a decision enumeration
+          // }
+          // if(!result.doc.county?.includes(result.doc.county)) {
+          //   thisProcess.county. //[TODO] need to have a better type guards
+          // }
+          // if(!result.doc.county?.includes(result.doc.county)) {
+          //   thisProcess.county?.push(result.doc.county || ''); //[TODO] need to have a better type guards
+          // }
 
           //Compare the exisiting start date with the new start date and set the earliest date
-          if(result.doc.registerDate && thisProcess.startDate){
-            if(result.doc.registerDate < thisProcess.startDate){
-              thisProcess.startDate = result.doc.registerDate;
-            }
-          }
-          //Compare the end date with the new end date and set the latest date
-          if(result.doc.finalNoaDate && thisProcess.endDate){
-            if(result.doc.finalNoaDate > thisProcess.endDate){
-              thisProcess.endDate = result.doc.finalNoaDate;
-            }
-          }
-          if(result.doc.noiDate && thisProcess.endDate){
-            if(result.doc.noiDate > thisProcess.endDate){
-              thisProcess.endDate = result.doc.noiDate;
-            }
-          }
-          if(result.doc.commentDate && thisProcess.endDate){
-            if(result.doc.commentDate > thisProcess.endDate){
-              thisProcess.endDate = result.doc.commentDate;
-            }
-          }
-          if(result.doc.draftNoa && thisProcess.endDate){
-            if(result.doc.draftNoa > thisProcess.endDate){
-              thisProcess.endDate = result.doc.draftNoa;
-            }
-          }
-          if(result.doc.registerDate){
-            if(result.doc.registerDate > thisProcess.startDate){
-              thisProcess.startDate = result.doc.registerDate;
-            }
-          }
+          // if(result.doc.registerDate && thisProcess.startDate){
+          //   if(result.doc.registerDate < thisProcess.startDate){
+          //     thisProcess.startDate = result.doc.registerDate;
+          //   }
+          // }
+          // //Compare the end date with the new end date and set the latest date
+          // if(result.doc.finalNoaDate && thisProcess.endDate){
+          //   if(result.doc.finalNoaDate > thisProcess.endDate){
+          //     thisProcess.endDate = result.doc.finalNoaDate;
+          //   }
+          // }
+          // if(result.doc.noiDate && thisProcess.endDate){
+          //   if(result.doc.noiDate > thisProcess.endDate){
+          //     thisProcess.endDate = result.doc.noiDate;
+          //   }
+          // }
+          // if(result.doc.commentDate && thisProcess.endDate){
+          //   if(result.doc.commentDate > thisProcess.endDate){
+          //     thisProcess.endDate = result.doc.commentDate;
+          //   }
+          // }
+          // if(result.doc.draftNoa && thisProcess.endDate){
+          //   if(result.doc.draftNoa > thisProcess.endDate){
+          //     thisProcess.endDate = result.doc.draftNoa;
+          //   }
+          // }
+          // if(result.doc.registerDate){
+          //   if(result.doc.registerDate > thisProcess.startDate){
+          //     thisProcess.startDate = result.doc.registerDate;
+          //   }
+          // }
 
         }}
         processes[processId].results.push(result);        
@@ -535,7 +577,6 @@ export function groupResultsByProcessId(results: SearchResultType[]): ProcessesT
       }
     }
   });
-  {{ JSON.stringify(processes, null, 2)   }}
   return processes;
 }
 

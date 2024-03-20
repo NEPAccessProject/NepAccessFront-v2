@@ -11,6 +11,7 @@ import SearchContext from "./SearchContext";
 import SearchResultCards from "./SearchResultCards";
 //import SearchResultCards from "./SearchResultCards";
 import { getHighlights } from "./searchUtils";
+import { string } from "prop-types";
 const CardItem = styled(Paper)(() => ({
   elevation: 1,
   padding: 0,
@@ -75,6 +76,18 @@ const SearchResult = (props: SearchResultPropsType) => {
   //   })();
   //   console.log("IN EFFECT WITH RESULT", result);
   // }, [result]);
+  useEffect(() => {
+  highlights.push(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
+    )
+    highlights.push(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
+    );
+    highlights.push(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
+    );
+  setHiglights(highlights);
+  },[]);
   const {
     commentDate,
     title,
@@ -103,7 +116,6 @@ const SearchResult = (props: SearchResultPropsType) => {
     //const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
     const end = text && text.length > 512 ? 512 : text.length;
     const html = text.substring(0, end as number) + "...";
-    console.log("🚀 ~ convertToHTML ~ html:", html);
     return { __html: html };
   }
 
@@ -121,49 +133,65 @@ const SearchResult = (props: SearchResultPropsType) => {
         return doc.registerDate ? doc.registerDate : "";
     }
   };
-  const documentDate = getDateBasedonDecision(decision);
+  const documentDate = getDateBasedonDecision(decision as string);
   return (
     <>
       {doc && (
-        <Grid container padding={1}>
-          <Grid xs={2} border={1} className="document-date-columns">
+        <Grid container padding={1} flex={1} border={1} borderColor={'red'}>
+          <Grid xs={2} border={1} flex={1} className="document-date-columns">
             {
               <>
-                <Box>{decision}</Box>
-                <Box>{result.doc.id}</Box>
-                <Box>{documentDate ? documentDate.toLocaleString() : ""}</Box>
+                <Box>d? {decision}</Box>
+                <Box>id? {result.doc.id}</Box>
+                <Box>documentDate? {documentDate ? documentDate.toLocaleString() : ""}</Box>
               </>
             }
           </Grid>
-          <Grid xs={10} margin={2} padding={2} border={1} className="document-title-column">
+          <Grid xs={10} flex={1} border={1} margin={2} padding={2} className="document-title-column">
             <Typography variant="h4">
-              {doc.documentType?.normalize()} - {title}
+
+              {doc.documentType && typeof(doc.documentType) == "object" &&  doc.documentType.map(documentType => {
+                  return (
+                    <>
+                    <b>{documentType}</b>
+                    </>
+                  )
+              })} {title}
             </Typography>
+              <b># of higlights: {highlights.length}</b>
           </Grid>
           <Grid xs={12} className="document-highlights-grid-item">
             <>
-              <Box>
                 {highlights.map((highlight, index) => (
-                  <Box key={index} padding={0.25} className="document-higlights">
+                  <Box key={index} padding={0.25} className="document-higlights" border={1} borderColor={'blue'}>
                     <Box id={`search-result-highlight-container-${doc.id}`}>
-                      {highlights.map((highlight, index) => {
-                        return (
+                      {highlights.map((highlight, index) => 
+                        <>
+                          {index < 3 && 
                           <Box key={index} padding={0} fontSize="0.75rem" className="document-highlight">
+                            <b>Highlight {index}</b>
                             <Box
                               dangerouslySetInnerHTML={convertToHTML(
-                                highlight[0]
+                                highlight
                               )}
                             ></Box>
-                          </Box>
-                        );
-                      })}
+                          </Box>}
+                        </>
+                      
+                      )}
+                      {index > 3}{
+                          <>
+                          <b>See More...</b>
+                          </>
+                      }
+                
                     </Box>
                   </Box>
-                ))}
-              </Box>
-            </>
+                ))
+              }
+              </>
+              </Grid>
           </Grid>
-        </Grid>
       )}
     </>
   );

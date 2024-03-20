@@ -22,6 +22,7 @@ import {
   SearchResultType,
   DocumentType,
   ResultDocumentType,
+  ResponseSearchResultsType,
 } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
@@ -33,6 +34,7 @@ import {
   groupResultsByProcessId,
   post,
   sortSearchResults,
+  handleDocumentTypeConversion,
 } from "./searchUtils";
 
 import SearchResultCards from "./SearchResultCards";
@@ -180,25 +182,28 @@ const SearchApp = (props: SearchAppPropType) => {
       );
       //   .then((res) => {
       console.log(`searchTop ~ response:`, response);
-      const results = (await response.data) as SearchResultType[];
+      const results = (await response.data);
       
       console.log(`//.then ~ results:`, results);
       //const resultsToDisplay = results.slice(0,limit > results.length? limit : results.length);
       const resultsToDisplay = results.slice(0, 10);
-      if (resultsToDisplay && resultsToDisplay.length > 0) {
-        const processesResults = groupResultsByProcessId(resultsToDisplay);
-        console.log(`processesResults:`, processesResults);
-        // processesToDisplay = groupResultsByProcessId(resultsToDisplay.slice(0,limit > results.length ? limit : results.length)) as ProcessObjectType[];
-        setResultsToDisplay(resultsToDisplay);
+        resultsToDisplay.map((result) => {
+           const newDoc = handleDocumentTypeConversion(result.doc);
+           console.log(`resultsToDisplay.map ~ newDoc:`, newDoc);
+          result = {...newDoc}
+
+        });
+        const processesResults = groupResultsByProcessId(results);
+        //console.log(`processesResults:`, processesResults);
+       
+        setResultsToDisplay(results);          
         console.log(
           `searchTop ~ resultsToDisplay:`,
           Object.keys(resultsToDisplay)
         );
         setProcesses(processesResults);
       }
-      console.log(`.then ~ processes to Display:`, processes);
-      console.log(`//.then ~ processesToDisplay:`, processesToDisplay);
-    } catch (error) {
+       catch (error) {
       console.error(error);
     }
   };
@@ -386,7 +391,7 @@ export const DisplayProcesses = (props) => {
                 {processes[key].results[0].doc.title}
               </Typography>
                 <Box flex={1} padding={0} borderTop={1} borderBottom={0} borderColor={'#eee'}>
-                  <SearchResultCards process={processes[key]} />
+                  {/* <SearchResultCards process={processes[key]} /> */}
                 </Box>
                 {processes[key].results.map((result) => (
                   <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType}`}>

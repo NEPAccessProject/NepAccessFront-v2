@@ -2,13 +2,13 @@
 
 //[TOO] maybe 
 export type ResultDocumentType = {
-	action?: string;
+	action: string;
 	agency?: string;
 	commentDate?: Date;
 	commentsFilename?: string;
 	cooperatingAgency?: string;
 	county?: string ;
-	decision: string ;
+	decision: string;
 	department?: string;
 	documentType?: string;
 	draftNoa?: string;
@@ -19,7 +19,7 @@ export type ResultDocumentType = {
 	folder?: string;
 	id: number;
 	link?: string;
-	noiDate?: Date | string;
+	noiDate?: string;
 	notes?: string;
 	processId: number;
 	registerDate?: Date;
@@ -33,15 +33,15 @@ export type ResultDocumentType = {
 }
 
 export type DocumentType = {
-	action?: string;
-	agency?: string;
+	action: string[] | string;
+	agency?: string[];
 	commentDate?: Date;
 	commentsFilename?: string;
 	cooperatingAgency?: string;
 	county?: string ;
-	decision:  string;
+	decision:  string[] | string;
 	department?: string;
-	documentType?: string;
+	documentType: string[] | string;
 	draftNoa?: string;
 	filename?: string;
 	finalNoa?: string; //Date | string ;
@@ -73,11 +73,19 @@ export type DocumentType = {
 	rowsPerPage: number;
   }
 
+  export type ResponseSearchResultsType = {
+	ids: number[];
+	doc: ResultDocumentType;
+	highlights: string[];
+	filenames: string;
+	score?: number;
+  }
+
 export type SearchResultType = {
   ids: number[];
   doc: DocumentType;
   highlights: string[];
-  filenames: string;//string[];
+  filenames: string[] | string;
   score?: number;
 }
 
@@ -212,15 +220,16 @@ export type ProcessObjectType = {
 	results: SearchResultType[];
 	processId: number;
 	title: string;
-	decision: string;
-	documentType: string;
-	status?: string;
-	location?: string;
-	county?: string[];
-	state?: string[];
-	region?: string[];
-	startDate: Date | string;
-	endDate: Date | string;
+	//decision?: string[] | string;
+	//action?: string[] | string;
+	//documentType?: string[] | string;
+	//status?: string;
+	//location?: string;
+	//county?: string[];
+	//state?: string[];
+	// region?: string[];
+	//startDate: Date | string;
+	//endDate: Date | string;
 	agency?: string[];
 	score?: number;
   }
@@ -246,3 +255,4 @@ export enum DecisionTypeEnum{
 	"Legislative;Project" =  4,
 	"Legislative;Plan" = 5,
 }
+
