@@ -4,6 +4,7 @@ import React from "react";
 import { ProcessObjectType, SearchResultType,ProcessesType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import { start } from "repl";
+import { count } from "console";
 
 // const Item = styled(Paper)(() => ({
 //     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -38,14 +39,14 @@ const SearchResultCards = (props) => {
   //   finalNoa,
   //   finalNoaDate,
   // } = doc;
-  const {processId,results,title,agency,startDate,endDate,region,register_date,score,county,status,state,decision} = process;
+  const {processId,documentType,results,title,agency,startDate,endDate,region,score,county,status,state,decision} = process;
 
   const itemCardProps = {
     display: "flex",
 
     margin: 0.5,
     padding: 0.5,
-    fontSize: "0.7rem",
+    fontSize: "0.8rem",
     elevation: 1,
     border: "1px solid #eee",
     borderRadius: 1,
@@ -53,7 +54,7 @@ const SearchResultCards = (props) => {
   return (
     <>
       <Grid
-        padding={2}
+        padding={1}
         container
         display={"flex"}
         spacing={1}
@@ -65,18 +66,34 @@ const SearchResultCards = (props) => {
             <b>Status:</b>&nbsp;{status ? status : "N/A"}
           </Grid>
         )}
+        {documentType && (
+          <Grid {...itemCardProps}>
+            <b>Document Type:</b>&nbsp;{documentType ? documentType : "N/A"}
+          </Grid>
+        )}
+        {decision && (
+          <Grid {...itemCardProps}>
+            <b>Decision:</b>&nbsp;{decision ? decision : "N/A"}
+          </Grid>
+        )}
         {startDate && (
           <Grid {...itemCardProps}>
             <b>Start Date:</b>&nbsp;
             {moment(startDate).format("MM/DD/YYYY") || "N/A"}
           </Grid>
         )}
-        {state && (
+        {endDate && (
+          <Grid {...itemCardProps}>
+            <b>End Date:</b>&nbsp;
+            {moment(endDate).format("MM/DD/YYYY") || "N/A"}
+          </Grid>
+        )}
+        {state && state.length && (
           <Grid {...itemCardProps}>
             <b>State:</b>&nbsp;<b>{state ? state : "N/A"}</b>
           </Grid>
         )}
-        {county && (
+        {county && county.length && (
           <Grid {...itemCardProps}>
             <b>County:</b>&nbsp;{county ? county : "N/A"}
           </Grid>

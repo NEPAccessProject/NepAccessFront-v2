@@ -1,6 +1,37 @@
 //[TODO] As these get fleshed out break this down to different files; with the index serving them as exports
 
 //[TOO] maybe 
+export type ResultDocumentType = {
+	action?: string;
+	agency?: string;
+	commentDate?: Date;
+	commentsFilename?: string;
+	cooperatingAgency?: string;
+	county?: string ;
+	decision: string ;
+	department?: string;
+	documentType?: string;
+	draftNoa?: string;
+	filename?: string; 
+	finalNoa?: string; //Date | string ;
+	finalNoaDate?: Date;
+	firstRodDate?: Date;
+	folder?: string;
+	id: number;
+	link?: string;
+	noiDate?: Date | string;
+	notes?: string;
+	processId: number;
+	registerDate?: Date;
+	size?: number;
+	state?: string;
+	status?: string;
+	subtype?: string;
+	summaryText?: string;
+	title: string;
+	isFast41?: boolean;
+}
+
 export type DocumentType = {
 	action?: string;
 	agency?: string;
@@ -8,18 +39,18 @@ export type DocumentType = {
 	commentsFilename?: string;
 	cooperatingAgency?: string;
 	county?: string ;
-	decision?: string ;
+	decision:  string;
 	department?: string;
 	documentType?: string;
 	draftNoa?: string;
-	filename?: string; 
+	filename?: string;
 	finalNoa?: string; //Date | string ;
-	finalNoaDate?: string;
-	firstRodDate?:  string;
+	finalNoaDate?: Date;
+	firstRodDate?: Date;
 	folder?: string;
 	id: number;
 	link?: string;
-	noiDate?: Date | string;
+	noiDate?: Date;
 	notes?: string;
 	processId: number;
 	registerDate?: Date;
@@ -181,16 +212,16 @@ export type ProcessObjectType = {
 	results: SearchResultType[];
 	processId: number;
 	title: string;
-	decision?: string;
+	decision: string;
+	documentType: string;
 	status?: string;
 	location?: string;
-	county?: string;
-	state?: string;
-	region?: string;
-	register_date?: Date | string;
-	startDate?: Date | string;
-	endDate?: Date | string;
-	agency?: string;
+	county?: string[];
+	state?: string[];
+	region?: string[];
+	startDate: Date | string;
+	endDate: Date | string;
+	agency?: string[];
 	score?: number;
   }
   export type ProcessesType = {
@@ -201,10 +232,17 @@ export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
 
 export enum DocumentTypeEnum {
 	'FINAL' = 1,
-	'Final Supplement' = 22,
-	'Draft Supplement' = 33,
-	'PLAN' = 44,
-	'DRAFT' = 55,
-	'ROD' = 66,
+	'Final Supplement' = 2,
+	'Draft Supplement' = 3,
+	'PLAN' = 4,
+	'DRAFT' = 5,
+	'ROD' = 6,
+}
 
+export enum DecisionTypeEnum{
+	"PROJECT" = 1,
+	"PLAN" = 2,
+	"Plan;Project" = 3,
+	"Legislative;Project" =  4,
+	"Legislative;Plan" = 5,
 }

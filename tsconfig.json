@@ -20,7 +20,7 @@
     "useDefineForClassFields": true,
     "paths": {
       "@/*": ["./*"]
-    }
+    },
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/node_modules/*", "dist", "**/dist/*"],

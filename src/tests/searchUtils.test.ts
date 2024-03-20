@@ -1,345 +1,14 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { HighlightsPostDataType, SearchResultType,ProcessObjectType, ProcessesType,DocumentTypeEnum } from '../components/interfaces/types';
-import { getUnhighlightedFromResults,post ,groupResultsByProcessId,sortSearchResults,sortProcessObjectByPropertyType,sortProcessObjects,sortProcessObjectByDocumentType} from "../components/Search/searchUtils";
-import { number } from "prop-types";
-const host = "https://bighorn.sbs.arizona.edu:8443/nepaBackend/"
-let doc1 = {
-  "id": 2707,
-  "title": "Copper Flat Copper Mine",
-  "documentType": "Draft",
-  "commentDate": "2016-03-04",
-  "registerDate": "2015-12-04",
-  "agency": "Bureau of Land Management",
-  "department": "",
-  "cooperatingAgency": "",
-  "state": "NM",
-  "county": "NM: Sierra",
-  "filename": "EisDocuments-183750.zip",
-  "commentsFilename": "CommentLetters-183750.zip",
-  "folder": "EisDocuments-183750",
-  "size": 108162924,
-  "link": "",
-  "notes": "",
-  "status": "",
-  "subtype": "",
-  "summaryText": "",
-  "noiDate": "",
-  "draftNoa": "",
-  "finalNoa": "",
-  "firstRodDate": "",
-  "processId": 2000251,
-  "action": "Mineral Resource Extraction",
-  "decision": "Project"
-};
-const results = [
-  {
-    "ids": [8870],
-    "doc":  {
-      "id": 2707,
-      "title": "Copper Flat Copper Mine",
-      "documentType": "Draft",
-      "commentDate": "2016-03-04",
-      "registerDate": "2015-12-04",
-      "agency": "Bureau of Land Management",
-      "department": "",
-      "cooperatingAgency": "",
-      "state": "NM",
-      "county": "NM: Sierra",
-      "filename": "EisDocuments-183750.zip",
-      "commentsFilename": "CommentLetters-183750.zip",
-      "folder": "EisDocuments-183750",
-      "size": 108162924,
-      "link": "",
-      "notes": "",
-      "status": "",
-      "subtype": "",
-      "summaryText": "",
-      "noiDate": "",
-      "draftNoa": "",
-      "finalNoa": "",
-      "firstRodDate": "",
-      "processId": 2000251,
-      "action": "Mineral Resource Extraction",
-      "decision": "Project"
-    } as unknown,
-    "highlights": [],
-    "filenames": "Copper Flat Copper Mine Draft EIS Volume 1.pdf",
-    "score": 7.6437206
-  },
-    {
-      "ids": [],
-      "doc": {
-        "id": 6752,
-        "title": "Lisbon Valley Copper Project Plan of Operations Approval for an Open Pit Copper Mine and Heach Operation in Lower Lisbon Valley San Juan and Grand Counties UT",
-        "documentType": "Final",
-        "commentDate": "1997-03-17",
-        "registerDate": "1997-02-14",
-        "agency": "Bureau of Land Management",
-        "department": null,
-        "cooperatingAgency": null,
-        "state": "UT",
-        "county": null,
-        "filename": "",
-        "commentsFilename": "CommentLetters-75241.zip",
-        "folder": null,
-        "size": null,
-        "link": null,
-        "notes": null,
-        "status": null,
-        "subtype": null,
-        "summaryText": null,
-        "noiDate": null,
-        "draftNoa": null,
-        "finalNoa": null,
-        "firstRodDate": null,
-        "processId": 1002481,
-        "action": null,
-        "decision": "Plan;Project"
-      } as unknown,
-      "highlights": [],
-      "filenames": "",
-      "score": 5.2250404
-  },
-  {
-	"ids": [],
-	"doc": {
-		"id": 11017,
-		"title": "Sanchez Open Pit Heap Leach Copper Mine Project Construction and Operation Permits Approval Gila Mountain Graham County AZ",
-		"documentType": "Final",
-		"commentDate": "1993-01-19",
-		"registerDate": "1992-12-18",
-		"agency": "Bureau of Land Management",
-		"department": null,
-		"cooperatingAgency": null,
-		"state": "AZ",
-		"county": null,
-		"filename": "",
-		"commentsFilename": "CommentLetters-75577.zip",
-		"folder": null,
-		"size": null,
-		"link": null,
-		"notes": null,
-		"status": null,
-		"subtype": null,
-		"summaryText": null,
-		"noiDate": null,
-		"draftNoa": null,
-		"finalNoa": null,
-		"firstRodDate": null,
-		"processId": 1004016,
-		"action": null,
-		"decision": "Project"
-	} as unknown,
-	"highlights": [],
-	"filenames": "",
-	"score": 4.9172807,
-},
-  {
-    "ids": [],
-    "doc": {
-      "id": 11016,
-      "title": "Sanchez Open Pit Heap Leach Copper Mine Project Construction and Operation Permits Approval Gila Mountain Graham County AZ",
-      "documentType": "Draft",
-      "commentDate": "1992-05-18",
-      "registerDate": "1992-03-13",
-      "agency": "Bureau of Land Management",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "AZ",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": 1004016,
-      "action": null,
-      "decision": "Project"
-    } as unknown,
-    "highlights": [],
-    "filenames": "",
-    "score": 4.9172807
-  },
-  {
-    "ids": [],
-    "doc": {
-      "id": 13902,
-      "title": "WITHDRAWN - Rock Creek Underground Copper/Silver Mine Project Construction and Operation COE Section 404 Permit Kootenai National Forest Sander County MT",
-      "documentType": "Draft",
-      "commentDate": "1995-08-18",
-      "registerDate": "1995-08-11",
-      "agency": "Forest Service",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "MT",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": null,
-      "action": null,
-      "decision": "Project"
-    },
-    "highlights": [],
-    "filenames": "",
-    "score": 4.6371946
-  },
-  {
-    "ids": [],
-    "doc": {
-      "id": 2937,
-      "title": "Cyprus Bagdad Copper Mine Mill Tailings and Waste Rock Storage Expansion Plan of Operation Approval NPDES and COE Section 404 Permits Issuance Yavapai County AZ",
-      "documentType": "Draft",
-      "commentDate": "1995-10-13",
-      "registerDate": "1995-08-18",
-      "agency": "Bureau of Land Management",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "AZ",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": 1001059,
-      "action": null,
-      "decision": "Project"
-    },
-    "highlights": [],
-    "filenames": "",
-    "score": 4.3098764
-  }, {
-    "ids": [],
-    "doc": {
-      "id": 2938,
-      "title": "Cyprus Bagdad Copper Mine Mill Tailings and Waste Rock Storage Expansion Plan of Operation Approval NPDES and COE Section 404 Permits Issuance Yavapai County AZ",
-      "documentType": "Final",
-      "commentDate": "1996-03-01",
-      "registerDate": "1996-02-02",
-      "agency": "Bureau of Land Management",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "AZ",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "CommentLetters-75590.zip",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": 1001059,
-      "action": null,
-      "decision": "Project"
-    },
-    "highlights": [],
-    "filenames": "",
-    "score": 4.3098764
-  }, {
-    "ids": [],
-    "doc": {
-      "id": 1995,
-      "title": "Carlota Open-Pit Copper Mine Project Construction and Operation Plan of Operations and COE Section 404 Permit Tonto National Forest Gila and Pinal Counties AZ",
-      "documentType": "Final",
-      "commentDate": "1997-09-15",
-      "registerDate": "1997-08-01",
-      "agency": "Forest Service",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "AZ",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": 1000695,
-      "action": null,
-      "decision": "Plan"
-    },
-    "highlights": [],
-    "filenames": "",
-    "score": 4.3098764
-  }, {
-    "ids": [],
-    "doc": {
-      "id": 1994,
-      "title": "Carlota Open-Pit Copper Mine Project Construction and Operation Plan of Operations and COE Section 404 Permit Tonto National Forest Gila and Pinal Counties AZ",
-      "documentType": "Draft",
-      "commentDate": "1995-05-18",
-      "registerDate": "1995-02-03",
-      "agency": "Forest Service",
-      "department": null,
-      "cooperatingAgency": null,
-      "state": "AZ",
-      "county": null,
-      "filename": "",
-      "commentsFilename": "",
-      "folder": null,
-      "size": null,
-      "link": null,
-      "notes": null,
-      "status": null,
-      "subtype": null,
-      "summaryText": null,
-      "noiDate": null,
-      "draftNoa": null,
-      "finalNoa": null,
-      "firstRodDate": null,
-      "processId": 1000695,
-      "action": null,
-      "decision": "Plan"
-    },
-    "highlights": [],
-    "filenames": "",
-    "score": 4.3098764
-  }
-] as SearchResultType[]
+import { afterEach, assert, beforeEach, describe, expect, test } from 'vitest';
+import { groupResultsByProcessId, sortResultsByDecision, sortResultsByDocumentType, sortResultsByRegisterDate } from "../components/Search/searchUtils";
+import { ProcessObjectType, SearchResultType } from '../components/interfaces/types';
+import results from "./data/results";
+console.log(`# of Mock Results: ${results.length}`)
+const host = "https://localhost:8080/"
 
-describe("get", () => {
+
+describe("Sorting of Results and Processes", () => {
   let mock;
 
   beforeEach(() => {
@@ -352,56 +21,129 @@ describe("get", () => {
   type ProcessType = {
     [key: number]: SearchResultType[]
   }
+  
+  test("sortResultsByRegisterDate", () => {
+
+    enum decisionEnum {
+      PROJECT = 'PROJECT',
+      PLAN = 'PLAY',
+      PROJECT_PLAN = 'PROJECT_PLAN',
+      LEGISLATIVE_PROJECT = 'LEGISLATIVE_PROJECT',
+      LEGISLATIVE_PLAN = 'LEGISLATIVE_PLAN'
+  }
+  
+  const decisionOrder = {
+      [decisionEnum.PROJECT] : 1,
+      [decisionEnum.PLAN] : 2,
+      [decisionEnum.PROJECT_PLAN] : 3,
+      [decisionEnum.LEGISLATIVE_PROJECT] : 4,
+      [decisionEnum.LEGISLATIVE_PLAN] : 5,  
+  } as const;
+  
+    const sorted = results.sort((a ,b) => {
+      if(a.doc?.decision && b.doc?.decision){
+        return decisionOrder[a.doc.decision] - decisionOrder[b.doc.decision];
+      }
+      else {
+        return 0;
+      }
+    });
+
+    sorted.map((result,idx)=>{
+      console.log(`RESULT ${idx} Decision`,result.doc?.decision);
+    })
+  })
+
+  test("Determines the correct end date for a process",()=>{
+    const processes = groupResultsByProcessId(results);
+    console.log(`test ~ processes:`, processes);
+    const process:ProcessObjectType = processes[1001687];
+    
+    expect(process.results).toBeGreaterThan(0);
+    const processResults:SearchResultType[] = process.results; 
+    expect(process.startDate).toBeDefined();
+    processResults.map((result,idx)=>{
+      console.log(`Result ${idx} - Register Date: ${result.doc.registerDate} - Final Noa Date: ${result.doc.finalNoaDate} - First Rod Date: ${result.doc.firstRodDate} - Noi Date: ${result.doc.noiDate}`);
+    })
 
 
-  test('Creates a correct process objects',()=>{
-      const processes = groupResultsByProcessId(results);
-      console.log(`Got ${Object.keys(processes).length} of Processes`,Object.keys(processes));
-      Object.keys(processes).map((key)=>{
-        console.log(`processes[${key}]:`, ' # of results: ', processes[key].results.length);
-      })
-      expect(Object.keys(processes).length).toBeGreaterThan(0);
-      expect(processes).toBeDefined();
-      expect(Object.keys(processes).length).toBeGreaterThan(0);
+
+  })
+
+  test("Should sort results based on the Decision Type Enum", () => {
+    
+//    console.log(`test ~ resultsToUse:`, resultsToUse);
+    //mix up some results with various document types inside a process
+
+    const sortedResults = sortResultsByDecision(results);
+    console.log('First Result Document Type: ', sortedResults[0].doc.decision)
+    console.log('Last Result Document Type: ', sortedResults[sortedResults.length - 1].doc.decision)
+    expect(sortedResults).toBeDefined();
+    expect(sortedResults.length).toBeGreaterThan(0);
+    sortedResults.map((result,idx)=>{
+      console.log(`\r\n RESULT with ${result.doc.id}:`,result.doc.decision);
+    })
+    console.log(`First Results Decision Type: `, sortedResults[0].doc.decision);
+    console.log(`Last Results Decision Type: `, sortedResults[sortedResults.length-1].doc)
+    expect(sortedResults[0].doc.documentType?.toLowerCase()).toBe("project");
+    expect(sortedResults[sortedResults.length - 1].doc.documentType?.toLowerCase()).toBe("Legislative;Plan");
+
   });
-});
+  test("Should sort a processes' results by Register Date ",()=>{
+      const processes = groupResultsByProcessId(results);
+      Object.keys(processes).forEach(key => {
+        const process = processes[key];
+        const sorted = sortResultsByRegisterDate(results,'startDate');
+        expect(sorted).toBeDefined();
+        expect(sorted.length).toBeGreaterThan(0);
+        const numberOfSortedResults = sorted.length;
+        sorted.map((result,idx)=>{
+          if(sorted[idx+1]){
+            const next = sorted[idx+1];
+            if( result.doc.registerDate && next.doc.registerDate){
+              const currentRegisterDate = new Date(result?.doc?.registerDate) as Date;
+              const nextRegisterDate = new Date(next?.doc?.registerDate) as Date;
+              assert(currentRegisterDate.getTime() <= nextRegisterDate.getTime(),"Current Register Date is less than Next Register Date");
+            }
+            else{
+              fail('Register Date is not defined for this result');
+            }
+          }
+        })
+      })
+    });
+
   test('Correctly sort results for a process',()=>{
     const processes = groupResultsByProcessId(results) || {};
     const arrProcesses = Object.entries(processes) || [];
-    console.log(arrProcesses);
     expect(arrProcesses).toBeDefined();
     arrProcesses.map((process,idx)=>{
       console.log(`process[${idx}]:`,process[idx]);
-    })
-    // console.log(`test ~ arrProcesses:`, arrProcesses);
-    // expect(arrProcesses).toBeDefined();
-    // const sortedProcesses = sortProcessObjects(arrProcesses,'startDate','desc');
-    // console.log(`Got ${Object.keys(processes).length} of Processes`,Object.keys(processes));
-  
+    })  
   });
 
   test('Sorts Processes using an enum',()=>{
     const processes = groupResultsByProcessId(results);
     Object.keys(processes).map((key)=>{
-      const process = processes[key];
-      const sorted = sortProcessObjectByPropertyType(process);
-      console.log(`Object.keys ~ sorted:`, sorted);
-      expect(sorted).toBeDefined();
+      const process = processes[key]
+      const results = process.results;
+      results.map((result,idx)=>{
+        console.log('\r\n --- Document Type',result.doc.documentType);
+        if(results[idx+1]){
+          console.log('\r\n ---- Next Document Type',results[idx+1].doc.documentType);
+        }
+      })
+      console.log(`Process key ${key} - decision ${process.decision}`);      
+      expect(process.decision).toEqual('Project');
+      // const sorted = sortProcessObjects([process],'decision','desc');
+      // console.log(`Object.keys ~ sorted:`, sorted.decision?.toLowerCase());
+      // expect(sorted.decision?.toLowerCase()).toBeGreaterThan(0);
+      
+      // expect(sorted).toBeDefined();
     }) 
 
   })
-  test('Sorts Processe by Start Date',()=>{
-    const processes = groupResultsByProcessId(results);
-    Object.keys(processes).map((key)=>{
-      const process = processes[key];
-      expect(process).toBeDefined();
-      const sortedByStartDate = sortProcessObjectByPropertyType(process);
-    })
-  });
-
-
-
-  
+});
 // export function groupResultsByProcessId(results: SearchResultType[]): ProcessesType{
 //   const processes:ProcessesType = {};
 //     const groupedResults = groupByResults(results);

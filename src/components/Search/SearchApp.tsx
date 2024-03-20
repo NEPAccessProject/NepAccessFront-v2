@@ -20,6 +20,8 @@ import {
   ProcessesType,
   SearchAppPropType,
   SearchResultType,
+  DocumentType,
+  ResultDocumentType,
 } from "../interfaces/types";
 import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
@@ -32,7 +34,7 @@ import {
   post,
   sortSearchResults,
 } from "./searchUtils";
-import { keyBy } from "lodash";
+
 import SearchResultCards from "./SearchResultCards";
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
@@ -179,6 +181,7 @@ const SearchApp = (props: SearchAppPropType) => {
       //   .then((res) => {
       console.log(`searchTop ~ response:`, response);
       const results = (await response.data) as SearchResultType[];
+      
       console.log(`//.then ~ results:`, results);
       //const resultsToDisplay = results.slice(0,limit > results.length? limit : results.length);
       const resultsToDisplay = results.slice(0, 10);
@@ -288,31 +291,16 @@ const SearchApp = (props: SearchAppPropType) => {
                     </Grid>
                   </Box>
                 )}
-                <Paper elevation={2}
-                style={{
-                  //border:' 1px solid #EEE',
-                  padding: 5,
-                }}
+                <Paper
+                  elevation={2}
+                  style={{
+                    //border:' 1px solid #EEE',
+                    padding: 5,
+                  }}
                   id="search-results-container"
                 >
                   <>
-                    {/* {JSON.stringify(Object.keys(processes))} */}
-                    
-                    {processes && Object.keys(processes).map((key, index) =>  (
-                      <div key={`${processes[key].processId}`}>
-                        <Typography textAlign="center" variant="h4">
-              {processes[key].results[0].doc.title}
-            </Typography>
-                        <Paper elevation={2} style={{border:'1px solid #eee', margin:5, marginBottom:15}}>
-                          <SearchResultCards process={processes[key]} />
-                          {processes[key].results.map(result => (
-                          <span key={`${result.doc.id}-${result.doc.decision}`}>  <SearchResult result={result} /></span>
-                          ))}
-                           
-                          </Paper>
-                      </div>
-                      // <Box border={2}>{processes[key].results.length}</Box>
-                    ))}
+                    <DisplayProcesses processes={processes} />
                     {/* {processes &&
                       Object.keys(processes).map((key) => {
                         ({ key });
@@ -357,11 +345,9 @@ export const DisplayProcesses = (props) => {
     //    paginateResults(results,newPage,limit)
   };
 
-  const processIds = Object.keys(processes);
-  console.log(`DisplayProcesses ~ processes:`, processes);
   return (
     <Paper
-      elevation={2}
+      elevation={1}
       //style={{ border: "1px solid #F0F0F0"}}
     >
       <TablePagination
@@ -383,24 +369,35 @@ export const DisplayProcesses = (props) => {
         bgcolor={"#F8F8F8"}
         paddingLeft={1}
         paddingRight={1}
-        border={2}
       >
-
-        {/* <Paper elevation={5} style={{border:'1px solid #EEE',borderTop:0, marginBottom:20, padding:1, borderRadius:1}}>
-            <Grid container key={processId}>
-              <Box margin={2} id="search-process-title" justifyContent={"center"} alignContent={"center"}>
-                     <Typography
-                      textAlign={"center"}
-                      variant="h3"
-                    >
-                      {processes[processId][0].doc.title}
-                    </Typography>
-                   </Box>
-              <Box>
-                
-              </Box>
-            </Grid>
-            </Paper> */}
+        {processes &&
+          Object.keys(processes).map((key, index) => (
+            <div key={`${processes[key].processId}`}>
+              
+              <Paper
+                elevation={2}
+                style={{
+                  border: "1px solid #eee",
+                  //margin: 5,
+                  marginBottom: 20,
+                }}
+              >
+                <Typography padding={2} paddingTop={1} textAlign="center" variant="h4">
+                {processes[key].results[0].doc.title}
+              </Typography>
+                <Box flex={1} padding={0} borderTop={1} borderBottom={0} borderColor={'#eee'}>
+                  <SearchResultCards process={processes[key]} />
+                </Box>
+                {processes[key].results.map((result) => (
+                  <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType}`}>
+                    {" "}
+                    <SearchResult result={result} />
+                  </span>
+                ))}
+              </Paper>
+            </div>
+            // <Box border={2}>{processes[key].results.length}</Box>
+          ))}
       </Box>
     </Paper>
   );

@@ -48,7 +48,14 @@ const SearchResult = (props: SearchResultPropsType) => {
   if (!result || !result.doc) return null;
   const doc: DocumentType = result.doc;
   const context = useContext(SearchContext);
-  const { getResultHighlights, error, loading, setError,showSnippets,filters } = context;
+  const {
+    getResultHighlights,
+    error,
+    loading,
+    setError,
+    showSnippets,
+    filters,
+  } = context;
   //applies only to the current result
   const [highlights, setHiglights] = useState<string[]>([]);
   //applies to all snippets
@@ -96,132 +103,182 @@ const SearchResult = (props: SearchResultPropsType) => {
     //const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
     const end = text && text.length > 512 ? 512 : text.length;
     const html = text.substring(0, end as number) + "...";
-    console.log("🚀 ~ convertToHTML ~ html:", html)
+    console.log("🚀 ~ convertToHTML ~ html:", html);
     return { __html: html };
   }
+
+  const getDateBasedonDecision = (decision: string): Date | string => {
+    switch (decision) {
+      case "NOI":
+        return doc.noiDate ? doc.noiDate : "";
+      case "Draft":
+        return doc.commentDate ? doc.commentDate : "";
+      case "Final":
+        return doc.registerDate ? doc.registerDate : "";
+      case "ROD":
+        return doc.firstRodDate ? doc.firstRodDate : "";
+      default:
+        return doc.registerDate ? doc.registerDate : "";
+    }
+  };
+  const documentDate = getDateBasedonDecision(decision);
   return (
     <>
       {doc && (
-        <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
-          <Divider/>
-          <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
-              {/* <div><b>Snippets</b>{showSnippets ? 'false' : 'true'}</div>
-              <div><b>Snippet</b>{showSnippet ? 'false' : 'true'}</div> */}
-            {/* <Typography textAlign="center" variant="h4">
-              {title}
-            </Typography> */}
-            {/* <Box display={"flex"} id={`search-result-card-box-${doc.id}`}>
-              <SearchResultCards result={result} />
-            </Box> */}
-
-            <Grid
-              id={`search-result-container${doc.id}`}
-              {...GridContainerProps}
-              display={"flex"}
-              flex={1}
-            >
-              <Grid xs={1} {...GridItemProps} display={"flex"}>
-                {documentType}
-              </Grid>
-              <Grid xs={1} {...GridItemProps} display={"flex"}>
-                {doc.processId}
-              </Grid>
-              <Grid xs={2} {...GridItemProps}>
-                {action}
-              </Grid>
-              <Grid xs={2} {...GridItemProps}>
-                {agency}
-              </Grid>
-              <Grid xs={2} {...GridItemProps}>
-                {`${registerDate ? registerDate : "N/A"}`}
-              </Grid>
-              <Grid xs={2} {...GridItemProps}>
-                {`${status ? status : "N/A"}`}
-              </Grid>
-              <Grid xs={2} {...GridItemProps}>
-                <Button variant="contained" color="primary">
-                  Download
-                </Button>
-              </Grid>
-            </Grid>
-            <Box
-              id={`search-result-highlights-${doc.id}`}
-              style={{
-                background: "#3D669C",
-                //border: "1px solid #ddd",
-                marginBottom: 0,
-              }}
-            >
-              { (showSnippet) ? (
-                <Button
-                  color="primary"
-                  fullWidth
-                  onClick={()=>setShowSnippet(false)}
-                >
-                  <Typography color={"white"}>See Less</Typography>
-                </Button>
-              ) : (
-                <Button
-                  color="primary"
-                  fullWidth
-                  onClick={(evt)=> setShowSnippet(true)}
-                >
-                  <Typography color={"white"}> See More</Typography>
-                </Button>
-              )}
-              <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
-                {(showSnippet) && (
-                  <Box style={{ backgroundColor: "#fff" }}>
-                    <Typography
-                      color="black"
-                      bgcolor="white"
-                      padding={1}
-                      paddingBottom={0}
-                      textAlign={"left"}
-                      fontSize={"1rem"}
-                      variant="body2"
-                    >
-                      <Box>
-                        {highlights.map((highlight, index) => (
-                          <Box
-                            key={index}
-                            padding={0.25}
-                            //borderBottom={1}
-                            //borderColor="grey.300"
-                          >
+        <Grid container padding={1}>
+          <Grid xs={2} border={1} className="document-date-columns">
+            {
+              <>
+                <Box>{decision}</Box>
+                <Box>{result.doc.id}</Box>
+                <Box>{documentDate ? documentDate.toLocaleString() : ""}</Box>
+              </>
+            }
+          </Grid>
+          <Grid xs={10} margin={2} padding={2} border={1} className="document-title-column">
+            <Typography variant="h4">
+              {doc.documentType?.normalize()} - {title}
+            </Typography>
+          </Grid>
+          <Grid xs={12} className="document-highlights-grid-item">
+            <>
+              <Box>
+                {highlights.map((highlight, index) => (
+                  <Box key={index} padding={0.25} className="document-higlights">
+                    <Box id={`search-result-highlight-container-${doc.id}`}>
+                      {highlights.map((highlight, index) => {
+                        return (
+                          <Box key={index} padding={0} fontSize="0.75rem" className="document-highlight">
                             <Box
-                              id={`search-result-highlight-container-${doc.id}`}
-                            >
-                             {highlights.map((highlight, index) => {
-                                return (
-                                  <Box
-                                    key={index}
-                                    padding={0}
-                                    fontSize="0.75rem"
-                                  >
-
-                                    <Box 
-                                      dangerouslySetInnerHTML={convertToHTML(
-                                        highlight[0]
-                                      )}
-                                    >
-                                    </Box>
-                                  </Box>
-                                );
-                              })}
-                            </Box>
+                              dangerouslySetInnerHTML={convertToHTML(
+                                highlight[0]
+                              )}
+                            ></Box>
                           </Box>
-                        ))}
-                      </Box>
-                    </Typography>
+                        );
+                      })}
+                    </Box>
                   </Box>
-                )}
+                ))}
               </Box>
-            </Box>
-          </Box>
-        </Box>
+            </>
+          </Grid>
+        </Grid>
       )}
     </>
   );
+  // return (
+  //   <>
+  //     {doc && (
+  //       <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
+  //         <Divider/>
+  //         <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
+  //           <Grid
+  //             id={`search-result-container${doc.id}`}
+  //             {...GridContainerProps}
+  //             display={"flex"}
+  //             flex={1}
+  //           >
+  //             <Grid xs={1} {...GridItemProps} display={"flex"}>
+  //               {documentType}
+  //             </Grid>
+  //             <Grid xs={1} {...GridItemProps} display={"flex"}>
+  //               {doc.processId}
+  //             </Grid>
+  //             <Grid xs={2} {...GridItemProps}>
+  //               {action}
+  //             </Grid>
+  //             <Grid xs={2} {...GridItemProps}>
+  //               {agency}
+  //             </Grid>
+  //             <Grid xs={2} {...GridItemProps}>
+  //               {`${registerDate ? registerDate : "N/A"}`}
+  //             </Grid>
+  //             <Grid xs={2} {...GridItemProps}>
+  //               {`${status ? status : "N/A"}`}
+  //             </Grid>
+  //             <Grid xs={2} {...GridItemProps}>
+  //               <Button variant="contained" color="primary">
+  //                 Download
+  //               </Button>
+  //             </Grid>
+  //           </Grid>
+  //           <Box
+  //             id={`search-result-highlights-${doc.id}`}
+  //             style={{
+  //               background: "#3D669C",
+  //               //border: "1px solid #ddd",
+  //               marginBottom: 0,
+  //             }}
+  //           >
+  //             { (showSnippet) ? (
+  //               <Button
+  //                 color="primary"
+  //                 fullWidth
+  //                 onClick={()=>setShowSnippet(false)}
+  //               >
+  //                 <Typography color={"white"}>See Less</Typography>
+  //               </Button>
+  //             ) : (
+  //               <Button
+  //                 color="primary"
+  //                 fullWidth
+  //                 onClick={(evt)=> setShowSnippet(true)}
+  //               >
+  //                 <Typography color={"white"}> See More</Typography>
+  //               </Button>
+  //             )}
+  //             <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
+  //               {(showSnippet) && (
+  //                 <Box style={{ backgroundColor: "#fff" }}>
+  //                   <Typography
+  //                     color="black"
+  //                     bgcolor="white"
+  //                     padding={1}
+  //                     paddingBottom={0}
+  //                     textAlign={"left"}
+  //                     fontSize={"1rem"}
+  //                     variant="body2"
+  //                   >
+  //                     <Box>
+  //                       {highlights.map((highlight, index) => (
+  //                         <Box
+  //                           key={index}
+  //                           padding={0.25}
+  //                         >
+  //                           <Box
+  //                             id={`search-result-highlight-container-${doc.id}`}
+  //                           >
+  //                            {highlights.map((highlight, index) => {
+  //                               return (
+  //                                 <Box
+  //                                   key={index}
+  //                                   padding={0}
+  //                                   fontSize="0.75rem"
+  //                                 >
+
+  //                                   <Box
+  //                                     dangerouslySetInnerHTML={convertToHTML(
+  //                                       highlight[0]
+  //                                     )}
+  //                                   >
+  //                                   </Box>
+  //                                 </Box>
+  //                               );
+  //                             })}
+  //                           </Box>
+  //                         </Box>
+  //                       ))}
+  //                     </Box>
+  //                   </Typography>
+  //                 </Box>
+  //               )}
+  //             </Box>
+  //           </Box>
+  //         </Box>
+  //       </Box>
+  //     )}
+  //   </>
+  // );
 };
 export default SearchResult;
