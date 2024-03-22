@@ -4,18 +4,17 @@
 import axios, { AxiosResponse } from "axios";
 import {
   DecisionTypeEnum,
+  DocumentType,
   DocumentTypeEnum,
   FilterType,
   HighlightsPostDataType,
   PaginiationType,
   ProcessObjectType,
   ProcessesType,
+  ResultDocumentType,
   SearchContextType,
   SearchResultType,
-  UnhighlightedType,
-  DocumentType,
-  ResultDocumentType,
-  SearchResultsType,
+  UnhighlightedType
 } from "../interfaces/types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
@@ -162,15 +161,8 @@ export function filterResults(results: SearchResultType[]): SearchResultType[] {
   const scores: number[] = [];
 //    results.map((result:SearchResultType) => scores.push(result.score));
   scores.sort((a, b) => b - a);
-  console.log("TOP SCORES", scores[0]);
-  console.log("BOTTOM SCORES", scores[scores.length - 1]);
-  console.log("Average Score", (scores[scores.length - 1] + scores[0]) / 2);
   const avg:number = (scores[scores.length - 1] + scores[0]) / 2;
   const filteredResults = results.filter((result) => result && result.score && result.score > avg);
-  console.log(
-    "🚀 ~ filterResults ~ # of filteredResults:",
-    filteredResults.length
-  );
 
   return filteredResults;
 }
@@ -265,8 +257,6 @@ export async function post(url, postData): Promise<any> {
 //   });
 // }
 
-
-
 export function sortResultsByDecision(results: SearchResultType[], sortDir: string = "asc"): SearchResultType[] {
   const decisionTypeOrder = Object.values(DecisionTypeEnum);
   const sorted = results.sort((a, b) => {
@@ -292,6 +282,29 @@ export function sortResultsByDocumentType(results: SearchResultType[], sortDir: 
   });
   return sorted;
 }
+export   const getDatesByDocumentType = (documentType: string,doc): string => {
+  if(!doc ||!doc.decision) return "";
+  console.log(`getDateBasedonDecision decision ${documentType}:`, doc);
+  if(!doc ||!doc.decision) return "N/A";
+  switch (documentType) {
+    case "NOI":
+      return doc.noiDate || "N/A";
+    case "Draft":
+      return doc.commentDate ? doc.commentDate : "N/A";
+    case "Final":
+      return doc.finalNoa ? doc.finalNOA : "N/A";
+    case "ROD":
+      return doc.firstRodDate ? doc.firstRodDate : "N/A";
+    case "Project":
+      return doc.registerDate ? doc.registerDate : "N/A";
+    case "Final Supplement":
+      return doc.finalNoaDate ? doc.finalNoaDate : "N/A";
+    case "Draft Supported":
+        return doc.noi
+    default:
+      return doc.registerDate ? doc.registerDate : "N/A";
+  }
+};
 export function getActiveFilters(filters:FilterType): FilterType {
   const activeFilter = {
     title: '',
@@ -367,7 +380,8 @@ export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:st
   try{
   //const luceneIds:HighlightIdsType[] = [];
 //     results.map((result:SearchResultType) => {
-        const filenames = result.filenames && result.filenames.split('>') as string[];
+        const resultFilenames = result.filenames as string;
+        const filenames = result.filenames && typeof(result.filenames) == "object" && resultFilenames.split('>') as string[];
         console.log(' filenames',filenames);
         console.log(`//results.map ~ filenames:`, filenames);
         result.ids.forEach((id) => {

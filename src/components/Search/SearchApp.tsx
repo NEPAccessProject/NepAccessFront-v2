@@ -6,6 +6,9 @@ import {
   Snackbar,
   TablePagination,
   Typography,
+  Theme,
+  ThemeOptions,
+  useTheme,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -36,6 +39,7 @@ import {
   sortSearchResults,
   handleDocumentTypeConversion,
 } from "./searchUtils";
+import theme from "../../themes/theme";
 
 import SearchResultCards from "./SearchResultCards";
 const SearchApp = (props: SearchAppPropType) => {
@@ -170,28 +174,23 @@ const SearchApp = (props: SearchAppPropType) => {
         setError("Please enter term(s) to search for.");
         return;
       }
-      console.log("GETTING ACTIVE FILTERS FROM:", filters);
       const activeFilters = getActiveFilters(filters);
-      console.log(`searchTop ~ activeFilters:`, activeFilters);
       const agencies: FilterOptionType[] = [];
-      console.log(`searchTop ~ agencies:`, agencies);
       let processesToDisplay: ProcessObjectType[] = [];
       const response = await axios.post(
         `${host}text/search_top`,
         activeFilters
       );
       //   .then((res) => {
-      console.log(`searchTop ~ response:`, response);
       const results = (await response.data);
       
-      console.log(`//.then ~ results:`, results);
       //const resultsToDisplay = results.slice(0,limit > results.length? limit : results.length);
       const resultsToDisplay = results.slice(0, 10);
         resultsToDisplay.map((result) => {
            const newDoc = handleDocumentTypeConversion(result.doc);
            console.log(`resultsToDisplay.map ~ newDoc:`, newDoc);
-          result = {...newDoc}
-
+           result.doc = {...newDoc}
+          console.log('NEW DOC?',result.doc);
         });
         const processesResults = groupResultsByProcessId(results);
         //console.log(`processesResults:`, processesResults);
@@ -244,6 +243,8 @@ const SearchApp = (props: SearchAppPropType) => {
     //hasActiveFilters: hasActiveFilters(),
     onTypeChecked,
   };
+  const theme = useTheme<Theme>();
+  console.log(`searchTop ~ theme:`, theme);
   return (
     <SearchContext.Provider value={value}>
       <Container id="search-app-container" maxWidth="xl" disableGutters>
@@ -297,7 +298,8 @@ const SearchApp = (props: SearchAppPropType) => {
                   </Box>
                 )}
                 <Paper
-                  elevation={2}
+                  //elevation={2}
+                  variant="outlined"
                   style={{
                     //border:' 1px solid #EEE',
                     padding: 5,
@@ -350,6 +352,8 @@ export const DisplayProcesses = (props) => {
     //    paginateResults(results,newPage,limit)
   };
 
+  const classes = useTheme<Theme>();
+  console.log(`DisplayProcesses ~ classes:`, classes);
   return (
     <Paper
       elevation={1}
@@ -387,14 +391,15 @@ export const DisplayProcesses = (props) => {
                   marginBottom: 20,
                 }}
               >
-                <Typography padding={2} paddingTop={1} textAlign="center" variant="h4">
+                <Typography padding={1} textAlign="center" color={"#3373F7"} fontSize="1.1rem" >
                 {processes[key].results[0].doc.title}
               </Typography>
-                <Box flex={1} padding={0} borderTop={1} borderBottom={0} borderColor={'#eee'}>
+                <Box bgcolor={"#FAFAFA"} flex={1} padding={0} borderTop={1} borderBottom={0} borderColor={'#eee'}>
                   {/* <SearchResultCards process={processes[key]} /> */}
                 </Box>
-                {processes[key].results.map((result) => (
-                  <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType}`}>
+                {processes[key].results.map((result,idx) => (
+                  // [TODO] We should be able to build a unique key for each result without using the index 
+                  <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType }-${idx}`}>
                     {" "}
                     <SearchResult result={result} />
                   </span>

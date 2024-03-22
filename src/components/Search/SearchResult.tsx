@@ -3,14 +3,14 @@ import {
   SearchResultPropsType,
   SearchResultType,
 } from "@/components/interfaces/types";
-import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import { Box, Button, Divider, Paper, Typography,Chip } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { styled } from "@mui/styles";
 import react, { useContext, useEffect, useState } from "react";
 import SearchContext from "./SearchContext";
 import SearchResultCards from "./SearchResultCards";
 //import SearchResultCards from "./SearchResultCards";
-import { getHighlights } from "./searchUtils";
+import { getHighlights,getDatesByDocumentType } from "./searchUtils";
 import { string } from "prop-types";
 const CardItem = styled(Paper)(() => ({
   elevation: 1,
@@ -44,10 +44,16 @@ const GridItemProps = {
   // },
 };
 
+function convertToHTML(text: string) {
+  //const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
+  const end = text && text.length > 512 ? 512 : text.length;
+  const html = text.substring(0, end as number) + "...";
+  return { __html: html };
+}
+
 const SearchResult = (props: SearchResultPropsType) => {
   const result: SearchResultType = props.result;
   if (!result || !result.doc) return null;
-  const doc: DocumentType = result.doc;
   const context = useContext(SearchContext);
   const {
     getResultHighlights,
@@ -62,7 +68,6 @@ const SearchResult = (props: SearchResultPropsType) => {
   //applies to all snippets
   const [showSnippet, setShowSnippet] = useState<boolean>(true);
   const [currentResult, setCurrentResult] = useState(result);
-  const docTitle = filters.title;
   const { score, ids } = currentResult;
   const _mounted = react.useRef(false);
 
@@ -77,28 +82,17 @@ const SearchResult = (props: SearchResultPropsType) => {
   //   console.log("IN EFFECT WITH RESULT", result);
   // }, [result]);
   useEffect(() => {
-  highlights.push(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
-    )
     highlights.push(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
     );
     highlights.push(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
     );
-  setHiglights(highlights);
-  },[]);
-  const {
-    commentDate,
-    title,
-    agency,
-    status,
-    documentType,
-    decision,
-    registerDate,
-    action,
-  } = doc;
-
+    highlights.push(
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Tristique et egestas quis ipsum. Elit ut aliquam purus sit amet luctus venenatis lectus. Pellentesque eu tincidunt tortor aliquam nulla. Sit amet commodo nulla facilisi nullam vehicula ipsum"
+    );
+    setHiglights(highlights);
+  }, []);
   // const onSnippetChange = (evt:React.ChangeEvent<HTMLButtonElement>) => {
   //   console.log(`onSnippetChange ~ evt:`, evt.target);
   //   console.log(`onSnippetChange ~ evt:`, evt.target);
@@ -107,206 +101,218 @@ const SearchResult = (props: SearchResultPropsType) => {
   //   console.log(`onSnippetChange ~ target:`, isChecked);
 
   // }
+  const doc: DocumentType = result.doc;
+  const {decision, commentDate, title, agency, status, registerDate, action,finalNoa,finalNoaDate } =
+  doc;
 
-  function convertToHTML(text: string) {
-    //console.log("🚀 ~ convertToHTML ~ text:", text)
-    // if (!text?.length) {
-    //   return false;
-    // }
-    //const content: string = text.replace(/<\/?[^>]+(>|$)/g, "");
-    const end = text && text.length > 512 ? 512 : text.length;
-    const html = text.substring(0, end as number) + "...";
-    return { __html: html };
-  }
-
-  const getDateBasedonDecision = (decision: string): Date | string => {
-    switch (decision) {
-      case "NOI":
-        return doc.noiDate ? doc.noiDate : "";
-      case "Draft":
-        return doc.commentDate ? doc.commentDate : "";
-      case "Final":
-        return doc.registerDate ? doc.registerDate : "";
-      case "ROD":
-        return doc.firstRodDate ? doc.firstRodDate : "";
-      default:
-        return doc.registerDate ? doc.registerDate : "";
-    }
-  };
-  const documentDate = getDateBasedonDecision(decision as string);
+  const documentType = doc.documentType;
   return (
-    <>
+    <Grid container padding={2}>
       {doc && (
-        <Grid container padding={1} flex={1} border={1} borderColor={'red'}>
-          <Grid xs={2} border={1} flex={1} className="document-date-columns">
-            {
+        <>
+          <Grid
+            xs={1}
+            justifyContent={'center'}
+            justifyItems={'center'}
+            alignItems={'center'}
+            alignSelf={'center'}
+          >
+           <Box>
+          <>
+          {getDatesByDocumentType(decision[0],doc)}
+          </>
+        {decision}
+        {getDatesByDocumentType(decision as string,doc)}  
+            {/* {decision && typeof(decision)=="object" && decision.map((decision)=>(
               <>
-                <Box>d? {decision}</Box>
-                <Box>id? {result.doc.id}</Box>
-                <Box>documentDate? {documentDate ? documentDate.toLocaleString() : ""}</Box>
+              <br/>
+              {getDateBasedonDecision(decision,doc).toString()}
+              <br/>
               </>
-            }
+            )
+            )} */}
+            {/* {doc.decision as string[] && doc.decision.map((decision, index) => (
+              getDateBasedonDecision(decision).toString()
+            ))} */}
+           </Box>
           </Grid>
-          <Grid xs={10} flex={1} border={1} margin={2} padding={2} className="document-title-column">
-            <Typography variant="h4">
-
-              {doc.documentType && typeof(doc.documentType) == "object" &&  doc.documentType.map(documentType => {
-                  return (
-                    <>
-                    <b>{documentType}</b>
-                    </>
-                  )
-              })} {title}
-            </Typography>
-              <b># of higlights: {highlights.length}</b>
+          <Grid
+            xs={10}
+            flex={1}
+            padding={2}
+            className="document-title-column"
+          >
+              <Button variant="text">
+                <Typography textAlign={"center"} fontSize={"0.8rem"}>
+                    {doc.documentType} - {doc.title}
+                </Typography>
+              </Button>
           </Grid>
-          <Grid xs={12} className="document-highlights-grid-item">
-            <>
-                {highlights.map((highlight, index) => (
-                  <Box key={index} padding={0.25} className="document-higlights" border={1} borderColor={'blue'}>
-                    <Box id={`search-result-highlight-container-${doc.id}`}>
-                      {highlights.map((highlight, index) => 
-                        <>
-                          {index < 3 && 
-                          <Box key={index} padding={0} fontSize="0.75rem" className="document-highlight">
-                            <b>Highlight {index}</b>
-                            <Box
-                              dangerouslySetInnerHTML={convertToHTML(
-                                highlight
-                              )}
-                            ></Box>
-                          </Box>}
-                        </>
-                      
-                      )}
-                      {index > 3}{
-                          <>
-                          <b>See More...</b>
-                          </>
-                      }
-                
-                    </Box>
-                  </Box>
-                ))
-              }
-              </>
-              </Grid>
+          {/* <Grid container padding={1} border={1} borderColor={'red'}>
+                <Grid xs={12}>Highlights ?</Grid>
+         </Grid> */}
+          <Grid container display={'flex'} padding={1} border={1} borderColor={'red'}>
+            <Grid flex={1}><ShowHighlights highlights={highlights} result={result} /></Grid>
           </Grid>
+        </>
       )}
-    </>
-  );
-  // return (
-  //   <>
-  //     {doc && (
-  //       <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
-  //         <Divider/>
-  //         <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
-  //           <Grid
-  //             id={`search-result-container${doc.id}`}
-  //             {...GridContainerProps}
-  //             display={"flex"}
-  //             flex={1}
-  //           >
-  //             <Grid xs={1} {...GridItemProps} display={"flex"}>
-  //               {documentType}
-  //             </Grid>
-  //             <Grid xs={1} {...GridItemProps} display={"flex"}>
-  //               {doc.processId}
-  //             </Grid>
-  //             <Grid xs={2} {...GridItemProps}>
-  //               {action}
-  //             </Grid>
-  //             <Grid xs={2} {...GridItemProps}>
-  //               {agency}
-  //             </Grid>
-  //             <Grid xs={2} {...GridItemProps}>
-  //               {`${registerDate ? registerDate : "N/A"}`}
-  //             </Grid>
-  //             <Grid xs={2} {...GridItemProps}>
-  //               {`${status ? status : "N/A"}`}
-  //             </Grid>
-  //             <Grid xs={2} {...GridItemProps}>
-  //               <Button variant="contained" color="primary">
-  //                 Download
-  //               </Button>
-  //             </Grid>
-  //           </Grid>
-  //           <Box
-  //             id={`search-result-highlights-${doc.id}`}
-  //             style={{
-  //               background: "#3D669C",
-  //               //border: "1px solid #ddd",
-  //               marginBottom: 0,
-  //             }}
-  //           >
-  //             { (showSnippet) ? (
-  //               <Button
-  //                 color="primary"
-  //                 fullWidth
-  //                 onClick={()=>setShowSnippet(false)}
-  //               >
-  //                 <Typography color={"white"}>See Less</Typography>
-  //               </Button>
-  //             ) : (
-  //               <Button
-  //                 color="primary"
-  //                 fullWidth
-  //                 onClick={(evt)=> setShowSnippet(true)}
-  //               >
-  //                 <Typography color={"white"}> See More</Typography>
-  //               </Button>
-  //             )}
-  //             <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
-  //               {(showSnippet) && (
-  //                 <Box style={{ backgroundColor: "#fff" }}>
-  //                   <Typography
-  //                     color="black"
-  //                     bgcolor="white"
-  //                     padding={1}
-  //                     paddingBottom={0}
-  //                     textAlign={"left"}
-  //                     fontSize={"1rem"}
-  //                     variant="body2"
-  //                   >
-  //                     <Box>
-  //                       {highlights.map((highlight, index) => (
-  //                         <Box
-  //                           key={index}
-  //                           padding={0.25}
-  //                         >
-  //                           <Box
-  //                             id={`search-result-highlight-container-${doc.id}`}
-  //                           >
-  //                            {highlights.map((highlight, index) => {
-  //                               return (
-  //                                 <Box
-  //                                   key={index}
-  //                                   padding={0}
-  //                                   fontSize="0.75rem"
-  //                                 >
+    </Grid>
 
-  //                                   <Box
-  //                                     dangerouslySetInnerHTML={convertToHTML(
-  //                                       highlight[0]
-  //                                     )}
-  //                                   >
-  //                                   </Box>
-  //                                 </Box>
-  //                               );
-  //                             })}
-  //                           </Box>
-  //                         </Box>
-  //                       ))}
-  //                     </Box>
-  //                   </Typography>
-  //                 </Box>
-  //               )}
-  //             </Box>
-  //           </Box>
-  //         </Box>
-  //       </Box>
-  //     )}
-  //   </>
-  // );
+    // return (
+    //   <>
+    //     {doc && (
+    //       <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
+    //         <Divider/>
+    //         <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
+    //           <Grid
+    //             id={`search-result-container${doc.id}`}
+    //             {...GridContainerProps}
+    //             display={"flex"}
+    //             flex={1}
+    //           >
+    //             <Grid xs={1} {...GridItemProps} display={"flex"}>
+    //               {documentType}
+    //             </Grid>
+    //             <Grid xs={1} {...GridItemProps} display={"flex"}>
+    //               {doc.processId}
+    //             </Grid>
+    //             <Grid xs={2} {...GridItemProps}>
+    //               {action}
+    //             </Grid>
+    //             <Grid xs={2} {...GridItemProps}>
+    //               {agency}
+    //             </Grid>
+    //             <Grid xs={2} {...GridItemProps}>
+    //               {`${registerDate ? registerDate : "N/A"}`}
+    //             </Grid>
+    //             <Grid xs={2} {...GridItemProps}>
+    //               {`${status ? status : "N/A"}`}
+    //             </Grid>
+    //             <Grid xs={2} {...GridItemProps}>
+    //               <Button variant="contained" color="primary">
+    //                 Download
+    //               </Button>
+    //             </Grid>
+    //           </Grid>
+    //           <Box
+    //             id={`search-result-highlights-${doc.id}`}
+    //             style={{
+    //               background: "#3D669C",
+    //               //border: "1px solid #ddd",
+    //               marginBottom: 0,
+    //             }}
+    //           >
+    //             { (showSnippet) ? (
+    //               <Button
+    //                 color="primary"
+    //                 fullWidth
+    //                 onClick={()=>setShowSnippet(false)}
+    //               >
+    //                 <Typography color={"white"}>See Less</Typography>
+    //               </Button>
+    //             ) : (
+    //               <Button
+    //                 color="primary"
+    //                 fullWidth
+    //                 onClick={(evt)=> setShowSnippet(true)}
+    //               >
+    //                 <Typography color={"white"}> See More</Typography>
+    //               </Button>
+    //             )}
+    //             <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
+    //               {(showSnippet) && (
+    //                 <Box style={{ backgroundColor: "#fff" }}>
+    //                   <Typography
+    //                     color="black"
+    //                     bgcolor="white"
+    //                     padding={1}
+    //                     paddingBottom={0}
+    //                     textAlign={"left"}
+    //                     fontSize={"1rem"}
+    //                     variant="body2"
+    //                   >
+    //                     <Box>
+    //                       {highlights.map((highlight, index) => (
+    //                         <Box
+    //                           key={index}
+    //                           padding={0.25}
+    //                         >
+    //                           <Box
+    //                             id={`search-result-highlight-container-${doc.id}`}
+    //                           >
+    //                            {highlights.map((highlight, index) => {
+    //                               return (
+    //                                 <Box
+    //                                   key={index}
+    //                                   padding={0}
+    //                                   fontSize="0.75rem"
+    //                                 >
+
+    //                                   <Box
+    //                                     dangerouslySetInnerHTML={convertToHTML(
+    //                                       highlight[0]
+    //                                     )}
+    //                                   >
+    //                                   </Box>
+    //                                 </Box>
+    //                               );
+    //                             })}
+    //                           </Box>
+    //                         </Box>
+    //                       ))}
+    //                     </Box>
+    //                   </Typography>
+    //                 </Box>
+    //               )}
+    //             </Box>
+    //           </Box>
+    //         </Box>
+    //       </Box>
+    //     )}
+    //   </>
+    // );
+  );
 };
+
 export default SearchResult;
+
+type highlightProps = {
+  highlights: string[];
+  result: SearchResultType;
+};
+export function ShowHighlights(props: highlightProps) {
+  const [showMoreSnippets, setShowMoreSnippets] = useState<boolean>(false);
+  const highlights: string[] = props.highlights;
+  const result: SearchResultType = props.result;
+  const doc: DocumentType = result.doc;
+  return (
+    <Box key={result.doc.id} padding={0.25} className="document-higlights">
+      <Box id={`search-result-highlight-container-${doc.id}`}>
+        {highlights.map((highlight, i) => (
+          <>
+            {i < 1 && (
+              <>
+                <Box
+                  key={i}
+                  padding={0}
+                  fontSize="0.75rem"
+                  className="document-highlight"
+                >
+                  <Box dangerouslySetInnerHTML={convertToHTML(highlight)}></Box>
+                </Box>
+                <Box
+                  key={i}
+                  padding={0}
+                  fontSize="0.75rem"
+                  className="document-highlight"
+                >
+                  <Button variant="text">Show More Snippets</Button>
+                </Box>
+              </>
+            )}
+          </>
+        ))}
+      </Box>
+    </Box>
+  );
+}

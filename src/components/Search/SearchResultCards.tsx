@@ -1,9 +1,9 @@
 import Grid from "@mui/material/Unstable_Grid2";
+import { Chip } from "material-ui";
 import moment from "moment";
 import React from "react";
 import { ProcessObjectType, SearchResultType,ProcessesType, ResultDocumentType,DocumentType } from "../interfaces/types";
 import SearchContext from "./SearchContext";
-import { result } from "lodash";
 
 // const Item = styled(Paper)(() => ({
 //     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -167,7 +167,7 @@ const SearchResultCards = (props) => {
   // );
   return (
     <>
-      Search Result Cards Placeholder
+      <Chip><b>Test Chip</b></Chip>
     </>
   )
 };

@@ -55,8 +55,8 @@ describe("Sorting of Results and Processes", () => {
   })
 
   test("Converts ; delinated strings to array for a documents", () => {
-    const resultsToUse = results.slice(0, 1) as ResponseSearchResultsType[]
-    resultsToUse.map((result:SearchResultType, idx) => {
+    const resultsToUse:SearchResultType[] = results.slice(0, 1) as ResponseSearchResultsType[]
+    resultsToUse.map((result) => {
       if(result.doc){
         const newDoc = handleDocumentTypeConversion(result.doc);
 
