@@ -14,12 +14,13 @@ import {
   ResultDocumentType,
   SearchContextType,
   SearchResultType,
-  UnhighlightedType
+  UnhighlightedType,
+  ResponseSearchResultsType,
 } from "../interfaces/types";
   //[TODO][CRITICAL] move this to a ENV value
   //const host = import.meta.env.VITE_API_HOST;
-  console.log(import.meta.env.VITE_API_HOST)
-  const host = import.meta.env.VITE_API_HOST || "http://localhost:8080/"; //look into passing this via an ENV variable
+//  console.log(import.meta.env.VITE_API_HOST)
+  const host = import.meta?.env?.VITE_API_HOST || "http://localhost:8080/"; //look into passing this via an ENV variable
   
 
   export enum SortBy {
@@ -32,66 +33,6 @@ import {
     Title = 'title'
   }
 
-  // export function sortProcesssObjects(
-  //   processObjects: ProcessObjectType[],
-  //   sortBy: SortBy,
-  //   sortDir: string = "asc"
-  // ): ProcessObjectType[] {
-  //   return processObjects.sort((a, b) => {
-  //     if (a[sortBy] < b[sortBy]) {
-  //       return sortDir === "asc" ? -1 : 1;
-  //     }
-  //     if (a[sortBy] > b[sortBy]) {
-  //       return sortDir === "asc" ? 1 : -1;
-  //     }
-  //     return 0;
-  //   });
-  // }
-  // export function sortProcessObjectByPropertyType(processObject: ProcessObjectType): ProcessObjectType {
-  //   const sortedProcessObject = { ...processObject };
-  //   const keys = Object.keys(sortedProcessObject);
-    
-  //   keys.sort((a, b) => {
-  //     const aValue = sortedProcessObject[a];
-  //     const bValue = sortedProcessObject[b];
-      
-  //     const aType = typeof aValue;
-  //     const bType = typeof bValue;
-      
-  //     if (aType < bType) return -1;
-  //     if (aType > bType) return 1;
-  //     return 0;
-  //   }).forEach(key => {
-  //     const value = sortedProcessObject[key];
-  //     delete sortedProcessObject[key];
-  //     sortedProcessObject[key] = value;
-  //   });
-    
-  //   console.log(`sortProcessObjectByPropertyType ~ sortedProcessObject:`, sortedProcessObject);
-  //   return sortedProcessObject;
-  // }
- 
-  // export function sortProcessObjectByStartDate(processObject: ProcessObjectType, sortdir: string = "asc"): ProcessObjectType {
-  //   const sortedProcessObject = { ...processObject };
-  //   console.log(`Trying to Sort Process`, processObject);
-
-  //   // Sort the properties of the process object
-  //   const sortedKeys = Object.keys(sortedProcessObject).sort((a, b) => {
-  //     if (sortdir === "asc") {
-  //       return new Date(sortedProcessObject[a].StartDate).getTime() - new Date(sortedProcessObject[b].StartDate).getTime();
-  //     } else {
-  //       return new Date(sortedProcessObject[b].StartDate).getTime() - new Date(sortedProcessObject[a].StartDate).getTime();
-  //     }
-  //   });
-
-  //   const result = {};
-  //   for (let key of sortedKeys) {
-  //     result[key] = sortedProcessObject[key];
-  //   }
-
-  //   console.log(`sortProcessObjectByStartDate ~ sortedProcessObject:`, result);
-  //   return result;
-  // }
   export function sortProcessObjectByDocumentType(processObject: ProcessObjectType, sortby: string, sortdir: string = "asc"): ProcessObjectType {
     const sortedProcessObject = { ...processObject };
     // Sort the properties of the process object
@@ -245,23 +186,11 @@ export async function post(url, postData): Promise<any> {
   });
 }  
 
-// export function sortResultsByDecision(results: SearchResultType[], sortDir: string = "asc"): SearchResultType[] {
-//   return results.sort((a, b) => {
-//     if (a?.doc && a?.doc?.decision < b.doc.decision) {
-//       return sortDir === "asc" ? -1 : 1;
-//     }
-//     if (a.doc.decision > b.doc.decision) {
-//       return sortDir === "asc" ? 1 : -1;
-//     }
-//     return 0;
-//   });
-// }
-
 export function sortResultsByDecision(results: SearchResultType[], sortDir: string = "asc"): SearchResultType[] {
   const decisionTypeOrder = Object.values(DecisionTypeEnum);
   const sorted = results.sort((a, b) => {
     if (a.doc.decision && b.doc.decision) {
-      const val =   decisionTypeOrder.indexOf(b.doc.decision as string) - decisionTypeOrder.indexOf(a.doc.decision as string);
+      const val =   decisionTypeOrder.indexOf(b.doc.decision) - decisionTypeOrder.indexOf(a.doc.decision as string);
       console.log(`a ${a.doc.decision} vs b ${b.doc.decision}`, val);
       return val;
     }
@@ -283,8 +212,9 @@ export function sortResultsByDocumentType(results: SearchResultType[], sortDir: 
   return sorted;
 }
 export   const getDatesByDocumentType = (documentType: string,doc): string => {
+  console.log(`getDatesByDocumentType ~ documentType:`, documentType, ' FOR DOCUMENT: ', doc);
   if(!doc ||!doc.decision) return "";
-  console.log(`getDateBasedonDecision decision ${documentType}:`, doc);
+//  console.log(`getDateBasedonDecision decision ${documentType}:`, doc);
   if(!doc ||!doc.decision) return "N/A";
   switch (documentType) {
     case "NOI":
@@ -300,7 +230,7 @@ export   const getDatesByDocumentType = (documentType: string,doc): string => {
     case "Final Supplement":
       return doc.finalNoaDate ? doc.finalNoaDate : "N/A";
     case "Draft Supported":
-        return doc.noi
+        return doc.noiDate? doc.noiDate : "N/A";
     default:
       return doc.registerDate ? doc.registerDate : "N/A";
   }
@@ -350,9 +280,9 @@ export function getUnhighlightedFromResults(results:SearchResultType[],searchTer
     fragmentSizeValue: 2,
   };
   //[TODO][CRITICAL] Need to seperate each entry in filenames as array 
-  results.map((result:SearchResultType) => {
+  results.map((result) => {
     console.log(`FILENAMES ~ type: ${typeof result.filenames} ~ result:`, result.filenames);
-    const filenames = result.filenames && result.filenames.length  && result.filenames.split('>') as string[] || [result.filenames];
+    const filenames = result.filenames && result.filenames.length  && result.filenames || [result.filenames];
     console.log(`results.map ~ filenames:`, filenames);
     console.log(`results.map ~ result:`, result);
     result.ids.forEach((id) => {
@@ -360,7 +290,7 @@ export function getUnhighlightedFromResults(results:SearchResultType[],searchTer
         console.log(`ID: ${id} | Filename: ${filename}`);
       const item:UnhighlightedType = {
         luceneIds: [id],
-        filename: result.doc.filename?.split(';') || [result.doc.filename]
+        filename: result.doc.filename,
       }
       postData.unhighlighted.push(item);
     });
@@ -380,8 +310,7 @@ export function getUnhighlightedFromResult(result:SearchResultType,searchTerm:st
   try{
   //const luceneIds:HighlightIdsType[] = [];
 //     results.map((result:SearchResultType) => {
-        const resultFilenames = result.filenames as string;
-        const filenames = result.filenames && typeof(result.filenames) == "object" && resultFilenames.split('>') as string[];
+        const filenames = result.filenames;
         console.log(' filenames',filenames);
         console.log(`//results.map ~ filenames:`, filenames);
         result.ids.forEach((id) => {
@@ -448,26 +377,32 @@ export const getHighlights = async(result:SearchResultType,title:string,fragment
     }
 });
 }
-
-export function handleDocumentTypeConversion(document: ResultDocumentType): DocumentType {
- let {decision,documentType,action} = document;
- const newDoc = {
-  ...document,
-   decision: decision && decision.split(',') || [],
-   documentType: documentType && documentType && documentType.split(';') || [],
-   action: action && action.split(';') || [],
- }
-return newDoc as DocumentType;
+export function handleDocumentTypeConversion(document:ResultDocumentType)
+{
+  //console.log('TRYING TO HANDLE DOCUMENT TYPE CONVERSION',document);
+  const newDoc = {
+   ...document,
+    documentType: document.documentType && typeof document.documentType === "string"  ? document.documentType.split(';') : [],
+    decision: document.decision && typeof document.decision === "string" ? document.decision.split(';') : [],
+    county: document.county,
+    cooperatingAgency: document.cooperatingAgency,
+    commentsFilename: document.commentsFilename,
+    commentDate:  document.commentDate && typeof document.commentDate === "string"? new Date(document.commentDate) : null,
+    agency: document.agency,
+    action: document.action && typeof document.action === "string" ? document.action.split(';') : [],
+  }
+  return newDoc;
 }
 
 function groupResults(results: SearchResultType[]): Record<string, SearchResultType[]> {
   const groupedResults: Record<string, SearchResultType[]> = {};
   results.forEach((result) => {
-    let doc = result.doc as ResultDocumentType;
+    if(!result.doc) return;
+    let doc = result.doc as DocumentType;
     let newDoc = {}
     const {decision,documentType,action} = doc;
 
-    if(result.doc && result.doc.processId){
+    if(result?.doc && result.doc.processId){
 
     const processId = result.doc.processId;
 
@@ -481,17 +416,30 @@ function groupResults(results: SearchResultType[]): Record<string, SearchResultT
   //console.log(`groupedResults:`, groupedResults);
   return groupedResults;
 }
+
+export function getFinalDocumentsFromResult(results: SearchResultType[]){
+  const finalResults = results.length && results.filter((result) => result.doc.documentType.includes('Final'));
+  return finalResults;
+}
+export function getFinalDocumentsFromResults(results){
+  results.map((result) => {
+    getFinalDocumentsFromResult(result);
+  })
+}
 /*
   This function should group each result into a larger process object, where things like start date and status 
 */
-export function groupResultsByProcessId(results: SearchResultType[]): ProcessesType {
+export function groupResultsByProcessId(results): ProcessesType {
   const processes: ProcessesType = {};
 
   const groupedResults = groupResults(results);
   
   results.forEach((result) => {
-    let doc = result.doc;
-    const newDoc = result.doc;
+    let doc = result?.doc;
+    if(!doc) return;
+    //const newDoc = {...result.doc};
+    const newDoc = handleDocumentTypeConversion(doc as ResultDocumentType);
+    result.doc = newDoc;
     let {decision,documentType,action} = doc;
 
     if (result.doc && result.doc.processId) {
@@ -500,11 +448,13 @@ export function groupResultsByProcessId(results: SearchResultType[]): ProcessesT
 
       if (!processes[result.doc.processId]) {
           processes[processId] = {
+//            process : processes[processId] || 0,
             //county: (result.doc && result.doc.county?.length && typeof(doc.county?.length) === "string") ? result.doc.county.split(';') || [],
             //decision: result.doc && result.doc?.decision.length && result.doc.decision.split(';') || [],
             //action: result.doc.action && result.doc.action.split(';') || [],
             //documentType: documentType,
   //          endDate: result.doc.finalNoaDate || result.doc.draftNoa || result.doc.noiDate || result.doc.commentDate && result.doc.registerDate,
+            //decision: result.doc.decision,
             processId: result.doc.processId,
 //            region: result.doc.county,
             results: groupedResults[result.doc.processId],
@@ -523,15 +473,16 @@ export function groupResultsByProcessId(results: SearchResultType[]): ProcessesT
           let filenames = result.filenames;
           const newDoc = {
             ...doc,
-            decision: (decision && typeof(doc.decision) === "string") ? [decision] : decision,
+            decision: (decision && typeof(doc.decision) === "string") ? [decision] : decision || [],
             action: (action && typeof(action) === "string") ? [action] : action,
-            documentType: ((documentType && typeof(documentType)) ? [documentType] : documentType)
+            documentType: ((documentType && typeof(documentType)) ? [documentType] : documentType || []),
           } as DocumentType;
 
           const newResult:SearchResultType = {
             ...result,
             doc: newDoc,
-            filenames: (filenames && typeof(filenames) === "string")? filenames.split(';') : filenames
+            filenames: result.filenames
+            //(filenames && typeof(filenames) === "string")? filenames.split(';') : filenames
           };
           // if(doc.decision.includes(";")){
           //     doc.decision = doc.decision.split(';');

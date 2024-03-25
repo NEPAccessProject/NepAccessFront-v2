@@ -122,7 +122,10 @@ const SearchHeader = () => {
       {/* <Grid xs={12}>
           <AppBar />
         </Grid> */}
-      <Grid xs={12} container>
+      <Grid xs={12} container style={{
+        background: "#A3C2C9",
+        borderBottom: "4px solid #3D669C",
+      }}>
         <Grid xs={12} {...GridContainerProps}>
           <Grid
             xs={10}
@@ -144,11 +147,17 @@ const SearchHeader = () => {
               }}
               onError={(evt) => onError(evt)}
               placeholder="Search for NEPA Documents..."
+             style={{
+              background: "#FAFAFA",
+             }}
               InputProps={{
                 endAdornment: (
                   <>
                     <Grid md={1} xs={1}>
                       <IconButton
+                      style={{
+                        backgroundColor:"#FFC31B"
+                      }}
                         name="title"
                         onClick={async () => await searchTop()}
                       >
@@ -160,7 +169,7 @@ const SearchHeader = () => {
               }}
             />
           </Grid>
-          <Grid {...GridItemProps} alignSelf={'center'} >
+          {/* <Grid {...GridItemProps} alignSelf={'center'} >
             <Button
               variant="contained"
               color="primary"
@@ -174,7 +183,7 @@ const SearchHeader = () => {
               onClick={async(evt) => await searchNoContext()}
             > No Context
               </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
         <Grid
           {...GridContainerProps}
@@ -205,6 +214,14 @@ const SearchHeader = () => {
                   justifyContent={"flex-end"}
                 >
                   <Checkbox
+                    style={{
+                      backgroundColor: "#FAFAFA",
+                      borderRadius: 0,
+                      border: 0,
+                      padding: 0,
+                      margin: 0,
+                    }}
+                    size="large"
                     name="showSnippets"
                     onClick={(evt) => setShowSnippets(!showSnippets)}
                     checked={showSnippets} 

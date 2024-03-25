@@ -8,9 +8,7 @@ import { Box, Button, Divider, Paper, Typography, Chip } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { styled } from "@mui/styles";
 import SearchContext from "./SearchContext";
-import SearchResultCards from "./SearchResultCards";
-//import SearchResultCards from "./SearchResultCards";
-import { getHighlights, getDatesByDocumentType } from "./searchUtils";
+import { getHighlights, getDatesByDocumentType,getFinalDocumentsFromResult,getFinalDocumentsFromResults } from "./searchUtils";
 import { string } from "prop-types";
 import { container } from "webpack";
 const CardItem = styled(Paper)(() => ({
@@ -120,67 +118,90 @@ const SearchResult = (props: SearchResultPropsType) => {
   const gridContainerProps = {
     display: "flex",
     container: true,
-    border: "1px solid #ccc",
+    //åborder: "1px solid #ccc",
   };
   const gridItemProps = {
     display: "flex",
     justifyContent: "center",
     justifyItems: "center",
     alignItems: "center",
+    alignContent: "space-around",
     alignSelf: "center",
-   //border: "1px solid #ddd",
+    //border: "1px solid #ddd",
   };
+  const dateToUse = getDatesByDocumentType(doc.decision[0],doc);
+  console.log(`//useEffect ~ dateToUse:`, dateToUse);
   return (
     <Grid margin={1} padding={1} {...gridContainerProps}>
       {doc && (
         <>
           <Grid xs={2} {...gridItemProps}>
-            <Box>
-              <Typography textAlign={"center"}>
-                <Box
-                  padding={0.5}
-                  margin={0}
-                  border={1}
-                  borderRadius={1}
-                  borderColor="#ddd"
-                >
-                  {getDatesByDocumentType(doc.documentType as string, doc)}
-                </Box>
-              </Typography>
+            <Box
+              padding={0.5}
+              borderRadius={1}
+              border="1px solid #D8D9D9"
+            >
+              <Box
+
+              //borderRadius={1}
+              >
+                <Typography padding={0.5} fontSize={12} textAlign={"center"}>
+                  <>
+                    {dateToUse}                  
+                   
+                  </>
+                </Typography>
+              </Box>
             </Box>
           </Grid>
-          <Grid xs={6} {...gridItemProps} className="document-title-column">
+          <Grid xs={8} {...gridItemProps} className="document-title-column">
             <Button variant="text">
-              <Typography textAlign={"center"} fontSize={"0.7rem"}>
+              <Typography textAlign={"center"} fontSize={"1.0rem"}>
                 <b>{doc.documentType}</b> - {doc.title}
               </Typography>
             </Button>
           </Grid>
-          <Grid xs={4} {...gridItemProps}>
-            <Box margin={0.25}>
+          <Grid xs={2} padding={1} flexDirection={'column'} display={'flex'} alignItems={'center'} alignContent={'center'} justifyContent={'center'}>
+             <Grid xs={12} margin={0.25} >
+                <Button
+                fullWidth
+                  variant="outlined"
+                  size="small"
+                  onClick={(evt) => onShowPreviewClicked(evt)}
+                >
+                  Preview
+                </Button>
+             </Grid>
+              <Grid xs={12} margin={0.25} >
               <Button
-                size="small"
+              fullWidth
+              size="small"
                 variant="outlined"
                 onClick={(evt) => onShowPreviewClicked(evt)}
               >
-                Preview
+                Details
               </Button>
-            </Box>
-            <Box margin={0.25} marginRight={1}>
+            </Grid>
+            <Grid xs={12}  margin={0.25}>
               <Button
                 size="small"
+                fullWidth
                 variant="outlined"
+                style={{
+                  border: "1px solid #3373F7",
+                }}
                 onClick={(evt) => onDownloadClicked(evt)}
               >
                 Download
               </Button>
-            </Box>
+            </Grid>
           </Grid>
-          
         </>
       )}
+      <Grid xs={12}>
+        <ShowHighlights highlights={highlights} result={result} />
+      </Grid>
     </Grid>
-
   );
 };
 
@@ -200,7 +221,7 @@ export function ShowHighlights(props: highlightProps) {
       <Box id={`search-result-highlight-container-${doc.id}`}>
         {highlights.map((highlight, i) => (
           <>
-            {i < 1 && (
+            {i < 1 || showMoreSnippets && (
               <>
                 <Box
                   key={`${result.doc.id}-box`}
@@ -208,8 +229,13 @@ export function ShowHighlights(props: highlightProps) {
                   fontSize="0.75rem"
                   className="document-highlight"
                 >
-                  {}
-                  {/* <Box dangerouslySetInnerHTML={highlight}></Box> */}
+                  <Box key={result.doc.id}>
+                    {highlight.substring(
+                      0,
+                      highlight.length < 255 ? highlight.length : 255
+                    )}
+                    ...
+                  </Box>
                 </Box>
                 <Box
                   key={result.doc.id}
@@ -217,12 +243,17 @@ export function ShowHighlights(props: highlightProps) {
                   fontSize="0.75rem"
                   className="document-highlight"
                 >
-                  <Button
-                    onClick={(evt) => setShowMoreSnippets(!showMoreSnippets)}
-                    variant="text"
-                  >
-                    Show More Snippets
-                  </Button>
+                  {highlights.length > 1 && (
+                    <Button
+                      onClick={(evt) => setShowMoreSnippets(!showMoreSnippets)}
+                      variant="text"
+                    >
+                      <Typography fontSize={12} color={"#3373F7"}>
+                        {" "}
+                        Show More Snippets
+                      </Typography>
+                    </Button>
+                  )}
                 </Box>
               </>
             )}
@@ -233,119 +264,116 @@ export function ShowHighlights(props: highlightProps) {
   );
 }
 
+// return (
+//   <>
+//     {doc && (
+//       <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
+//         <Divider/>
+//         <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
+//           <Grid
+//             id={`search-result-container${doc.id}`}
+//             {...GridContainerProps}
+//             display={"flex"}
+//             flex={1}
+//           >
+//             <Grid xs={1} {...GridItemProps} display={"flex"}>
+//               {documentType}
+//             </Grid>
+//             <Grid xs={1} {...GridItemProps} display={"flex"}>
+//               {doc.processId}
+//             </Grid>
+//             <Grid xs={2} {...GridItemProps}>
+//               {action}
+//             </Grid>
+//             <Grid xs={2} {...GridItemProps}>
+//               {agency}
+//             </Grid>
+//             <Grid xs={2} {...GridItemProps}>
+//               {`${registerDate ? registerDate : "N/A"}`}
+//             </Grid>
+//             <Grid xs={2} {...GridItemProps}>
+//               {`${status ? status : "N/A"}`}
+//             </Grid>
+//             <Grid xs={2} {...GridItemProps}>
+//               <Button variant="contained" color="primary">
+//                 Download
+//               </Button>
+//             </Grid>
+//           </Grid>
+//           <Box
+//             id={`search-result-highlights-${doc.id}`}
+//             style={{
+//               background: "#3D669C",
+//               //border: "1px solid #ddd",
+//               marginBottom: 0,
+//             }}
+//           >
+//             { (showSnippet) ? (
+//               <Button
+//                 color="primary"
+//                 fullWidth
+//                 onClick={()=>setShowSnippet(false)}
+//               >
+//                 <Typography color={"white"}>See Less</Typography>
+//               </Button>
+//             ) : (
+//               <Button
+//                 color="primary"
+//                 fullWidth
+//                 onClick={(evt)=> setShowSnippet(true)}
+//               >
+//                 <Typography color={"white"}> See More</Typography>
+//               </Button>
+//             )}
+//             <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
+//               {(showSnippet) && (
+//                 <Box style={{ backgroundColor: "#fff" }}>
+//                   <Typography
+//                     color="black"
+//                     bgcolor="white"
+//                     padding={1}
+//                     paddingBottom={0}
+//                     textAlign={"left"}
+//                     fontSize={"1rem"}
+//                     variant="body2"
+//                   >
+//                     <Box>
+//                       {highlights.map((highlight, index) => (
+//                         <Box
+//                           key={index}
+//                           padding={0.25}
+//                         >
+//                           <Box
+//                             id={`search-result-highlight-container-${doc.id}`}
+//                           >
+//                            {highlights.map((highlight, index) => {
+//                               return (
+//                                 <Box
+//                                   key={index}
+//                                   padding={0}
+//                                   fontSize="0.75rem"
+//                                 >
 
-
-
-    // return (
-    //   <>
-    //     {doc && (
-    //       <Box id="search-result-doc-container" marginTop={2} borderTop={0} borderBottom={0}>
-    //         <Divider/>
-    //         <Box marginTop={1} id={`search-result-container-box-${doc.id}`}>
-    //           <Grid
-    //             id={`search-result-container${doc.id}`}
-    //             {...GridContainerProps}
-    //             display={"flex"}
-    //             flex={1}
-    //           >
-    //             <Grid xs={1} {...GridItemProps} display={"flex"}>
-    //               {documentType}
-    //             </Grid>
-    //             <Grid xs={1} {...GridItemProps} display={"flex"}>
-    //               {doc.processId}
-    //             </Grid>
-    //             <Grid xs={2} {...GridItemProps}>
-    //               {action}
-    //             </Grid>
-    //             <Grid xs={2} {...GridItemProps}>
-    //               {agency}
-    //             </Grid>
-    //             <Grid xs={2} {...GridItemProps}>
-    //               {`${registerDate ? registerDate : "N/A"}`}
-    //             </Grid>
-    //             <Grid xs={2} {...GridItemProps}>
-    //               {`${status ? status : "N/A"}`}
-    //             </Grid>
-    //             <Grid xs={2} {...GridItemProps}>
-    //               <Button variant="contained" color="primary">
-    //                 Download
-    //               </Button>
-    //             </Grid>
-    //           </Grid>
-    //           <Box
-    //             id={`search-result-highlights-${doc.id}`}
-    //             style={{
-    //               background: "#3D669C",
-    //               //border: "1px solid #ddd",
-    //               marginBottom: 0,
-    //             }}
-    //           >
-    //             { (showSnippet) ? (
-    //               <Button
-    //                 color="primary"
-    //                 fullWidth
-    //                 onClick={()=>setShowSnippet(false)}
-    //               >
-    //                 <Typography color={"white"}>See Less</Typography>
-    //               </Button>
-    //             ) : (
-    //               <Button
-    //                 color="primary"
-    //                 fullWidth
-    //                 onClick={(evt)=> setShowSnippet(true)}
-    //               >
-    //                 <Typography color={"white"}> See More</Typography>
-    //               </Button>
-    //             )}
-    //             <Box id={`search-result-highlights-box-${doc.id}-${doc.processId}`}>
-    //               {(showSnippet) && (
-    //                 <Box style={{ backgroundColor: "#fff" }}>
-    //                   <Typography
-    //                     color="black"
-    //                     bgcolor="white"
-    //                     padding={1}
-    //                     paddingBottom={0}
-    //                     textAlign={"left"}
-    //                     fontSize={"1rem"}
-    //                     variant="body2"
-    //                   >
-    //                     <Box>
-    //                       {highlights.map((highlight, index) => (
-    //                         <Box
-    //                           key={index}
-    //                           padding={0.25}
-    //                         >
-    //                           <Box
-    //                             id={`search-result-highlight-container-${doc.id}`}
-    //                           >
-    //                            {highlights.map((highlight, index) => {
-    //                               return (
-    //                                 <Box
-    //                                   key={index}
-    //                                   padding={0}
-    //                                   fontSize="0.75rem"
-    //                                 >
-
-    //                                   <Box
-    //                                     dangerouslySetInnerHTML={convertToHTML(
-    //                                       highlight[0]
-    //                                     )}
-    //                                   >
-    //                                   </Box>
-    //                                 </Box>
-    //                               );
-    //                             })}
-    //                           </Box>
-    //                         </Box>
-    //                       ))}
-    //                     </Box>
-    //                   </Typography>
-    //                 </Box>
-    //               )}
-    //             </Box>
-    //           </Box>
-    //         </Box>
-    //       </Box>
-    //     )}
-    //   </>
-    // );
+//                                   <Box
+//                                     dangerouslySetInnerHTML={convertToHTML(
+//                                       highlight[0]
+//                                     )}
+//                                   >
+//                                   </Box>
+//                                 </Box>
+//                               );
+//                             })}
+//                           </Box>
+//                         </Box>
+//                       ))}
+//                     </Box>
+//                   </Typography>
+//                 </Box>
+//               )}
+//             </Box>
+//           </Box>
+//         </Box>
+//       </Box>
+//     )}
+//   </>
+// );

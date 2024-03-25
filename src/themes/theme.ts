@@ -71,8 +71,8 @@ const CustomTypography = styled(Typography)<TypographyProps>(({ theme }) => ({
 			// },
 		},
 		typography: {
-			fontFamily: ['open-sans','sans-serif'].join(','),
-			fontSize: 12,
+			fontFamily: ['open-sans','robato','sans-serif'].join(','),
+			fontSize: 10,
 			// resultsTitle: {
 			//   fontSize: "1.6rem",
 			//   fontColor: "#80a9ff",

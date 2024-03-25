@@ -1,5 +1,5 @@
-import { SearchResultType } from "@/components/interfaces/types";
-const results:SearchResultType[] =[
+import { SearchResultType,ResultDocumentType,ResponseSearchResultsType } from "@/components/interfaces/types";
+const results:ResponseSearchResultsType[] =[
   {
     "ids": [
       29993,
@@ -1920,5 +1920,4 @@ const results:SearchResultType[] =[
     "Is_fast41": 0
   }
 ]
-
 export default results;

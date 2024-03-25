@@ -31,6 +31,8 @@ import SearchContext from "./SearchContext";
 import SearchHeader from "./SearchHeader";
 import SearchResult from "./SearchResult";
 import SearchTips from "./SearchTips";
+import SearchProcessCards from "./SearchProcessCards";
+
 import {
   getActiveFilters,
   getUnhighlightedFromResults,
@@ -41,7 +43,6 @@ import {
 } from "./searchUtils";
 import theme from "../../themes/theme";
 
-import SearchResultCards from "./SearchResultCards";
 const SearchApp = (props: SearchAppPropType) => {
   const context = useContext(SearchContext);
   console.log("SEARCH APP CONTENXT:", context);
@@ -60,6 +61,7 @@ const SearchApp = (props: SearchAppPropType) => {
   const [hasSearched, setHasSearched] = useState<boolean>(context.showSnippets);
   const [showSnippets, setShowSnippets] = useState<boolean>(false);
   const [processes, setProcesses] = useState<ProcessesType>();
+  const [processesToDisplay, setProcessesToDisplay] = useState<ProcessesType>();
   const { page, limit, sortby, sortdir } = pagination;
   const { title } = filters;
   const host = import.meta.env.VITE_API_HOST;
@@ -195,7 +197,8 @@ const SearchApp = (props: SearchAppPropType) => {
         const processesResults = groupResultsByProcessId(results);
         //console.log(`processesResults:`, processesResults);
        
-        setResultsToDisplay(results);          
+        setResultsToDisplay(resultsToDisplay); 
+        setProcessesToDisplay(processesResults);         
         console.log(
           `searchTop ~ resultsToDisplay:`,
           Object.keys(resultsToDisplay)
@@ -247,7 +250,14 @@ const SearchApp = (props: SearchAppPropType) => {
   console.log(`searchTop ~ theme:`, theme);
   return (
     <SearchContext.Provider value={value}>
-      <Container id="search-app-container" maxWidth="xl" disableGutters>
+      <Container 
+        id="search-app-container" 
+        maxWidth="xl" 
+        disableGutters
+        style={{
+          //background:"#A3C2C9"
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -264,7 +274,7 @@ const SearchApp = (props: SearchAppPropType) => {
             </Alert>
           </Snackbar>
         </Box>
-        <Paper id="search-filters-container" elevation={1}>
+        <Box id="search-filters-container">
           <Grid container spacing={2}>
             <Grid xs={3}>
               <Paper elevation={1}>
@@ -272,15 +282,13 @@ const SearchApp = (props: SearchAppPropType) => {
               </Paper>
             </Grid>
             <Grid xs={9} id="search-results-container-item">
-              <Paper
+              <Box
                 id="search-header-container-grid"
-                elevation={1}
-                sx={{ borderRadius: 0, marginBottom: 1, border: 0 }}
+                //elevation={0}
+                sx={{ borderRadius: 0, border: 0,}}
               >
                 <Grid xs={12} flex={1}>
-                  <Paper elevation={1}>
                     <SearchHeader />
-                  </Paper>
                 </Grid>
                 {loading && (
                   <Box>
@@ -297,27 +305,30 @@ const SearchApp = (props: SearchAppPropType) => {
                     </Grid>
                   </Box>
                 )}
-                <Paper
+                <Box
                   //elevation={2}
-                  variant="outlined"
                   style={{
                     //border:' 1px solid #EEE',
+                    //backgroundColor: "#A3C2C9",
                     padding: 5,
                   }}
                   id="search-results-container"
                 >
-                  <>
-                    <DisplayProcesses processes={processes} />
-                    {/* {processes &&
-                      Object.keys(processes).map((key) => {
-                        ({ key });
-                      })} */}
-                  </>
-                </Paper>
-              </Paper>
+                  <Box>
+
+                    {processes && Object.keys(processes).length !== 0 
+                    ? (
+                      <DisplayProcesses processes={processes} />
+                    ) : (
+                      <Box bgcolor={"#FAFAFA"} minHeight={500}  paddingLeft={1} paddingRight={1}><SearchTips /></Box>
+                    )
+                    }
+                  </Box>
+                </Box>
+              </Box>
             </Grid>
           </Grid>
-        </Paper>
+        </Box>
       </Container>
     </SearchContext.Provider>
   );
@@ -326,7 +337,7 @@ const SearchApp = (props: SearchAppPropType) => {
 export default SearchApp;
 
 export const DisplayProcesses = (props) => {
-  const { processes } = props;
+  const processes = props.processes as ProcessObjectType[];
   const context = React.useContext(SearchContext);
   const { filters, pagination, updatePaginationStateValues, results } = context;
   console.log(`Context DisplayProcesses ~ results:`, results.length);
@@ -350,20 +361,18 @@ export const DisplayProcesses = (props) => {
     //setPage(newPage);
     updatePaginationStateValues("page", newPage);
     //    paginateResults(results,newPage,limit)
-  };
-
+  }
   const classes = useTheme<Theme>();
-  console.log(`DisplayProcesses ~ classes:`, classes);
   return (
     <Paper
-      elevation={1}
+      elevation={0}
       //style={{ border: "1px solid #F0F0F0"}}
     >
       <TablePagination
         rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
         onChange={(evt) => onPaginationChange(evt)}
         //count={results.length} [TODO] Need to get count from the server
-        count={results.length}
+        count={Object.keys(processes).length}
         rowsPerPage={rowsPerPage} //{limit}
         page={page}
         onPageChange={(evt, page) => handleChangePage(evt, page)}
@@ -378,10 +387,15 @@ export const DisplayProcesses = (props) => {
         bgcolor={"#F8F8F8"}
         paddingLeft={1}
         paddingRight={1}
+        padding={1}
       >
+        <Typography margin={0.5} variant="h4" gutterBottom>
+                  {Object.keys(processes).length} Processes Found
+                </Typography>
         {processes &&
           Object.keys(processes).map((key, index) => (
-            <div key={`${processes[key].processId}`}>
+            <div key={`${processes[key].processId}`} style={{
+            }}>
               
               <Paper
                 elevation={2}
@@ -394,15 +408,23 @@ export const DisplayProcesses = (props) => {
                 <Typography padding={1} textAlign="center" color={"#3373F7"} fontSize="1.1rem" >
                 {processes[key].results[0].doc.title}
               </Typography>
-                <Box bgcolor={"#FAFAFA"} flex={1} padding={0} borderTop={1} borderBottom={0} borderColor={'#eee'}>
-                  {/* <SearchResultCards process={processes[key]} /> */}
-                </Box>
                 {processes[key].results.map((result,idx) => (
                   // [TODO] We should be able to build a unique key for each result without using the index 
-                  <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType }-${idx}`}>
-                    {" "}
-                    <SearchResult result={result} />
-                  </span>
+                  <>
+                    {result.doc &&
+                    (
+                    <>
+                      <SearchProcessCards process={processes[key]} />
+                      <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType }-${idx}`}>
+                        {" "}
+                        {result && result.doc && (
+                        <SearchResult result={result} />
+                        )}
+                      </span>
+                    </>
+                    )
+                    }
+                  </>
                 ))}
               </Paper>
             </div>

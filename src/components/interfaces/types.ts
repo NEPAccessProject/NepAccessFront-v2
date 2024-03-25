@@ -8,21 +8,21 @@ export type ResultDocumentType = {
 	commentsFilename?: string;
 	cooperatingAgency?: string;
 	county?: string ;
-	decision: string;
+	decision?: string;
 	department?: string;
 	documentType?: string;
 	draftNoa?: string;
 	filename?: string; 
 	finalNoa?: string; //Date | string ;
-	finalNoaDate?: Date;
-	firstRodDate?: Date;
+	finalNoaDate?: string;
+	firstRodDate?: string;
 	folder?: string;
 	id: number;
 	link?: string;
 	noiDate?: string;
 	notes?: string;
 	processId: number;
-	registerDate?: Date;
+	registerDate?: string;
 	size?: number;
 	state?: string;
 	status?: string;
@@ -33,18 +33,18 @@ export type ResultDocumentType = {
 }
 
 export type DocumentType = {
-	action: string[] | string;
+	action: string[];
 	agency?: string[];
 	commentDate?: Date;
 	commentsFilename?: string;
 	cooperatingAgency?: string;
 	county?: string ;
-	decision:  string[] | string;
+	decision?:  string[];
 	department?: string;
-	documentType: string[] | string;
-	draftNoa?: string;
+	documentType?: string[];
+	draftNoa?: Date;
 	filename?: string;
-	finalNoa?: string; //Date | string ;
+	finalNoa?: Date; //Date | string ;
 	finalNoaDate?: Date;
 	firstRodDate?: Date;
 	folder?: string;
@@ -85,7 +85,7 @@ export type SearchResultType = {
   ids: number[];
   doc: DocumentType;
   highlights: string[];
-  filenames: string[] | string;
+  filenames: string[];
   score?: number;
 }
 

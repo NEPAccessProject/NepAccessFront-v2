@@ -141,7 +141,7 @@ const SearchFilters = (props) => {
     // alignItems: "center",
   };
   return (
-    <Box padding={1}>
+    <Box padding={1} bgcolor={"#FAF9F9"}>
       <Box alignItems={"center"}>
         <FormLabel {...formLabelProps}>
           <Typography>
@@ -186,29 +186,29 @@ const SearchFilters = (props) => {
       </Box>
       <Grid container>
         <Grid xs={12} {...gridItemProps} >
-          <Grid xs={12}><Typography variant="filterLabel">Lead Agencies:</Typography></Grid>
+          <Grid xs={12}><Typography>Lead Agencies:</Typography></Grid>
           <Grid xs={12}><AgencyFilter /></Grid>
         </Grid>
         <Grid {...gridItemProps} xs={12}>
-          <Grid xs={12}><Typography variant="filterLabel">Cooperating Agencies:</Typography></Grid>
+          <Grid xs={12}><Typography >Cooperating Agencies:</Typography></Grid>
           <Grid xs={12}><CooperatingAgenciesFilter /></Grid>
         </Grid>
         <Grid {...gridItemProps} xs={12}>
-          <Grid xs={12}><Typography variant="filterLabel">State(s) / Region(s):</Typography></Grid>
+          <Grid xs={12}><Typography>State(s) / Region(s):</Typography></Grid>
           <Grid xs={12}><StatesFilter /></Grid>
         </Grid>
         <Grid {...gridItemProps} xs={12}>
           <Grid xs={12}>
-            <Typography variant="filterLabel">Counties / Locations:</Typography>
+            <Typography>Counties / Locations:</Typography>
             </Grid>
           <Grid xs={12}><CountyFilter /></Grid>
         </Grid>
         <Grid {...gridItemProps} xs={12}>
-          <Grid xs={12}><Typography variant="filterLabel">Actions:</Typography></Grid>
+          <Grid xs={12}><Typography>Actions:</Typography></Grid>
           <Grid xs={12}><ActionsFilter /></Grid>
         </Grid>
         <Grid {...gridItemProps} xs={12}>
-          <Grid xs={12}><Typography variant="filterLabel">Decision(s):</Typography></Grid>
+          <Grid xs={12}><Typography>Decision(s):</Typography></Grid>
           <Grid xs={12}><DecisionFilter /></Grid>
         </Grid> 
       </Grid>
