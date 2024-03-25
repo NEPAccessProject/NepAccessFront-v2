@@ -1,4 +1,4 @@
-import React, {useState,useContext, useContext}
+import React, { useContext, useEffect, useState } from "react";
 import {
   DocumentType,
   SearchResultPropsType,
@@ -7,7 +7,6 @@ import {
 import { Box, Button, Divider, Paper, Typography, Chip } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { styled } from "@mui/styles";
-import react, { useContext, useEffect, useState } from "react";
 import SearchContext from "./SearchContext";
 import SearchResultCards from "./SearchResultCards";
 //import SearchResultCards from "./SearchResultCards";
@@ -30,7 +29,7 @@ const GridContainerProps = {
 
 const GridItemProps = {
   flex: 1,
-  border: "1px solid #eee",
+  //border: "1px solid #eee",
   display: "flex",
   justifyContent: "center",
   justifyItems: "center",
@@ -72,7 +71,6 @@ const SearchResult = (props: SearchResultPropsType) => {
   const [showMoreSnippets, setShowMoreSnippets] = useState<boolean>(false);
   const [currentResult, setCurrentResult] = useState(result);
   const { score, ids } = currentResult;
-  const _mounted = react.useRef(false);
 
   // useEffect(() => {
   //  useEffect(() => {
@@ -130,7 +128,7 @@ const SearchResult = (props: SearchResultPropsType) => {
     justifyItems: "center",
     alignItems: "center",
     alignSelf: "center",
-    border: "1px solid #ddd",
+   //border: "1px solid #ddd",
   };
   return (
     <Grid margin={1} padding={1} {...gridContainerProps}>
@@ -140,7 +138,7 @@ const SearchResult = (props: SearchResultPropsType) => {
             <Box>
               <Typography textAlign={"center"}>
                 <Box
-                  padding={1}
+                  padding={0.5}
                   margin={0}
                   border={1}
                   borderRadius={1}
@@ -151,26 +149,32 @@ const SearchResult = (props: SearchResultPropsType) => {
               </Typography>
             </Box>
           </Grid>
-          <Grid xs={7} {...gridItemProps} className="document-title-column">
+          <Grid xs={6} {...gridItemProps} className="document-title-column">
             <Button variant="text">
               <Typography textAlign={"center"} fontSize={"0.7rem"}>
                 <b>{doc.documentType}</b> - {doc.title}
               </Typography>
             </Button>
           </Grid>
-          <Grid xs={3} {...gridItemProps}>
-            <Button
-              variant="outlined"
-              onClick={(evt) => onShowPreviewClicked(evt)}
-            >
-              Preview
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={(evt) => onDownloadClicked(evt)}
-            >
-              Download
-            </Button>
+          <Grid xs={4} {...gridItemProps}>
+            <Box margin={0.25}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(evt) => onShowPreviewClicked(evt)}
+              >
+                Preview
+              </Button>
+            </Box>
+            <Box margin={0.25} marginRight={1}>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(evt) => onDownloadClicked(evt)}
+              >
+                Download
+              </Button>
+            </Box>
           </Grid>
           
         </>
