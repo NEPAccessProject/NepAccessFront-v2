@@ -238,10 +238,10 @@ export type ProcessObjectType = {
 }
 export type InputEvent = React.ChangeEvent<HTMLInputElement>;
 export type ButtonEvent = React.MouseEvent<HTMLButtonElement>;
-
+//registerDate //endPublish noiDate finalNoaDate firstRodDate,
 export enum DocumentTypeEnum {
-	'FINAL' = 1,
-	'Final Supplement' = 2,
+	'FINAL' = 'finalNOA',
+	'FINAL Supplement' = 'commentDate',
 	'Draft Supplement' = 3,
 	'PLAN' = 4,
 	'DRAFT' = 5,
