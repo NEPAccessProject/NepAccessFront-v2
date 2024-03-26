@@ -32,16 +32,7 @@ const SearchProcessCards = (props) => {
   const { filters, pagination, updatePaginationStateValues, setError } =
     context;
   const _mounted = React.useRef(false);
-  const itemCardProps = {
-    display: "flex",
 
-    margin: 0.5,
-    padding: 0.5,
-    fontSize: "0.8rem",
-    elevation: 1,
-    border: "1px solid #eee",
-    borderRadius: 1,
-  };
   useEffect(() => {
     _mounted.current = true;
     return () => {
@@ -166,12 +157,25 @@ const SearchProcessCards = (props) => {
   const cardStyle = {
     padding:1,
         display: "flex",
-        spacing:0.5,
+        spacing:1,
         justifyContent:"flex-start",
         flexWrap:"wrap",
         borderBottom:1,
-        borderColor:"#EAE9E9"
+        borderColor:"#7E7F7F"
+        
   }
+
+  const itemCardProps = {
+    display: "flex",
+
+    margin: 0.5,
+    padding: 0.5,
+    fontSize: "0.8rem",
+    elevation: 1,
+    backgroundColor: "#D1E3E3",
+    border: "1px solid #eee",
+    borderRadius: 1,
+  };
   return (
     <>
       <Grid
@@ -184,6 +188,7 @@ const SearchProcessCards = (props) => {
           <>
             {doc[`${entry.key}`] && typeof doc[`${entry.key}`] === "string" && (
               <Grid
+              bgcolor={"#D1E3E3"}
                 {...itemCardProps}
               >
                     <>

@@ -15,6 +15,7 @@ group by decision
 -- Create
 select `document_type`, count(1) from eisdoc
 group by document_type
+order by count(1) desc
 
 
 -- Add EPA Comment Letter as part document type
@@ -40,3 +41,4 @@ where final_noa is not null
 select * from vweisdoc
 
 
+select * from eisdoc where is_fast41 = 1

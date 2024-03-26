@@ -31,7 +31,28 @@ describe("Sorting of Results and Processes", () => {
       LEGISLATIVE_PROJECT = 'LEGISLATIVE_PROJECT',
       LEGISLATIVE_PLAN = 'LEGISLATIVE_PLAN'
   }
-  
+  //Date fields
+  /*
+CommentDate
+RegisterDate
+DraftNoa
+FinalNoa
+first_rod_date
+NoiDate
+ coalesce(NoiDate,FinalNoa,DraftNoa)
+  */
+   enum DocumentTypeEnum {
+    'ROD' = "registerDate",
+    'FINAL' = 'finalNOA',
+    'FINAL Supplement' = 'commentDate', // 
+    'Draft Supplement' = 3,
+    'PLAN' = 4,
+    'DRAFT' = 5,
+  }
+  //Left align title
+//Environmental Assessment with Finding of No Significant Impact
+  //ROD -- > Final Suplement --> Final -->  Draft Supplement --> Plan --> Draft --> Whatever other document type
+
   const decisionOrder = {
       [decisionEnum.PROJECT] : 1,
       [decisionEnum.PLAN] : 2,
@@ -53,6 +74,17 @@ describe("Sorting of Results and Processes", () => {
       console.log(`RESULT ${idx} Decision`,result.doc?.decision);
     })
   })
+
+  test("Retrives the correct result to use for a process",()=>{
+    const resultsToUse = results.filter((result)=>{
+      if(!result.doc) return false;
+      return result.doc.documentType.includes('Final');
+    });
+    console.log('#of Results to use',resultsToUse.length, 'From # of Results',results.length)
+    expect(resultsToUse).toBeDefined();
+    expect(resultsToUse[0].doc.documentType).toBe('Final');
+  })
+  
 
   test("Converts ; delinated strings to array for a documents", () => {
     const resultsToUse:SearchResultType[] = results.slice(0, 1) as ResponseSearchResultsType[]

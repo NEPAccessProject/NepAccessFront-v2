@@ -11,6 +11,7 @@ import SearchContext from "./SearchContext";
 import { getHighlights, getDatesByDocumentType,getFinalDocumentsFromResult,getFinalDocumentsFromResults } from "./searchUtils";
 import { string } from "prop-types";
 import { container } from "webpack";
+import { BorderColor, BorderLeft, BorderRight, Padding } from "@mui/icons-material";
 const CardItem = styled(Paper)(() => ({
   elevation: 1,
   padding: 0,
@@ -122,11 +123,14 @@ const SearchResult = (props: SearchResultPropsType) => {
   };
   const gridItemProps = {
     display: "flex",
+    padding: 1,
     justifyContent: "center",
     justifyItems: "center",
     alignItems: "center",
     alignContent: "space-around",
     alignSelf: "center",
+    BorderLeft:1,
+    BorderRight:1,
     //border: "1px solid #ddd",
   };
   const dateToUse = getDatesByDocumentType(doc.decision[0],doc);
@@ -135,17 +139,14 @@ const SearchResult = (props: SearchResultPropsType) => {
     <Grid margin={1} padding={1} {...gridContainerProps}>
       {doc && (
         <>
-          <Grid xs={2} {...gridItemProps}>
+          <Grid xs={2} {...gridItemProps} borderLeft={0} borderRight={1} borderColor={'#ddd'}>
             <Box
               padding={0.5}
-              borderRadius={1}
-              border="1px solid #D8D9D9"
+//              borderRadius={1}
+//              border="1px solid #D8D9D9"
             >
-              <Box
-
-              //borderRadius={1}
-              >
-                <Typography padding={0.5} fontSize={12} textAlign={"center"}>
+              <Box>
+                <Typography padding={0.5} fontSize={14} textAlign={"center"}>
                   <>
                     {dateToUse}                  
                    
@@ -154,15 +155,26 @@ const SearchResult = (props: SearchResultPropsType) => {
               </Box>
             </Box>
           </Grid>
-          <Grid xs={8} {...gridItemProps} className="document-title-column">
-            <Button variant="text">
-              <Typography textAlign={"center"} fontSize={"1.0rem"}>
-                <b>{doc.documentType}</b> - {doc.title}
-              </Typography>
+          <Grid  xs={1} borderRight={1} borderColor={'#ccc'} {...gridItemProps} className="document-title-column">
+            {result.doc.documentType}
+          </Grid>
+          <Grid xs={1} {...gridItemProps} borderRight={1} borderColor={'#ccc'}  className="document-title-column">
+            {result.doc.decision}
+          </Grid>
+          <Grid xs={2} {...gridItemProps} borderRight={1} borderColor={'#ccc'} >
+            <Button>
+            {result.doc.action}
+
             </Button>
           </Grid>
-          <Grid xs={2} padding={1} flexDirection={'column'} display={'flex'} alignItems={'center'} alignContent={'center'} justifyContent={'center'}>
-             <Grid xs={12} margin={0.25} >
+          <Grid xs={2} {...gridItemProps} borderRight={1} borderColor={'#ccc'} >
+            <Button>
+            {result.doc.filename}
+
+            </Button>
+          </Grid>
+
+          <Grid xs={4} padding={1} flexDirection={'row'} display={'flex'} alignItems={'center'} alignContent={'center'} justifyContent={'center'}>
                 <Button
                 fullWidth
                   variant="outlined"
@@ -171,8 +183,6 @@ const SearchResult = (props: SearchResultPropsType) => {
                 >
                   Preview
                 </Button>
-             </Grid>
-              <Grid xs={12} margin={0.25} >
               <Button
               fullWidth
               size="small"
@@ -181,8 +191,6 @@ const SearchResult = (props: SearchResultPropsType) => {
               >
                 Details
               </Button>
-            </Grid>
-            <Grid xs={12}  margin={0.25}>
               <Button
                 size="small"
                 fullWidth
@@ -194,7 +202,6 @@ const SearchResult = (props: SearchResultPropsType) => {
               >
                 Download
               </Button>
-            </Grid>
           </Grid>
         </>
       )}
@@ -221,7 +228,7 @@ export function ShowHighlights(props: highlightProps) {
       <Box id={`search-result-highlight-container-${doc.id}`}>
         {highlights.map((highlight, i) => (
           <>
-            {i < 1 || showMoreSnippets && (
+            {i < 1 && (
               <>
                 <Box
                   key={`${result.doc.id}-box`}

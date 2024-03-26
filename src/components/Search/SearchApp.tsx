@@ -184,28 +184,27 @@ const SearchApp = (props: SearchAppPropType) => {
         activeFilters
       );
       //   .then((res) => {
-      const results = (await response.data);
-      
+      const results = await response.data;
+
       //const resultsToDisplay = results.slice(0,limit > results.length? limit : results.length);
       const resultsToDisplay = results.slice(0, 10);
-        resultsToDisplay.map((result) => {
-           const newDoc = handleDocumentTypeConversion(result.doc);
-           console.log(`resultsToDisplay.map ~ newDoc:`, newDoc);
-           result.doc = {...newDoc}
-          console.log('NEW DOC?',result.doc);
-        });
-        const processesResults = groupResultsByProcessId(results);
-        //console.log(`processesResults:`, processesResults);
-       
-        setResultsToDisplay(resultsToDisplay); 
-        setProcessesToDisplay(processesResults);         
-        console.log(
-          `searchTop ~ resultsToDisplay:`,
-          Object.keys(resultsToDisplay)
-        );
-        setProcesses(processesResults);
-      }
-       catch (error) {
+      resultsToDisplay.map((result) => {
+        const newDoc = handleDocumentTypeConversion(result.doc);
+        console.log(`resultsToDisplay.map ~ newDoc:`, newDoc);
+        result.doc = { ...newDoc };
+        console.log("NEW DOC?", result.doc);
+      });
+      const processesResults = groupResultsByProcessId(results);
+      //console.log(`processesResults:`, processesResults);
+
+      setResultsToDisplay(resultsToDisplay);
+      setProcessesToDisplay(processesResults);
+      console.log(
+        `searchTop ~ resultsToDisplay:`,
+        Object.keys(resultsToDisplay)
+      );
+      setProcesses(processesResults);
+    } catch (error) {
       console.error(error);
     }
   };
@@ -250,13 +249,15 @@ const SearchApp = (props: SearchAppPropType) => {
   console.log(`searchTop ~ theme:`, theme);
   return (
     <SearchContext.Provider value={value}>
-      <Container 
-        id="search-app-container" 
-        maxWidth="xl" 
+      <Container
+        id="search-app-container"
+        maxWidth="xl"
         disableGutters
-        style={{
-          //background:"#A3C2C9"
-        }}
+        style={
+          {
+            //background:"#A3C2C9"
+          }
+        }
       >
         <Box
           sx={{
@@ -285,10 +286,10 @@ const SearchApp = (props: SearchAppPropType) => {
               <Box
                 id="search-header-container-grid"
                 //elevation={0}
-                sx={{ borderRadius: 0, border: 0,}}
+                sx={{ borderRadius: 0, border: 0 }}
               >
                 <Grid xs={12} flex={1}>
-                    <SearchHeader />
+                  <SearchHeader />
                 </Grid>
                 {loading && (
                   <Box>
@@ -315,14 +316,18 @@ const SearchApp = (props: SearchAppPropType) => {
                   id="search-results-container"
                 >
                   <Box>
-
-                    {processes && Object.keys(processes).length !== 0 
-                    ? (
+                    {processes && Object.keys(processes).length !== 0 ? (
                       <DisplayProcesses processes={processes} />
                     ) : (
-                      <Box bgcolor={"#FAFAFA"} minHeight={500}  paddingLeft={1} paddingRight={1}><SearchTips /></Box>
-                    )
-                    }
+                      <Box
+                        bgcolor={"#FAFAFA"}
+                        minHeight={500}
+                        paddingLeft={1}
+                        paddingRight={1}
+                      >
+                        <SearchTips />
+                      </Box>
+                    )}
                   </Box>
                 </Box>
               </Box>
@@ -361,27 +366,13 @@ export const DisplayProcesses = (props) => {
     //setPage(newPage);
     updatePaginationStateValues("page", newPage);
     //    paginateResults(results,newPage,limit)
-  }
+  };
   const classes = useTheme<Theme>();
   return (
     <Paper
-      elevation={0}
+      elevation={1}
       //style={{ border: "1px solid #F0F0F0"}}
     >
-      <TablePagination
-        rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
-        onChange={(evt) => onPaginationChange(evt)}
-        //count={results.length} [TODO] Need to get count from the server
-        count={Object.keys(processes).length}
-        rowsPerPage={rowsPerPage} //{limit}
-        page={page}
-        onPageChange={(evt, page) => handleChangePage(evt, page)}
-        onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
-        showFirstButton={true}
-        showLastButton={true}
-        color="primary"
-        component={`div`}
-      />
       <Box
         id="search-process-root"
         bgcolor={"#F8F8F8"}
@@ -389,14 +380,32 @@ export const DisplayProcesses = (props) => {
         paddingRight={1}
         padding={1}
       >
-        <Typography margin={0.5} variant="h4" gutterBottom>
-                  {Object.keys(processes).length} Processes Found
-                </Typography>
+        <Grid container flex={1}>
+        <Grid flex={1} xs={3}>
+          <Typography margin={0.5} variant="h4" gutterBottom>
+            {Object.keys(processes).length} Processes Found
+          </Typography>
+        </Grid>
+        <Grid flex={1} xs={9}>
+          <TablePagination
+            rowsPerPageOptions={[1, 5, 10, 20, 25, 100]}
+            onChange={(evt) => onPaginationChange(evt)}
+            //count={results.length} [TODO] Need to get count from the server
+            count={Object.keys(processes).length}
+            rowsPerPage={rowsPerPage} //{limit}
+            page={page}
+            onPageChange={(evt, page) => handleChangePage(evt, page)}
+            onRowsPerPageChange={(evt) => handleChangeRowsPerPage(evt)}
+            showFirstButton={true}
+            showLastButton={true}
+            color="primary"
+            component={`div`}
+          />
+        </Grid>
+        </Grid>
         {processes &&
           Object.keys(processes).map((key, index) => (
-            <div key={`${processes[key].processId}`} style={{
-            }}>
-              
+            <div key={`${processes[key].processId}`} style={{}}>
               <Paper
                 elevation={2}
                 style={{
@@ -405,25 +414,34 @@ export const DisplayProcesses = (props) => {
                   marginBottom: 20,
                 }}
               >
-                <Typography padding={1} textAlign="center" color={"#3373F7"} fontSize="1.1rem" >
-                {processes[key].results[0].doc.title}
-              </Typography>
-                {processes[key].results.map((result,idx) => (
-                  // [TODO] We should be able to build a unique key for each result without using the index 
+                <Typography
+                  padding={1}
+                  textAlign="center"
+                  color={"#3373F7"}
+                  fontSize="1.1rem"
+                >
+                  {processes[key].results[0].doc.title}
+                </Typography>
+                <Box borderBottom={1} borderColor={"#BABBBB"}>
+                  <SearchProcessCards process={processes[key]} />
+                </Box>
+                {processes[key].results.map((result, idx) => (
+                  // [TODO] We should be able to build a unique key for each result without using the index
                   <>
-                    {result.doc &&
-                    (
-                    <>
-                      <SearchProcessCards process={processes[key]} />
-                      <span key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType }-${idx}`}>
-                        {" "}
-                        {result && result.doc && (
-                        <SearchResult result={result} />
-                        )}
-                      </span>
-                    </>
-                    )
-                    }
+                    {result.doc && (
+                      <>
+                        <Box
+                          borderBottom={1}
+                          borderColor={"#BABBBB"}
+                          key={`${result.doc.id}-${result.doc.decision}-${result.doc.documentType}-${idx}`}
+                        >
+                          {" "}
+                          {result && result.doc && (
+                            <SearchResult result={result} />
+                          )}
+                        </Box>
+                      </>
+                    )}
                   </>
                 ))}
               </Paper>
