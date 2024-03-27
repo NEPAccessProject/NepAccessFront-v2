@@ -76,34 +76,59 @@ NoiDate
   })
 
   test("Retrives the correct result to use for a process",()=>{
-    const resultsToUse = results.filter((result)=>{
-      if(!result.doc) return false;
-      return result.doc.documentType.includes('Final');
-    });
-    console.log('#of Results to use',resultsToUse.length, 'From # of Results',results.length)
-    expect(resultsToUse).toBeDefined();
-    expect(resultsToUse[0].doc.documentType).toBe('Final');
-  })
+    // const processMetaData: Record<number, ProcessObjectType> = {
+    // }
+    const processes = groupResultsByProcessId(results);   
+    let records:Record<number,SearchResultType[]>;
+
+    Object.keys(processes).forEach((processId)=>{
+      console.log('PROCESS WITH PROCESS ID', processId)
+        const processObj:ProcessObjectType = processes[processId];
+        //console.log('Process Object', processObj)
+        //const processResults:SearchResultType[] = [];
+        let metaRecords: Record<number, ProcessObjectType>;
+
+        const processResults:SearchResultType[] = processObj.results.filter((result:SearchResultType)=>{
+          //console.log('RESULT DOCUMENT TYPE',result.doc);
+            if(result?.doc.documentType && result.doc.documentType.includes('Final')){
+                return result;
+            }
+            if(result?.doc.documentType && result.doc.documentType.includes('Draft')){
+              return result;
+            }
+            return result;   
+        }) || [];
+          console.log(`# of PROCESS RESULTS for Process ID ${processId}`, processResults.length);
+            //console.log('PROCESS OBJECT', processObj);
+            processObj.results = processResults;
+
+                console.log(`ADDING PROCESS OBJECT TO PROCESS METADATA with TYPE ${typeof processObj}`, processObj);
+                if(processObj !== undefined && processObj !== null){
+                 
+                  metaRecords[processId] = processObj || {};
+                }
+                records[processId] = processResults;
+          console.log('RECORDS for Process ID', metaRecords);
+          expect(metaRecords).toBeDefined();
+          expect(Object.keys(metaRecords).length).toBeGreaterThan(0);
+      })
+    })
   
 
   test("Converts ; delinated strings to array for a documents", () => {
-    const resultsToUse:SearchResultType[] = results.slice(0, 1) as ResponseSearchResultsType[]
-    resultsToUse.map((result) => {
+    results.map((result,idx) => {
       if(result.doc){
-        const newDoc = handleDocumentTypeConversion(result.doc);
+        const doc = result.doc;
+        const decision = doc.decision;
+        const newDoc = handleDocumentTypeConversion(doc);
 
         console.log(`\r\n --- DOC ${idx}:`, newDoc);
 
         expect(typeof(newDoc.decision)).toBe("object");
         expect(typeof(newDoc.documentType)).toBe("object");
         expect(typeof(newDoc.action)).toBe("object");
-        result.doc  = newDoc;
+        //result.doc  = newDoc as DocumentType;
       }
-    })
-
-    resultsToUse.map((result,idx)=>{
-      //convert the docs which are of  ResultDocumentType and convert it to DocumentType so we can split the strings
-      console.log(`\r\n ---- RESULT ${idx} DOC`,result.doc);
     })
     
   });

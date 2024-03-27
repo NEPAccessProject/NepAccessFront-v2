@@ -109,10 +109,8 @@ const SearchResult = (props: SearchResultPropsType) => {
     title,
     agency,
     status,
-    registerDate,
     action,
-    finalNoa,
-    finalNoaDate,
+    draftNoa,
   } = doc;
   const onShowPreviewClicked = (evt: React.MouseEvent<HTMLButtonElement>) => {};
   const onDownloadClicked = (evt: React.MouseEvent<HTMLButtonElement>) => {};
@@ -131,9 +129,12 @@ const SearchResult = (props: SearchResultPropsType) => {
     alignSelf: "center",
     BorderLeft:1,
     BorderRight:1,
+    borderRadious:1,
     //border: "1px solid #ddd",
   };
-  const dateToUse = getDatesByDocumentType(doc.decision[0],doc);
+  //const dateToUse = getDatesByDocumentType(doc.decision[0],doc);
+const {registerDate,noiDate,finalNoa,finalNoaDate,firstRodDate} = doc;
+const dateToUse =  noiDate || firstRodDate || finalNoa || draftNoa || doc.registerDate;
   console.log(`//useEffect ~ dateToUse:`, dateToUse);
   return (
     <Grid margin={1} padding={1} {...gridContainerProps}>
@@ -145,10 +146,17 @@ const SearchResult = (props: SearchResultPropsType) => {
 //              borderRadius={1}
 //              border="1px solid #D8D9D9"
             >
+              
               <Box>
                 <Typography padding={0.5} fontSize={14} textAlign={"center"}>
                   <>
-                    {dateToUse}                  
+                  <Box fontWeight={700} fontSize={14} textAlign={"center"}>
+                    {/* {finalNoa && finalNoaDate.toDateString()} */}
+                  </Box>
+                    {/* <Box>{getDatesByDocumentType(doc.documentType.join(" ,"),doc)}</Box> */}
+                    {/* <Box>{finalNoa && finalNoa.toDateString()}</Box>
+                    <Box>{doc.draftNoa && doc.draftNoa.toDateString()}</Box> */}
+                    {dateToUse && typeof(dateToUse) === "object" ? dateToUse.toDateString() : dateToUse}
                    
                   </>
                 </Typography>
@@ -159,7 +167,7 @@ const SearchResult = (props: SearchResultPropsType) => {
             {result.doc.documentType}
           </Grid>
           <Grid xs={1} {...gridItemProps} borderRight={1} borderColor={'#ccc'}  className="document-title-column">
-            {result.doc.decision}
+            {result.doc.decision }
           </Grid>
           <Grid xs={2} {...gridItemProps} borderRight={1} borderColor={'#ccc'} >
             <Button>
@@ -228,7 +236,7 @@ export function ShowHighlights(props: highlightProps) {
       <Box id={`search-result-highlight-container-${doc.id}`}>
         {highlights.map((highlight, i) => (
           <>
-            {i < 1 && (
+            {i < 1 || showMoreSnippets && (
               <>
                 <Box
                   key={`${result.doc.id}-box`}
@@ -236,7 +244,7 @@ export function ShowHighlights(props: highlightProps) {
                   fontSize="0.75rem"
                   className="document-highlight"
                 >
-                  <Box key={result.doc.id}>
+                  <Box key={result.doc.id} border={1}>
                     {highlight.substring(
                       0,
                       highlight.length < 255 ? highlight.length : 255
@@ -250,14 +258,25 @@ export function ShowHighlights(props: highlightProps) {
                   fontSize="0.75rem"
                   className="document-highlight"
                 >
-                  {highlights.length > 1 && (
+                  {!showMoreSnippets && (
                     <Button
                       onClick={(evt) => setShowMoreSnippets(!showMoreSnippets)}
                       variant="text"
                     >
                       <Typography fontSize={12} color={"#3373F7"}>
                         {" "}
-                        Show More Snippets
+                        Show More Snippets...
+                      </Typography>
+                    </Button>
+                  )}
+                   {showMoreSnippets && (
+                    <Button
+                      onClick={(evt) => setShowMoreSnippets(!showMoreSnippets)}
+                      variant="text"
+                    >
+                      <Typography fontSize={12} color={"#3373F7"}>
+                        {" "}
+                        Hide Snippets...
                       </Typography>
                     </Button>
                   )}

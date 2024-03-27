@@ -167,11 +167,9 @@ const SearchProcessCards = (props) => {
 
   const itemCardProps = {
     display: "flex",
-
-    margin: 0.5,
-    padding: 0.5,
-    fontSize: "0.8rem",
-    elevation: 1,
+   margin: 0.5,
+   padding: 1,
+    fontSize: ".8rem",
     backgroundColor: "#D1E3E3",
     border: "1px solid #eee",
     borderRadius: 1,
@@ -179,54 +177,123 @@ const SearchProcessCards = (props) => {
   return (
     <>
       <Grid
-        style={cardStyle}
+        //flex={1}
+        container
+        display={'flex'}
       >
-        {/* {resultToUse &&
-          resultToUse.length &&
-          resultToUse.map((result) => <>{JSON.stringify(result)}</>)} */}
-        {keyToLabelMap.map((entry) => (
-          <>
-            {doc[`${entry.key}`] && typeof doc[`${entry.key}`] === "string" && (
-              <Grid
-              bgcolor={"#D1E3E3"}
-                {...itemCardProps}
-              >
-                    <>
-                    {entry.label} : {doc[`${entry.key}`]}
-                    </>
-              </Grid>
-            )
-        }
-            {doc[`${entry.key}`] && typeof doc[`${entry.key}`] !== "string" &&  (
-              <Grid
-                {...itemCardProps}
-              >
-                    <>
-                    {entry.label} : {JSON.stringify(doc[`${entry.key}`])}
-                    </>
-              </Grid>
-            )}
-            
-            {/* {doc[`${entry.key}`] && typeof doc[`${entry.key}`] === "date" && (
-              <Grid
-                {...itemCardProps}
-              >
-                    <>
-                    {entry.label} : {JSON.stringify(doc[`${entry.key}`])}
-                    </>
-              </Grid>
-            )} */}
-            {/* {doc[`${entry.key}`] && typeof doc[`${entry.key}`] === "object" && (
-              <Grid
-                {...itemCardProps}
-              >
-                    <>
-                    {entry.label} : {JSON.stringify(doc[`${entry.key}`].joins(", "))}
-                    </>
-              </Grid>
-            )} */}
-          </>
-        ))}
+        {action && (
+          <Grid
+            {...itemCardProps}
+          >
+            <b>Action: </b>&nbsp;{action}
+          </Grid>
+        )}
+    {agency && (
+          <Grid
+            {...itemCardProps}
+          >
+            <b>Agency: </b>&nbsp;{agency}
+          </Grid>
+        )}
+    {commentDate && (
+
+      <Grid
+        {...itemCardProps}
+      >
+      <b>Comment Date: </b>&nbsp;{commentDate.toDateString()}
+      </Grid>
+    )}
+    {/* {commentsFilename && (
+      <Grid
+        {...itemCardProps}
+      >
+        {commentsFilename}
+      </Grid>
+    )} */}
+    {cooperatingAgency && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Copperating Agency:</b>&nbsp;{cooperatingAgency}
+      </Grid>
+    )}
+    {county && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>County:</b>&nbsp;{county}
+      </Grid>
+    )}
+    {decision && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Decision:&nbsp;</b>{decision.join(", ")}
+      </Grid>
+    )}
+    {department && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Department: </b>&nbsp;{department}
+      </Grid>
+    )}
+    {documentType && (
+      <Grid
+        {...itemCardProps}
+      >
+       <b>Document Type: </b> &nbsp;{documentType.join(", ")}
+      </Grid>
+    )}
+    {draftNoa && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Draft NOA:</b>&nbsp;{JSON.stringify(draftNoa)}
+      </Grid>
+    )}
+    {finalNoa && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Final NOA: </b>&nbsp;{JSON.stringify(finalNoa)}
+      </Grid>
+    )}
+    {finalNoaDate && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Final NOA Date: </b>&nbsp;{JSON.stringify(finalNoaDate)}
+      </Grid>
+    )}
+    {noiDate && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>NOI Date: </b>&nbsp;{JSON.stringify(noiDate)}
+      </Grid>
+    )}
+    {processId && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Process ID: </b>&nbsp;{processId}
+      </Grid>
+    )}
+    {state && ( 
+      <Grid
+        {...itemCardProps}
+      >
+        <b>State(s): </b>&nbsp;{state}
+      </Grid>
+    )}
+    {status && (
+      <Grid
+        {...itemCardProps}
+      >
+        <b>Status: </b>&nbsp;{status}
+      </Grid>
+    )}
       </Grid>
     </>
   );
